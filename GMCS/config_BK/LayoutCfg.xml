@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="GBK"?>
+<HostsLayoutInfo>
+    <Position id="00" name="A营">
+        <Group id="0000" name="A营04步战车一队">
+            <Model id="000000" name="A_04_1_1模拟器">
+                <Host type="中转主机" id="00000000" name="中转主机" aIP="172.15.0.222" cIP="172.20.0.43" mac="8CDCD421736C" sIP="172.15.0.222"/>
+                <Host type="普通主机" id="00000001" name="普通主机" aIP="127.0.0.1" cIP="172.20.0.101" mac="AABBCCDDEEFF" sIP="172.15.0.222"/>
+                <Host type="普通主机" id="00000002" name="普通主机" aIP="172.15.0.21" cIP="172.20.0.50" mac="4439C4586244" sIP="172.15.0.222"/>
+            </Model>
+        </Group>
+    </Position>
+</HostsLayoutInfo>

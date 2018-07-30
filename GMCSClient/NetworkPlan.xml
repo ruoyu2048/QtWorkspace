@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="GBK"?>
+<NetworkPlanInfo>
+    <ZHGK>
+        <IP>172.15.0.15</IP>
+    </ZHGK>
+    <MNZH>
+        <IP>172.15.0.0</IP>
+    </MNZH>
+    <FZDK>
+        <IP>172.16.0.0</IP>
+        <IP>172.17.0.0</IP>
+        <IP>172.18.0.0</IP>
+        <IP>172.19.0.0</IP>
+        <IP>172.20.0.0</IP>
+    </FZDK>
+</NetworkPlanInfo>

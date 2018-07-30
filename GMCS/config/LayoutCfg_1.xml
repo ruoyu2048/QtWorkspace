@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="GBK"?>
+<HostsLayoutInfo>
+    <Position id="00" name="A营">
+        <Group id="0000" name="A营04步战车一队">
+            <Model id="000000" name="A_04_1_1模拟器">
+                <Host id="00000000" name="接口机" mac="AABBCCDDEEFF" cIP="172.15.0.222" aIP="172.20.0.43" sIP="172.15.0.221" type="接口电台"/>
+                <Host id="00000001" name="子网机" mac="AABBCCDDEEFF" cIP="172.15.0.42" aIP="172.20.0.50" sIP="172.15.0.221" type="电台"/>
+            </Model>
+        </Group>
+    </Position>
+</HostsLayoutInfo>

@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icon/2_1red.png</file>
+        <file>icon/2_2yellow.png</file>
+        <file>icon/2_3green.png</file>
+        <file>icon/MainFrame.png</file>
+        <file>icon/quit.png</file>
+        <file>icon/warning.png</file>
+        <file>icon/3_1general.ico</file>
+        <file>icon/3_2exception.ico</file>
+        <file>icon/3_3error.ico</file>
+        <file>icon/1_1PowerOn.png</file>
+        <file>icon/1_2PowerOff.png</file>
+        <file>icon/1_3Restart.png</file>
+        <file>icon/1_4Refresh.png</file>
+        <file>icon/1_5Search.png</file>
+    </qresource>
+</RCC>

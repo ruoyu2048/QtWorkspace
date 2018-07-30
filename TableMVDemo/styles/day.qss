@@ -1,0 +1,104 @@
+QMainWindow {
+    background-color:#c5e0ee;
+    color:white;
+    border:0px;
+}
+/********QMenuBar*********/
+QMenuBar
+{
+    background-color:#28b4e9;
+    color:white;
+}
+
+QMenuBar::item
+{
+    background: transparent;
+    height:100px;
+    width:120px;
+}
+
+QMenuBar::item:selected
+{
+    background: transparent;
+    border: 1px solid #76797C;
+}
+
+QMenuBar::item:pressed
+{
+    border: 1px solid #76797C;
+    background-color: #3daee9;
+    color: white;
+    margin-bottom:-1px;
+    padding-bottom:1px;
+}
+
+/********QDockWidget*********/
+QDockWidget
+{
+	background:#a6d3e8;
+	color:#333333;
+}
+/********QWidget*********/
+QWidget
+{
+}
+/********QPushButton*********/
+QPushButton
+{
+	background:#f3f8fb;
+	color:#999999;
+	font:14px solid;
+	border-radius:5px;
+	border:1px solid #6e7378;
+	min-height:25px;
+}
+QPushButton:hover
+{
+	background:green;
+}
+/********QDialog*********/
+QDialog
+{
+	background:#c5e0ee;
+	color:#333333;
+}
+
+
+/********QComboBox*********/
+QComboBox
+{
+	background:#f3f8fb;
+	color:#333333;
+	border:none;
+	min-height:25px;
+}
+/********QLabel*********/
+QLabel
+{
+	background:#c5e0ee;
+	color:#333333;
+}
+
+/********QRadioButton*********/
+QRadioButton {
+    background-color: transparent;
+    color:#333333;
+    
+}
+
+/********QCheckBox*********/
+QCheckBox{
+    background-color: transparent;
+    color:#333333;
+    
+}
+/********QlineEdit*********/
+QlineEdit
+{
+	background:#f3f8fb;
+	color:#333333;
+	border:1px solid #1d2e43;
+}
+
+
+

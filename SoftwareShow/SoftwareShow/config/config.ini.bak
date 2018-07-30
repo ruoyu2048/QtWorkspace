@@ -1,0 +1,17 @@
+;包括服务器IP、数据库名称、用户名、密码
+[SQL]
+SERVER=172.20.0.77
+DATABASE=shenyang
+USER=sa
+PWD=123456
+[DS]
+SHEET1=SimulatorCodeTable
+SHEET2=SimNodePCInfoTable
+;包括交换机名称、本机IP、路由键和消息队列名
+[XXZX]
+exName=ZHGK.Exchange
+IP=172.20.1.96
+QueName=ZHGK.Queue
+rtBindKey=ZHGK.Key.Server
+rtDesKey=ZHGK.Key.Client
+URL=amqp://vmt:vmt@172.20.1.254:5672/

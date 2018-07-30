@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FileTransDemo</class>
+ <widget class="QDialog" name="FileTransDemo">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>506</width>
+    <height>271</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>FileTransDemo</string>
+  </property>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>487</width>
+     <height>252</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="laLocalPort">
+      <property name="text">
+       <string>本地端口：</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="leLocalPort"/>
+    </item>
+    <item row="0" column="2">
+     <widget class="QLabel" name="laDstPort">
+      <property name="text">
+       <string>目的端口：</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QLineEdit" name="leDstPort"/>
+    </item>
+    <item row="0" column="4">
+     <widget class="QPushButton" name="BtnInit">
+      <property name="text">
+       <string>初始化</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="5">
+     <widget class="QTextEdit" name="teMsg"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="laDstTCPPort">
+      <property name="text">
+       <string>目的端口：</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="leDstTCPPort"/>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLabel" name="laDstIP">
+      <property name="text">
+       <string>目的端口：</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QLineEdit" name="leDstIP"/>
+    </item>
+    <item row="2" column="4">
+     <widget class="QPushButton" name="BtnSend">
+      <property name="text">
+       <string>发送文件</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

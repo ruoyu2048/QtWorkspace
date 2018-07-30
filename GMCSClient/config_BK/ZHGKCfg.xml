@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="GBK"?>
+<HostInfo>
+    <Host cIP="172.15.0.222" sIP="172.15.0.221" type="2"/>
+    <Host cIP="172.20.0.43" sIP="172.15.0.221" type="2"/>
+    <Host cIP="172.20.0.101" sIP="172.20.0.43" type="1"/>
+</HostInfo>
