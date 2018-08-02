@@ -63,7 +63,11 @@ private:
 private:
     QStringList m_raderList;//所有雷达配置存储文件夹存储路径列表
 signals:
-
+    void createRaderItem(QString strRaderName);
+    void addRaderSubItem(QString strSubName);
+    void addClassItem(QString strClassName);
+    void addItem(QString strName);
+    void addData(QString strName,QString dataType,QString dataValue);
 public slots:
 };
 

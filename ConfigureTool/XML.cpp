@@ -102,6 +102,7 @@ int XML::readEquipmentList(QString strPath,QSet<QString> &readyLoadFiles)
     if( "RaderEquipment"==root.tagName() && "true"==root.attribute("enable") )
     {
         qDebug()<<"Device:"<<root.attribute("name");
+        emit createRaderItem(root.attribute("name"));
         QDomNode node = root.firstChild();
         while(!node.isNull()) {
            QDomElement element = node.toElement(); // try to convert the node to an element.
@@ -178,44 +179,52 @@ int XML::readEquipmentInfo(QString strPath)
 
     //Root
     QDomElement root = doc.documentElement();
-    qDebug()<<root.attribute("name");
-    //Second Level
-    QDomNode secNode = root.firstChild();
-    while(!secNode.isNull()) {
-       QDomElement eleSec = secNode.toElement(); // try to convert the node to an element.
-       if(!eleSec.isNull()) {
-           if( "Class" == eleSec.tagName() && "true" == eleSec.attribute("enable")){
-              QString strClassName = eleSec.attribute("name");
-              qDebug()<<"\t"<<strClassName;
-              //Third Level
-              QDomNode thirNode = eleSec.firstChild();
-              while (!thirNode.isNull()) {
-                 QDomElement eleThir = thirNode.toElement(); // try to convert the node to an element.
-                 if(!eleThir.isNull()) {
-                     if( "Item" == eleThir.tagName() && "true" == eleThir.attribute("enable")){
-                        QString strItemName = eleThir.attribute("name");
-                        qDebug()<<"\t\t"<<strItemName;
-                        //Forth Level
-                        QDomNode forthNode = eleThir.firstChild();
-                        while (!forthNode.isNull()) {
-                           QDomElement eleForth = forthNode.toElement(); // try to convert the node to an element.
-                           if(!eleForth.isNull()) {
-                               if( "Attribute" == eleForth.tagName() && "true" == eleForth.attribute("enable")){
-                                  QString strAttrName = eleForth.attribute("name");
-                                  QString strDataType = eleForth.attribute("dataType");
-                                  QString strDataValue = eleForth.attribute("value");
-                                  qDebug()<<"\t\t\t"<<strAttrName<<strDataType<<strDataValue;
+    if( !root.isNull() )
+    {
+        qDebug()<<root.attribute("name");
+        emit addRaderSubItem(root.attribute("name"));
+        //Second Level
+        QDomNode secNode = root.firstChild();
+        while(!secNode.isNull()) {
+           QDomElement eleSec = secNode.toElement(); // try to convert the node to an element.
+           if(!eleSec.isNull()) {
+               if( "Class" == eleSec.tagName() && "true" == eleSec.attribute("enable")){
+                  QString strClassName = eleSec.attribute("name");
+                  qDebug()<<"\t"<<strClassName;
+                  emit addClassItem(strClassName);
+
+                  //Third Level
+                  QDomNode thirNode = eleSec.firstChild();
+                  while (!thirNode.isNull()) {
+                     QDomElement eleThir = thirNode.toElement(); // try to convert the node to an element.
+                     if(!eleThir.isNull()) {
+                         if( "Item" == eleThir.tagName() && "true" == eleThir.attribute("enable")){
+                            QString strItemName = eleThir.attribute("name");
+                            qDebug()<<"\t\t"<<strItemName;
+                            emit addItem(strItemName);
+                            //Forth Level
+                            QDomNode forthNode = eleThir.firstChild();
+                            while (!forthNode.isNull()) {
+                               QDomElement eleForth = forthNode.toElement(); // try to convert the node to an element.
+                               if(!eleForth.isNull()) {
+                                   if( "Attribute" == eleForth.tagName() && "true" == eleForth.attribute("enable")){
+                                      QString strAttrName = eleForth.attribute("name");
+                                      QString strDataType = eleForth.attribute("dataType");
+                                      QString strDataValue = eleForth.attribute("value");
+                                      qDebug()<<"\t\t\t"<<strAttrName<<strDataType<<strDataValue;
+                                      emit addData(strAttrName,strDataType,strDataValue);
+                                   }
                                }
-                           }
-                           forthNode = forthNode.nextSibling();
-                        }
+                               forthNode = forthNode.nextSibling();
+                            }
+                         }
                      }
-                 }
-                 thirNode = thirNode.nextSibling();
+                     thirNode = thirNode.nextSibling();
+                  }
               }
-          }
-       }
-       secNode = secNode.nextSibling();
+           }
+           secNode = secNode.nextSibling();
+        }
     }
     return 0;
 }
