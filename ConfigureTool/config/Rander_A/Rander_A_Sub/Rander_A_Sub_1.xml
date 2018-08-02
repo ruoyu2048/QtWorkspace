@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--分机设备信息配置结构说明-->
+<!--
+<分机设备 设备名称>
+	<分类 是否启用 类型 名称>
+		<项目 是否启用 名称>
+		<项目属性 是否启用 名称 数据类型 数据默认值/>
+		</项目>
+	</分类>
+</分级设备>
+-->
+<SubEquipment name="设备1">
+	<Class enable="true" type="monitor" name="监视">
+		<Item enable="true" name="老板1">
+			<Attribute enable="true" name="test" dataType="string" value="test"/>
+			<Attribute enable="true" name="test" dataType="string" value="test"/>
+			<Attribute enable="true" name="test" dataType="string" value="test"/>
+		</Item>
+		<Item name="老板2" enable="true">
+			<Attribute enable="true" name="test" dataType="string" value="test"/>
+			<Attribute enable="true" name="test" dataType="string" value="test"/>
+			<Attribute enable="true" name="test" dataType="string" value="test"/>	
+		</Item>
+	</Class>
+	<Class enable="true" type="control" name="控制">
+		<Item enable="true" name="老板1">
+			<Attribute enable="true" name="test" dataType="string" value="test"/>
+			<Attribute enable="true" name="test" dataType="string" value="test"/>
+			<Attribute enable="true" name="test" dataType="string" value="test"/>
+		</Item>
+		<Item name="老板2" enable="true">
+			<Attribute enable="true" name="test" dataType="string" value="test"/>
+			<Attribute enable="true" name="test" dataType="string" value="test"/>
+			<Attribute enable="true" name="test" dataType="string" value="test"/>	
+		</Item>
+	</Class>
+</SubEquipment>

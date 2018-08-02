@@ -5,6 +5,7 @@
 #include <QTabWidget>
 #include <QTreeWidget>
 #include <QGridLayout>
+#include "XML.h"
 
 class MainWindow : public QWidget
 {
@@ -18,7 +19,7 @@ public:
 private:
     QGridLayout* m_pGLayout;
     QTabWidget* m_pTabMain;
-
+    XML*        m_pXML;
 signals:
 
 public slots:
