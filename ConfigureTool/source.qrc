@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>config/Rander_A/Rander_A_Sub/Rander_A_Sub_1.xml</file>
+        <file>config/Rander_A/Rander_A_Sub/Rander_A_Sub_2.xml</file>
+        <file>config/Rander_A/Rander_A_Sub/Rander_A_Sub_3.xml</file>
+        <file>config/Rander_A/Rander_A.xml</file>
+        <file>config/Rander_B/Rander_B_Sub/Rander_B_Sub_1.xml</file>
+        <file>config/Rander_B/Rander_B_Sub/Rander_B_Sub_2.xml</file>
+        <file>config/Rander_B/Rander_B_Sub/Rander_B_Sub_3.xml</file>
+        <file>config/Rander_B/Rander_B.xml</file>
+    </qresource>
+</RCC>
