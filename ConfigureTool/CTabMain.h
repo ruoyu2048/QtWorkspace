@@ -6,6 +6,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include "XML.h"
+#include "CtrlDelegate.h"
 
 class CTabMain : public QTabWidget
 {
@@ -16,6 +17,7 @@ public:
 
 private:
     XML*                m_pXML;
+    CtrlDelegate*       m_pCtrlDelegate;
     QPushButton*        m_pBtnSaveSet;//保存设置
     QTabWidget*         m_pTabMain;
     QTreeWidget*        m_pCurTree;

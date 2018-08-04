@@ -18,15 +18,21 @@ void CTabMain::InitTabMain()
     connect(m_pXML,SIGNAL(addData(QString,QString,QString)),this,SLOT(addData(QString,QString,QString)));
     connect(this,SIGNAL(currentChanged(int)),this,SLOT(changeCurTree(int)));
 
+    m_pCtrlDelegate = new CtrlDelegate(this);
+    m_pCtrlDelegate->setCtrlType(LineEdit);
+
     if(m_pXML->getAllRaderConfigDirPath(":/config")){
         m_pXML->parseConfigurationFiles();
     }
+
 }
 
 void CTabMain::createRaderItem(QString strRaderName)
 {
     m_pCurTree = new QTreeWidget(this);
     m_pCurTree->setColumnCount(2);
+    //m_pCurTree->setItemDelegateForColumn(1,m_pCtrlDelegate);
+    m_pCurTree->setItemDelegate(m_pCtrlDelegate);
     m_pCurTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     m_pCurTree->setHeaderHidden(true);
     connect(m_pCurTree,SIGNAL(itemClicked(QTreeWidgetItem*,int)),this,SLOT(treeCellClicked(QTreeWidgetItem*,int)));
@@ -70,8 +76,8 @@ void CTabMain::changeCurTree(int nIndex)
 
 void CTabMain::treeCellClicked(QTreeWidgetItem* pTreeItem,int nCol)
 {
-    qDebug()<<pTreeItem->text(nCol);
-    if( nCol >0 )
-        m_pCurTree->setItemWidget(pTreeItem,nCol,new QPushButton("AAAA"));
+//    qDebug()<<pTreeItem->text(nCol);
+//    if( nCol >0 )
+//        m_pCurTree->setItemWidget(pTreeItem,nCol,new QPushButton("AAAA"));
 }
 
