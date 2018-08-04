@@ -5,38 +5,26 @@
 #include <QTabWidget>
 #include <QTreeWidget>
 #include <QGridLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
 #include <QList>
-#include "XML.h"
+#include "CTabMain.h"
 
 class MainWindow : public QWidget
 {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-
     void InitMainWindow();
-    void InitMainTab();
 
 private:
-    XML*                m_pXML;
     QGridLayout*        m_pGLayout;
-    QTabWidget*         m_pTabMain;
-    QTreeWidget*        m_pCurTree;
-    QTreeWidgetItem*    m_pCurSubItem;
-    QTreeWidgetItem*    m_pCurClass;
-    QTreeWidgetItem*    m_pCurItem;
-    QList<QTreeWidget*> m_treeWidgetList;
-
+    QHBoxLayout*        m_pHLayout;
+    QPushButton*        m_pBtnSaveSet;//保存设置
+    CTabMain*           m_pTabMain;
 signals:
 
 public slots:
-
-private slots:
-    void createRaderItem(QString strRaderName);
-    void addRaderSubItem(QString strSubName);
-    void addClassItem(QString strClassName);
-    void addItem(QString strName);
-    void addData(QString strName,QString dataType,QString dataValue);
 };
 
 #endif // MAINWINDOW_H

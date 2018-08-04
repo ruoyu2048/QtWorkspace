@@ -11,27 +11,27 @@
 -->
 <SubEquipment name="设备3">
 	<Class enable="true" type="monitor" name="监视">
-		<Item enable="true" name="老板1">
-			<Attribute enable="true" name="test" dataType="string" value="test"/>
-			<Attribute enable="true" name="test" dataType="string" value="test"/>
-			<Attribute enable="true" name="test" dataType="string" value="test"/>
+		<Item enable="true" name="采集板1">
+			<Attribute enable="true" name="属性" dataType="string" value="100"/>
+			<Attribute enable="true" name="属性" dataType="string" value="100"/>
+			<Attribute enable="true" name="属性" dataType="string" value="100"/>
 		</Item>
-		<Item name="老板2" enable="true">
-			<Attribute enable="true" name="test" dataType="string" value="test"/>
-			<Attribute enable="true" name="test" dataType="string" value="test"/>
-			<Attribute enable="true" name="test" dataType="string" value="test"/>	
+		<Item enable="true" name="采集板2">
+			<Attribute enable="true" name="属性" dataType="string" value="100"/>
+			<Attribute enable="true" name="属性" dataType="string" value="100"/>
+			<Attribute enable="true" name="属性" dataType="string" value="100"/>
 		</Item>
 	</Class>
 	<Class enable="true" type="control" name="控制">
-		<Item enable="true" name="老板1">
-			<Attribute enable="true" name="test" dataType="string" value="test"/>
-			<Attribute enable="true" name="test" dataType="string" value="test"/>
-			<Attribute enable="true" name="test" dataType="string" value="test"/>
+		<Item enable="true" name="组建1">
+			<Attribute enable="true" name="属性" dataType="string" value="100"/>
+			<Attribute enable="true" name="属性" dataType="string" value="100"/>
+			<Attribute enable="true" name="属性" dataType="string" value="100"/>
 		</Item>
-		<Item name="老板2" enable="true">
-			<Attribute enable="true" name="test" dataType="string" value="test"/>
-			<Attribute enable="true" name="test" dataType="string" value="test"/>
-			<Attribute enable="true" name="test" dataType="string" value="test"/>	
+		<Item enable="true" name="组建2">
+			<Attribute enable="true" name="属性" dataType="string" value="100"/>
+			<Attribute enable="true" name="属性" dataType="string" value="100"/>
+			<Attribute enable="true" name="属性" dataType="string" value="100"/>
 		</Item>
 	</Class>
 </SubEquipment>

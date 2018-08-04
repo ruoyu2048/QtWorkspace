@@ -11,7 +11,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     MainWindow.cpp \
-    XML.cpp
+    XML.cpp \
+    CTabMain.cpp \
+    CtrlDelegate.h.cpp
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings
@@ -26,4 +28,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 HEADERS += \
     MainWindow.h \
-    XML.h
+    XML.h \
+    CTabMain.h \
+    CtrlDelegate.h
+
+RESOURCES += \
+    source.qrc
