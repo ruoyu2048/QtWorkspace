@@ -2,4 +2,6 @@
 <!--分机设备列表-->
 <RaderEquipment enable="true" name="测试1">
 	<SubEquipment enable="true" name="Rander_A_Sub_1"/>
+	<SubEquipment enable="true" name="Rander_A_Sub_2"/>
+	<SubEquipment enable="true" name="Rander_A_Sub_3"/>
 </RaderEquipment>

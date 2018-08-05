@@ -15,6 +15,8 @@ public:
     explicit CTabMain(QWidget *parent = nullptr);
     void InitTabMain();
 
+    void InitTab();
+
 private:
     XML*                m_pXML;
     CtrlDelegate*       m_pCtrlDelegate;
@@ -28,7 +30,7 @@ private:
 signals:
 
 public slots:
-
+    void saveConfigureInfo();
 private slots:
     void createRaderItem(QString strRaderName);
     void addRaderSubItem(QString strSubName);
@@ -36,6 +38,7 @@ private slots:
     void addItem(QString strName);
     void addData(QString strName,QString dataType,QString dataValue);
     void changeCurTree(int nIndex);
+    void itemClicked(QModelIndex modelIndex);
     void treeCellClicked(QTreeWidgetItem* pTreeItem,int nCol);
 };
 

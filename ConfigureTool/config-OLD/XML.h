@@ -2,7 +2,6 @@
 #define XML_H
 
 #include <QObject>
-#include "CTreeItem.h"
 
 class XML : public QObject
 {
@@ -60,9 +59,6 @@ private:
     *返回值：如果解析成功，则返回true，否则返回false
     ************************************************************************/
     int readEquipmentInfo(QString strPath);
-
-public:
-    QList<RaderInfo> m_raderInfoList;//雷达配置文件信息树
 
 private:
     QStringList m_raderList;//所有雷达配置存储文件夹存储路径列表
