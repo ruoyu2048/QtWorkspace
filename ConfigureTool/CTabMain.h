@@ -15,31 +15,21 @@ public:
     explicit CTabMain(QWidget *parent = nullptr);
     void InitTabMain();
 
-    void InitTab();
-
 private:
     XML*                m_pXML;
-    CtrlDelegate*       m_pCtrlDelegate;
     QPushButton*        m_pBtnSaveSet;//保存设置
     QTabWidget*         m_pTabMain;
     QTreeWidget*        m_pCurTree;
-    QTreeWidgetItem*    m_pCurSubItem;
-    QTreeWidgetItem*    m_pCurClass;
-    QTreeWidgetItem*    m_pCurItem;
     QList<QTreeWidget*> m_treeWidgetList;
+    QMap<QLineEdit*,QString> m_lineEditMap;
 signals:
 
 public slots:
     void saveConfigureInfo();
 private slots:
-    void createRaderItem(QString strRaderName);
-    void addRaderSubItem(QString strSubName);
-    void addClassItem(QString strClassName);
-    void addItem(QString strName);
-    void addData(QString strName,QString dataType,QString dataValue);
-    void changeCurTree(int nIndex);
+    void currentTabChanged(int index);
     void itemClicked(QModelIndex modelIndex);
-    void treeCellClicked(QTreeWidgetItem* pTreeItem,int nCol);
+    void lineTextEdited(QString strText);
 };
 
 #endif // CTABMAIN_H
