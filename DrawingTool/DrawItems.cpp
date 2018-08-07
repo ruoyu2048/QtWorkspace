@@ -50,31 +50,40 @@ void GraphicsItem::updateGeometry()
     const Handles::iterator hend =  m_handles.end();
     for (Handles::iterator it = m_handles.begin(); it != hend; ++it) {
         SizeHandleRect *hndl = *it;;
-        switch (hndl->Quadrant()) {
+        switch (hndl->dir()) {
+        //case SizeHandleRect::LeftTop:
         case LeftTop:
             hndl->move(geom.x() - w / 2, geom.y() - h / 2);
             break;
+        //case SizeHandleRect::Top:
         case Top:
             hndl->move(geom.x() + geom.width() / 2 - w / 2, geom.y() - h / 2);
             break;
+        //case SizeHandleRect::RightTop:
         case RightTop:
             hndl->move(geom.x() + geom.width() - w / 2, geom.y() - h / 2);
             break;
+        //case SizeHandleRect::Right:
         case Right:
             hndl->move(geom.x() + geom.width() - w / 2, geom.y() + geom.height() / 2 - h / 2);
             break;
+        //case SizeHandleRect::RightBottom:
         case RightBottom:
             hndl->move(geom.x() + geom.width() - w / 2, geom.y() + geom.height() - h / 2);
             break;
+        //case SizeHandleRect::Bottom:
         case Bottom:
             hndl->move(geom.x() + geom.width() / 2 - w / 2, geom.y() + geom.height() - h / 2);
             break;
+        //case SizeHandleRect::LeftBottom:
         case LeftBottom:
             hndl->move(geom.x() - w / 2, geom.y() + geom.height() - h / 2);
             break;
+        //case SizeHandleRect::Left:
         case Left:
             hndl->move(geom.x() - w / 2, geom.y() + geom.height() / 2 - h / 2);
             break;
+        //case SizeHandleRect::Center:
         case Center:
             hndl->move(geom.center().x()  - w / 2 , geom.center().y() - h / 2);
             break;
@@ -89,38 +98,49 @@ void GraphicsItem::setState(SelectionHandleState st)
 {
     const Handles::iterator hend =  m_handles.end();
     for (Handles::iterator it = m_handles.begin(); it != hend; ++it)
-        (*it)->SetState(st);
+        (*it)->setState(st);
 }
 
-enumQuadrant GraphicsItem::hitTest(const QPointF &point) const
+//SizeHandleRect::Direction GraphicsItem::hitTest(const QPointF &point) const
+Direction GraphicsItem::hitTest(const QPointF &point) const
 {
     const Handles::const_iterator hend =  m_handles.end();
     for (Handles::const_iterator it = m_handles.begin(); it != hend; ++it)
     {
         if ((*it)->hitTest(point) ){
-            return (*it)->Quadrant();
+            return (*it)->dir();
         }
     }
+    //return SizeHandleRect::None;
     return None;
 }
 
-Qt::CursorShape GraphicsItem::getCursor(enumQuadrant qua)
+//Qt::CursorShape GraphicsItem::getCursor(SizeHandleRect::Direction dir)
+Qt::CursorShape GraphicsItem::getCursor(Direction dir)
 {
-    switch (qua) {
+    switch (dir) {
+    //case SizeHandleRect::Right:
     case Right:
         return Qt::SizeHorCursor;
+    //case SizeHandleRect::RightTop:
     case RightTop:
         return Qt::SizeBDiagCursor;
+    //case SizeHandleRect::RightBottom:
     case RightBottom:
         return Qt::SizeFDiagCursor;
+    //case SizeHandleRect::LeftBottom:
     case LeftBottom:
         return Qt::SizeBDiagCursor;
+    //case SizeHandleRect::Bottom:
     case Bottom:
         return Qt::SizeVerCursor;
+    //case SizeHandleRect::LeftTop:
     case LeftTop:
         return Qt::SizeFDiagCursor;
+    //case SizeHandleRect::Left:
     case Left:
         return Qt::SizeHorCursor;
+    //case SizeHandleRect::Top:
     case Top:
         return Qt::SizeVerCursor;
     default:
@@ -129,9 +149,10 @@ Qt::CursorShape GraphicsItem::getCursor(enumQuadrant qua)
     return Qt::ArrowCursor;
 }
 
-void GraphicsItem::resizeTo(enumQuadrant qua, const QPointF &point)
+//void GraphicsItem::resizeTo(SizeHandleRect::Direction dir, const QPointF &point)
+void GraphicsItem::resizeTo(Direction dir, const QPointF &point)
 {
-    Q_UNUSED(qua);
+    Q_UNUSED(dir);
     Q_UNUSED(point);
 }
 
@@ -159,10 +180,11 @@ GraphicsRectItem::GraphicsRectItem(const QRect & rect ,QGraphicsItem *parent)
     ,m_width(rect.width())
     ,m_height(rect.height())
 {
+
     // handles
     m_handles.reserve(None);
     for (int i = LeftTop; i <= Left; ++i) {
-        SizeHandleRect *shr = new SizeHandleRect(this, static_cast<enumQuadrant>(i), this);
+        SizeHandleRect *shr = new SizeHandleRect(this, static_cast<Direction>(i), this);
         m_handles.push_back(shr);
     }
     updateGeometry();
@@ -189,17 +211,17 @@ QPainterPath GraphicsRectItem::shape() const
 //这个类里有两个方法比较重要，一个就是resizeTo，另外一个就是changeSize(),
 //resizeTo就是改变对象的大小，为啥还要有个changeSize方法呢。这个问题后面说。
 //先看看这两个函数的具体实现。
-void GraphicsRectItem::resizeTo(enumQuadrant qua, const QPointF &point)
+//void GraphicsRectItem::resizeTo(SizeHandleRect::Direction dir, const QPointF &point)
+void GraphicsRectItem::resizeTo(Direction dir, const QPointF &point)
 {
-    Q_UNUSED(point);
     //将场景坐标映射为本地坐标。
     QPointF local = mapFromScene(point);
     QString dirName;
 
-    //const QRectF &geom = this->boundingRect();
+    const QRectF &geom = this->boundingRect();
     //临时对象，记录改变后的大小。
     QRect delta = this->rect().toRect();
-    switch (qua) {
+    switch (dir) {
     case Right:
         dirName = "Rigth";
         delta.setRight(local.x());
@@ -250,8 +272,6 @@ void GraphicsRectItem::resizeTo(enumQuadrant qua, const QPointF &point)
 
 void GraphicsRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
 
     QColor c = QColor(Qt::red);
     c.setAlpha(160);
@@ -286,8 +306,6 @@ QPainterPath GraphicsEllipseItem::shape() const
 
 void GraphicsEllipseItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
     QColor c = QColor(Qt::red);
     c.setAlpha(160);
     QRectF rc = rect();
@@ -304,10 +322,13 @@ void GraphicsEllipseItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
 
 
 
-GraphicsLineItem::GraphicsLineItem(QGraphicsItem *parent):GraphicsRectItem(QRect(0,0,0,0),parent)
+GraphicsLineItem::GraphicsLineItem(QGraphicsItem *parent)
+    :GraphicsRectItem(QRect(0,0,0,0),parent)
 {
     // handles
+    //m_handles.reserve(SizeHandleRect::None);
     m_handles.reserve(None);
+
     Handles::iterator hend =  m_handles.end();
     for (Handles::iterator it = m_handles.begin(); it != hend; ++it)
         delete (*it);
@@ -335,14 +356,15 @@ QPainterPath GraphicsLineItem::shape() const
     return qt_graphicsItem_shapeFromPath(path,pen());
 }
 
-void GraphicsLineItem::resizeTo(enumQuadrant qua, const QPointF &point)
+void GraphicsLineItem::resizeTo(Direction dir, const QPointF &point)
 {
     QPointF local = mapFromScene(point);
     prepareGeometryChange();
 
-    //const QRectF &geom = this->boundingRect();
+    const QRectF &geom = this->boundingRect();
     QRect delta = this->rect().toRect();
-    switch(qua)
+
+    switch(dir)
     {
     case LeftTop:
         delta.setTopLeft(local.toPoint());
@@ -362,9 +384,7 @@ void GraphicsLineItem::resizeTo(enumQuadrant qua, const QPointF &point)
 
 void GraphicsLineItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-    //QColor c = QColor(Qt::red);
+    QColor c = QColor(Qt::red);
     painter->setPen(pen());
     painter->drawLine(rect().topLeft(),rect().bottomRight());
 }
@@ -409,18 +429,15 @@ QPainterPath GraphicsItemGroup::shape() const
     return m_group->shape() ;
 }
 
-void GraphicsItemGroup::resizeTo(enumQuadrant qua, const QPointF &point)
+void GraphicsItemGroup::resizeTo(Direction dir, const QPointF &point)
 {
-    Q_UNUSED(qua);
-    Q_UNUSED(point);
+
 }
 
 void GraphicsItemGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
     QPointF origin = mapFromScene(pos());
+
     QPointF origin1 = m_group->transformOriginPoint();
 
     QColor c1 = QColor(Qt::blue);
@@ -435,3 +452,4 @@ void GraphicsItemGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     painter->drawEllipse(origin1.x() - 3 , origin1.y() - 3 ,6,6);
 
 }
+

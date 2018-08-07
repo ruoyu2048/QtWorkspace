@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets
+QT       += core gui widgets svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,14 +26,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         MainWindow.cpp \
-    SizeHandleRect.cpp \
-    DrawItems.cpp
+        DrawItems.cpp \
+        DrawScene.cpp \
+        DrawTool.cpp \
+        SizeHandleRect.cpp
 
 HEADERS += \
         MainWindow.h \
-    SizeHandleRect.h \
-    GlobalDef.h \
-    DrawItems.h
+        DrawItems.h \
+        DrawScene.h \
+        DrawTool.h \
+        SizeHandleRect.h
 
 FORMS += \
         MainWindow.ui
