@@ -185,47 +185,51 @@ void CTcpSocket::parseDatagram(QByteArray rcvAry)
     mCacheAry.append(rcvAry);
     //获取缓存长度
     int nCacheLen = mCacheAry.length();
-    //解析缓存
-    int nMaxRcvBufLen = nCacheLen;
-    unsigned char cRcvBuf[COMMAXLEN] = {'0'};
-    if( nCacheLen >= COMMAXLEN ){
-        nMaxRcvBufLen = COMMAXLEN;
-    }
-    memmove(cRcvBuf,rcvAry.data(),nMaxRcvBufLen);
-    /*---------------------------------数据完整性验证---------------------------------*/
-    if( 0xAA != cRcvBuf[0] ){//帧头不正确
-        qDebug()<<cRcvBuf[0]<<"|帧头不正确";
-    }
-    //查找帧尾
-    int nTotalLen = 0;
-    bool bFindTail = false;
-    for( ;nTotalLen<nMaxRcvBufLen;nTotalLen++ ){
-        if( 0xA5 == cRcvBuf[nTotalLen] ){
-            ++nTotalLen;
-            bFindTail = true;
-            qDebug()<<nTotalLen<<nCacheLen;
-            break;
+    while( nCacheLen > 0 )
+    {
+        //解析缓存
+        int nMaxRcvBufLen = nCacheLen;
+        unsigned char cRcvBuf[COMMAXLEN] = {'0'};
+        if( nCacheLen >= COMMAXLEN ){
+            nMaxRcvBufLen = COMMAXLEN;
         }
-    }
-    //如果没有找到帧尾，则跳过
-    if( false == bFindTail )
-        return;
+        memmove(cRcvBuf,rcvAry.data(),nMaxRcvBufLen);
+        /*---------------------------------数据完整性验证---------------------------------*/
+        if( 0xAA != cRcvBuf[0] ){//帧头不正确
+            qDebug()<<cRcvBuf[0]<<"|帧头不正确";
+        }
+        //查找帧尾
+        int nTotalLen = 0;
+        bool bFindTail = false;
+        for( ;nTotalLen<nMaxRcvBufLen;nTotalLen++ ){
+            if( 0xA5 == cRcvBuf[nTotalLen] ){
+                ++nTotalLen;
+                bFindTail = true;
+                qDebug()<<nTotalLen<<nCacheLen;
+                break;
+            }
+        }
+        //如果没有找到帧尾，则跳过
+        if( false == bFindTail )
+            return;
 
-    //计算校验位
-    unsigned char cCheck = cRcvBuf[1];
-    for(int i=2;i<nTotalLen-2;i++){
-        cCheck = cCheck^cRcvBuf[i];
+        //计算校验位
+        unsigned char cCheck = cRcvBuf[1];
+        for(int i=2;i<nTotalLen-2;i++){
+            cCheck = cCheck^cRcvBuf[i];
+        }
+        //比较校验位
+        if( cCheck != cRcvBuf[nTotalLen-2] ){//校验位判断
+            mCacheAry.remove(0,nTotalLen);//将错误信息丢弃
+            qDebug()<<"校验位错误";
+            return;
+        }
+        /*---------------------------------解析报文---------------------------------*/
+        switchDatagram(cRcvBuf, nTotalLen);
+        //将解析过得信息从缓存中清除
+        mCacheAry.remove(0,nTotalLen);
+        nCacheLen = mCacheAry.length();
     }
-    //比较校验位
-    if( cCheck != cRcvBuf[nTotalLen-2] ){//校验位判断
-        mCacheAry.remove(0,nTotalLen);//将错误信息丢弃
-        qDebug()<<"校验位错误";
-        //return;
-    }
-    /*---------------------------------解析报文---------------------------------*/
-    switchDatagram(cRcvBuf, nTotalLen);
-    //将解析过得信息从缓存中清除
-    mCacheAry.remove(0,nTotalLen);
     qDebug()<<"mCacheArySZ:"<<mCacheAry.size();
 }
 
