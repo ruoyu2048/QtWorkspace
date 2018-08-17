@@ -1,4 +1,4 @@
-QT += core network
+QT += core network sql
 QT -= gui
 
 CONFIG += c++11
@@ -10,10 +10,16 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    PubFunc.cpp \
-    CTcpClient.cpp \
-    CUdp.cpp \
-    CTcpServer.cpp
+#    PubFunc.cpp \
+#    CTcpClient.cpp \
+#    CUdp.cpp \
+#    CTcpServer.cpp \
+    Libs/CTcpClient/CTcpClient.cpp \
+    Libs/CTcpServer/CTcpServer.cpp \
+    Libs/CUdp/CUdp.cpp \
+    Libs/DB/DB.cpp \
+    Libs/Logger/logger.cpp \
+    Libs/PubDef/PubFunc.cpp
 
 
 # The following define makes your compiler emit warnings if you use
@@ -28,12 +34,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 HEADERS += \
-    DataStruct.h \
-    PubFunc.h \
-    CTcpClient.h \
-    CTcpServer.h \
-    CUdp.h \
-    CTcpServer.h
+#    DataStruct.h \
+#    PubFunc.h \
+#    CTcpClient.h \
+#    CTcpServer.h \
+#    CUdp.h \
+#    CTcpServer.h \
+    Libs/CTcpClient/CTcpClient.h \
+    Libs/CTcpServer/CTcpServer.h \
+    Libs/CUdp/CUdp.h \
+    Libs/DB/DB.h \
+    Libs/Logger/logger.h \
+    Libs/PubDef/DataStruct.h \
+    Libs/PubDef/PubFunc.h
 
 
 

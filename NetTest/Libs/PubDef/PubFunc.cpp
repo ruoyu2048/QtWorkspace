@@ -1,9 +1,5 @@
 #include "PubFunc.h"
-#include <iostream>
 #include <cstring>
-//#include <windows.h>
-
-using namespace std;
 //添加附加字
 bool SendBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,short int PreLen,short int& AfterLen)
 {

@@ -1,8 +1,12 @@
 #include <QCoreApplication>
 
-#include "CTcpClient.h"
-#include "CTcpServer.h"
-#include "CUdp.h"
+//#include "CTcpClient.h"
+//#include "CTcpServer.h"
+//#include "CUdp.h"
+
+#include "./Libs/CTcpClient/CTcpClient.h"
+#include "./Libs/CTcpServer/CTcpServer.h"
+#include "./Libs/CUdp/CUdp.h"
 
 #include <QLibrary>
 
