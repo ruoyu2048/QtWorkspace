@@ -23,7 +23,7 @@ struct FrameHead{
     char cDesAdd;           //目的地址
     char cSrcAdd;           //原地址
     char cType;             //消息类型
-    int  iLenth;            //信息区长度
+    //int  iLenth;            //信息区长度
 
     FrameHead(){
         //memset(this,0,sizeof(FrameHead));

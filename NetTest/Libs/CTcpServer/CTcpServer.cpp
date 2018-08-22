@@ -182,7 +182,7 @@ void CTcpSocket::parseDatagram(QByteArray rcvAry)
 {
     //将获取到的报文添加到缓存中
     mCacheAry.append(rcvAry);
-    //获取缓存长度
+    //计算缓存长度
     int nCacheLen = mCacheAry.length();
     while( nCacheLen > 0 )
     {
@@ -192,13 +192,12 @@ void CTcpSocket::parseDatagram(QByteArray rcvAry)
         if( nCacheLen >= COMMAXLEN ){
             nMaxRcvBufLen = COMMAXLEN;
         }
-        memmove(cRcvBuf,mCacheAry.data(),nMaxRcvBufLen);
-        /*---------------------------------数据完整性验证---------------------------------*/
+        memmove(cRcvBuf,(unsigned char*)mCacheAry.data(),nMaxRcvBufLen);
+        /*---------------------------------报文数据完整性验证---------------------------------*/
         //先找帧头
         bool bFindHead = true;
         if( 0xAA != cRcvBuf[0] ){//帧头不正确
-            //qDebug()<<"帧头不正确 [Head:"<<cRcvBuf[0]<<"Sz:"<<mCacheAry.size()<<"RcvData:"<<mCacheAry.data()<<"]";
-            qDebug()<<"帧头不正确 [Head:"<<cRcvBuf[0];
+            qDebug()<<"帧头不正确 [Head:"<<cRcvBuf[0]<<"]";
             bFindHead = false;
         }
         //再找帧尾
@@ -212,6 +211,7 @@ void CTcpSocket::parseDatagram(QByteArray rcvAry)
             }
         }
 
+        //有效报文(有头有尾)
         if( true == bFindHead && true ==bFindTail )
         {
             //计算校验位
@@ -237,43 +237,44 @@ void CTcpSocket::parseDatagram(QByteArray rcvAry)
             }
             /*---------------------------------解析报文---------------------------------*/
             switchDatagram(cRcvBuf, nTotalLen);
-            //将解析过得信息从缓存中清除
+            //将解析过的报文数据从缓存中清除
             mCacheAry.remove(0,nTotalLen);
+            //重新计算缓存中的报文数据长度
             nCacheLen = mCacheAry.length();
         }
         else
         {
-            //如果只找到帧头，但是没有找到帧尾，则跳过
+            //有头无尾，则跳过
             if( true == bFindHead && false == bFindTail ){
-                //nCacheLen = mCacheAry.length();
                 break;
             }
-            else
-            {
-                QByteArray invalideAry = mCacheAry.mid(0,nCacheLen);
-                qDebug()<<"A_InvalideDate:"<<invalideAry<<"nCacheLen:"<<nCacheLen;
+            else{
+                //无头无尾、无头有尾，则丢弃
+                QByteArray invalidData = mCacheAry.mid(0,nTotalLen);
+                qDebug()<<"InvalidDataLen:"<<nTotalLen<<"InvalidData:"<<invalidData;
+                //将无效的报文数据从缓存中丢弃
                 mCacheAry.remove(0,nTotalLen);
+                //重新计算缓存中的报文数据长度
                 nCacheLen = mCacheAry.length();
-                qDebug()<<"B_InvalideDate:"<<mCacheAry<<"nCacheLen:"<<nCacheLen;
+                qDebug()<<"CurCacheLen:"<<nCacheLen<<"CurCacheData:"<<mCacheAry<<"\n";
                 continue;
             }
         }
     }
-    qDebug()<<"mCacheArySZ:"<<mCacheAry.size();
 }
 
 void CTcpSocket::switchDatagram(unsigned char* cRcvBuf,int nTotalLen)
 {
     //信息区
     short nInfoLen = 0;//信息长度=长度位(2)+信息区位长度(N)
-    unsigned char cInfoBuf[COMMAXLEN] = {'0'};//解码后的信息区缓存
+    unsigned char cInfoBuf[COMMAXLEN] = {'0'};//解码后报文=转码后的长度+信息区
     RecvBufChange(cRcvBuf,cInfoBuf,nTotalLen,nInfoLen);
 
     //帧头
     FrameHead head;
     memmove((unsigned char*)&head,cRcvBuf,sizeof(FrameHead));
     //报头信息(帧头、目的地址、源地址、类型)
-    qDebug()<<head.cHead<<head.cDesAdd<<head.cSrcAdd<<head.cType;
+    //qDebug()<<head.cHead<<head.cDesAdd<<head.cSrcAdd<<head.cType;
 
     switch (head.cType) {
     case 0x32:{
