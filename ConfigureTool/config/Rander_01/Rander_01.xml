@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--分机设备列表-->
+<Radar enable="true" name="Radar_01" displayName="总机_01">
+	<Subject enable="true" name="Subject_01" displayName="分机_01" cfg="Subject_01"/>
+	<Subject enable="true" name="Subject_02" displayName="分机_02" cfg="Subject_02"/>
+</Radar>
