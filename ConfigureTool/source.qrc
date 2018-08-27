@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>config/Rander_A/Rander_A_Sub/Rander_A_Sub_1.xml</file>
-        <file>config/Rander_A/Rander_A.xml</file>
-    </qresource>
-</RCC>
