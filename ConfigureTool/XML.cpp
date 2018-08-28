@@ -64,7 +64,6 @@ bool XML::parseConfigurationFiles()
 
         if( 0 != readAllEquipmentInfo(strCfgDirPath,raderTotal,readyLoadFiles) )
             return false;
-
         mRaderTotals.push_back(raderTotal);
     }
     return true;
@@ -114,14 +113,16 @@ int XML::readEquipmentList(QString strPath,Rader_Total &raderTotal,QSet<QString>
     QDomElement root = doc.documentElement();
     if( "Radar"==root.tagName() && "true"==root.attribute("enable") )
     {
-        qDebug()<<"Device:"<<root.attribute("name");
+        raderTotal.name = root.attribute("name");
+        raderTotal.displayName = root.attribute("displayName");
+
         QDomNode node = root.firstChild();
         while(!node.isNull()) {
            QDomElement element = node.toElement(); // try to convert the node to an element.
            if(!element.isNull()) {
                if( "Subject" == element.tagName() && "true" == element.attribute("enable")){
-                  raderTotal.name = element.attribute("name");
-                  raderTotal.displayName = element.attribute("displayName");
+                  //raderTotal.name = element.attribute("name");
+                  //raderTotal.displayName = element.attribute("displayName");
                   raderTotal.cfgFile = element.attribute("cfg");
                   readyLoadFiles.insert(raderTotal.cfgFile);
               }
@@ -164,7 +165,7 @@ int XML::readAllEquipmentInfo(QString strPath,Rader_Total &raderTotal,QSet<QStri
                 QFileInfo subFileInfo = subFileInfoList.at(j);
                 if(readyLoadFiles.find(subFileInfo.baseName()) != readyLoadFiles.end()){
                     Subject subject;
-                    if( readEquipmentInfo(subFileInfo.absoluteFilePath(),subject) )
+                    if( 0==readEquipmentInfo(subFileInfo.absoluteFilePath(),subject) )
                         raderTotal.subjects.push_back(subject);
                 }
             }
@@ -191,68 +192,62 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
     }
     file.close();
 
-    RaderInfo raderInfo;
-    raderInfo.filePath = strPath;
     //Subject
     QDomElement rootElem = doc.documentElement();
     if( !rootElem.isNull() ){
         if( "Subject" == rootElem.tagName() ){
             subject.name = rootElem.attribute("name");
             subject.displayName = rootElem.attribute("displayName");
-            qDebug()<<subject.name <<subject.displayName;
+            //qDebug()<<subject.name <<subject.displayName;
 
             //subjectInfo
             QDomNode secNode = rootElem.firstChildElement();
             while( !secNode.isNull() ){
                 QDomElement subInfoElement = secNode.toElement();
-                if(!subInfoElement.isNull()) {
-                    if( "subjectInfo" == subInfoElement.tagName() ){
-                        SubjectInfo subjectInfo;
-                        subjectInfo.name = subInfoElement.attribute("name");
-                        subjectInfo.displayName = subInfoElement.attribute("displayName");
-                        subjectInfo.type = subInfoElement.attribute("type");
-                        qDebug()<<subInfoElement.attribute("name")<<subInfoElement.attribute("displayName");
-                        subject.subjectInfos.push_back(subjectInfo);
+                if(!subInfoElement.isNull() && "subjectInfo" == subInfoElement.tagName()) {
+                    SubjectInfo subjectInfo;
+                    subjectInfo.name = subInfoElement.attribute("name");
+                    subjectInfo.displayName = subInfoElement.attribute("displayName");
+                    subjectInfo.type = subInfoElement.attribute("type");
+                    //qDebug()<<subInfoElement.attribute("name")<<subInfoElement.attribute("displayName")<<subjectInfo.type;
+                    //subject.subjectInfos.push_back(subjectInfo);
 
-                        //entity
-                        QDomNode entNode = secNode.firstChildElement();
-                        while( !entNode.isNull() ){
-                            QDomElement entElem = entNode.toElement();
-                            if( !entElem.isNull() ){
-                                if( "entity" == entElem.tagName() ){
-                                    Entity entity;
-                                    entity.name = entElem.attribute("name");
-                                    entity.displayName = entElem.attribute("displayName");
-                                    qDebug()<<entElem.attribute("name")<<entElem.attribute("displayName");
-                                    subjectInfo.ents.push_back(entity);
+                    //entity
+                    QDomNode entNode = secNode.firstChildElement();
+                    while( !entNode.isNull() ){
+                        QDomElement entElem = entNode.toElement();
+                        if( !entElem.isNull() && "entity" == entElem.tagName()){
+                            Entity entity;
+                            entity.name = entElem.attribute("name");
+                            entity.displayName = entElem.attribute("displayName");
+                            //qDebug()<<entElem.attribute("name")<<entElem.attribute("displayName");
+                            //subjectInfo.ents.push_back(entity);
 
-                                    //Attr
-                                    //subjectInfo
-                                    QDomNode attrNode = entElem.firstChildElement();
-                                    while( !attrNode.isNull() ){
-                                        QDomElement attrElem = attrNode.toElement();
-                                        if(!attrElem.isNull()) {
-                                            if( "attribute" == attrElem.tagName() ){
-                                                Attr attr;
-                                                attr.name = attrElem.attribute("name");
-                                                attr.displayName = attrElem.attribute("displayName");
-                                                attr.displayType = attrElem.attribute("displayType");
-                                                attr.dataType = attrElem.attribute("dataType");
-                                                attr.value = attrElem.attribute("value");
-                                                attr.paramType = attrElem.attribute("paramType");
-                                                attr.validator = attrElem.attribute("validator");
-                                                attr.tips = attrElem.attribute("tips");
-                                                qDebug()<<attrElem.attribute("name")<<attrElem.attribute("displayName");
-                                                entity.attrs.push_back(attr);
-                                            }
-                                        }
-                                        attrNode = attrNode.nextSibling();
-                                    }
+                            //Attr
+                            //subjectInfo
+                            QDomNode attrNode = entElem.firstChildElement();
+                            while( !attrNode.isNull() ){
+                                QDomElement attrElem = attrNode.toElement();
+                                if(!attrElem.isNull()  && "attribute" == attrElem.tagName()) {
+                                    Attr attr;
+                                    attr.name = attrElem.attribute("name");
+                                    attr.displayName = attrElem.attribute("displayName");
+                                    attr.displayType = attrElem.attribute("displayType");
+                                    attr.dataType = attrElem.attribute("dataType");
+                                    attr.value = attrElem.attribute("value");
+                                    attr.paramType = attrElem.attribute("paramType");
+                                    attr.validator = attrElem.attribute("validator");
+                                    attr.tips = attrElem.attribute("tips");
+                                    //qDebug()<<attrElem.attribute("name")<<attrElem.attribute("displayName");
+                                    entity.attrs.push_back(attr);
                                 }
+                                attrNode = attrNode.nextSibling();
                             }
-                            entNode = entNode.nextSibling();
+                            subjectInfo.ents.push_back(entity);
                         }
+                        entNode = entNode.nextSibling();
                     }
+                    subject.subjectInfos.push_back(subjectInfo);
                 }
                 secNode = secNode.nextSibling();
             }

@@ -19,76 +19,89 @@ void CTabMain::InitTabMain()
     if(m_pXML->getConfigureInfo(":/config")){
         QList<Rader_Total>::iterator it = m_pXML->mRaderTotals.begin();
         for( ;it!= m_pXML->mRaderTotals.end();it++ ){
+            //Tab Tag
             Rader_Total raderTotal = *it;
-            qDebug()<<"A\t"<<raderTotal.displayName<<raderTotal.subjects.size();
+            //qDebug()<<"A\t"<<raderTotal.displayName<<raderTotal.subjects.size();
+            QTreeWidget* pCurTree = new QTreeWidget(this);
+            pCurTree->setHeaderHidden(true);
+            connect(pCurTree,SIGNAL(clicked(QModelIndex)),this,SLOT(itemClicked(QModelIndex)));
+            pCurTree->setColumnCount(3);
+            pCurTree->setColumnWidth(0,300);
+            this->addTab(pCurTree,raderTotal.displayName);
+            //保存到队列中
+            m_treeWidgetList.push_back(pCurTree);
+            m_pCurTree = pCurTree;
 
+            //Subject
             QList<Subject> subjects = raderTotal.subjects;
             QList<Subject>::iterator itSubject = subjects.begin();
-            for( ;itSubject!=subjects.end();it++ ){
+            for( ;itSubject!=subjects.end();itSubject++ ){
                 Subject subject = *itSubject;
-                qDebug()<<"B\t\t"<<subject.displayName;
+                //qDebug()<<"B\t\t"<<subject.displayName;
+                QTreeWidgetItem* pSubject = new QTreeWidgetItem(pCurTree);
+                pSubject->setText(0,subject.displayName);
+
+                //SubjectInfo
+                QList<SubjectInfo> subjectInfos = subject.subjectInfos;
+                QList<SubjectInfo>::iterator itSubInfo = subjectInfos.begin();
+                for( ;itSubInfo != subjectInfos.end(); itSubInfo++){
+                    SubjectInfo subjectInfo = *itSubInfo;
+                    //qDebug()<<"C\t\t\t"<<subjectInfo.displayName<<subjectInfo.ents.size();
+                    QTreeWidgetItem* pSubInfo = new QTreeWidgetItem(pSubject);
+                    pSubInfo->setText(0,subjectInfo.displayName);
+
+                    //Entity
+                    QList<Entity> ents = subjectInfo.ents;
+                    QList<Entity>::iterator itEnts = ents.begin();
+                    for( ;itEnts!=ents.end();itEnts++ ){
+                        Entity ent = *itEnts;
+                        //qDebug()<<"D\t\t\t\t"<<ent.displayName;
+                        QTreeWidgetItem* pEnt = new QTreeWidgetItem(pSubInfo);
+                        pEnt->setText(0,ent.displayName);
+
+                        //Attr
+                        QList<Attr> attrs = ent.attrs;
+                        QList<Attr>::iterator itAttr = attrs.begin();
+                        for( ;itAttr!=attrs.end();itAttr++ ){
+                            Attr attr = *itAttr;
+                            //qDebug()<<"E\t\t\t\t\t"<<attr.displayName;
+                            QTreeWidgetItem* pAttr = new QTreeWidgetItem(pEnt);
+
+                            QLabel* pLable = new QLabel(attr.displayName);
+                            pLable->setObjectName("Lable");
+                            pCurTree->setItemWidget(pAttr,0,pLable);
+                            if( "control" == subjectInfo.type )
+                            {
+                                if( "text" == attr.displayType )
+                                {
+                                    QLineEdit* pLineEdit = new QLineEdit();
+                                    pLineEdit->setObjectName("LineEdit");
+                                    pLineEdit->setFrame(true);
+                                    pLineEdit->setMaximumWidth(100);
+                                    pCurTree->setItemWidget(pAttr,1,pLineEdit);
+                                    connect(pLineEdit,SIGNAL(textEdited(QString)),this,SLOT(lineTextEdited(QString)));
+                                }
+                                else if("select"==attr.displayType)
+                                {
+                                    QComboBox* pCombo = new QComboBox();
+                                    pCombo->setObjectName("ComboBox");
+                                    pCombo->setFrame(true);
+                                    pCombo->setMaximumWidth(100);
+                                    pCombo->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+                                    QStringList paramTypes = attr.paramType.split(";");
+                                    pCombo->addItems(paramTypes);
+                                    pCurTree->setItemWidget(pAttr,1,pCombo);
+                                }
+                            }
+                            if( "monitor" == subjectInfo.type ){
+                                pAttr->setText(1,attr.value);
+                            }
+                        }
+                    }
+                }
             }
+            pCurTree->expandAll();
         }
-
-//        QList<RaderInfo>::iterator it = m_pXML->m_raderInfoList.begin();
-//        for(;it!=m_pXML->m_raderInfoList.end();it++){
-//            QTreeWidget* pCurTree = new QTreeWidget(this);
-//            pCurTree->setHeaderHidden(true);
-//            connect(pCurTree,SIGNAL(clicked(QModelIndex)),this,SLOT(itemClicked(QModelIndex)));
-//            pCurTree->setColumnCount(3);
-//            pCurTree->setColumnWidth(0,300);
-//            //pCurTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-//            RaderInfo raderInfo = *it;
-//            qDebug()<<raderInfo.displayName;
-//            this->addTab(pCurTree,raderInfo.displayName);
-//            //保存到队列中
-//            m_treeWidgetList.push_back(pCurTree);
-//            m_pCurTree = pCurTree;
-
-//            qDebug()<<raderInfo.secLevel.description<<raderInfo.secLevel.displayName;
-//            QTreeWidgetItem* pFirstItem = new QTreeWidgetItem(pCurTree);
-//            pFirstItem->setText(0,raderInfo.secLevel.displayName);
-
-//            QList<Third_Level>::iterator itThird = raderInfo.secLevel.ents.begin();
-//            for(;itThird!=raderInfo.secLevel.ents.end();itThird++)
-//            {
-//                QTreeWidgetItem* pSecItem = new QTreeWidgetItem(pFirstItem);
-//                //pData->setFlags(Qt::ItemIsEditable|Qt::ItemIsEnabled);
-//                pSecItem->setText(0,(*itThird).displayName);
-
-//                QList<Forth_Level>::iterator itForth=(*itThird).attrs.begin();
-//                for(;itForth !=(*itThird).attrs.end();itForth++ )
-//                {
-//                    QTreeWidgetItem* pThirdItem = new QTreeWidgetItem(pSecItem);
-//                    pThirdItem->setFlags(Qt::ItemIsEditable|Qt::ItemIsEnabled);
-//                    QLabel* pLable = new QLabel((*itForth).displayName);
-//                    pLable->setObjectName("Lable");
-//                    //pLable->setMinimumWidth(500);
-//                    pCurTree->setItemWidget(pThirdItem,0,pLable);
-//                    if( "text" == (*itForth).displayType )
-//                    {
-//                        QLineEdit* pLineEdit = new QLineEdit();
-//                        pLineEdit->setObjectName("LineEdit");
-//                        pLineEdit->setFrame(false);
-//                        pCurTree->setItemWidget(pThirdItem,1,pLineEdit);
-//                        connect(pLineEdit,SIGNAL(textEdited(QString)),this,SLOT(lineTextEdited(QString)));
-//                        m_lineEditMap.insert(pLineEdit,"[0-9]+$");
-//                    }
-//                    else if("select"==(*itForth).displayType)
-//                    {
-//                        QComboBox* pCombo = new QComboBox();
-//                        pCombo->setObjectName("ComboBox");
-//                        pCombo->setFrame(false);
-//                        pCombo->setMaximumWidth(100);
-//                        pCombo->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-//                        QStringList paramTypes = (*itForth).paramType.split(";");
-//                        pCombo->addItems(paramTypes);
-//                        pCurTree->setItemWidget(pThirdItem,1,pCombo);
-//                    }
-//                }
-//            }
-//            pCurTree->expandAll();
-//        }
     }
     connect(this,SIGNAL(currentChanged(int)),this,SLOT(currentTabChanged(int)));
 }
