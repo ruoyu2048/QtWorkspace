@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 
 void MainWindow::InitMainWindow()
 {
+    this->setMinimumSize(600,400);
     m_pGLayout = new QGridLayout(this);
     m_pTabMain = new CTabMain(this);
 

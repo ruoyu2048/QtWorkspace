@@ -62,7 +62,7 @@ void CTabMain::InitTabMain()
                         //Attr
                         QList<Attr> attrs = ent.attrs;
                         QList<Attr>::iterator itAttr = attrs.begin();
-                        for( ;itAttr!=attrs.end();itAttr++ ){
+                        for( ;itAttr!=attrs.end(); ){
                             Attr attr = *itAttr;
                             //qDebug()<<"E\t\t\t\t\t"<<attr.displayName;
                             QTreeWidgetItem* pAttr = new QTreeWidgetItem(pEnt);
@@ -92,9 +92,19 @@ void CTabMain::InitTabMain()
                                     pCombo->addItems(paramTypes);
                                     pCurTree->setItemWidget(pAttr,1,pCombo);
                                 }
+                                itAttr++;
+                                if( itAttr==attrs.end() ){
+                                    QPushButton* pBtn = new QPushButton("设置",this);
+                                    pBtn->setMaximumWidth(100);
+                                    connect(pBtn,SIGNAL(pressed()),this,SLOT(btnSetClicked()));
+                                    pCurTree->setItemWidget(pAttr,2,pBtn);
+                                    //将设置按钮与父Item关联
+                                    m_btnMap.insert(pBtn,pEnt);
+                                }
                             }
                             if( "monitor" == subjectInfo.type ){
                                 pAttr->setText(1,attr.value);
+                                itAttr++;
                             }
                         }
                     }
@@ -165,6 +175,34 @@ void CTabMain::lineTextEdited(QString strText)
             // 错误提示
             QToolTip::showText(pLineEdit->mapToGlobal( QPoint(100, 0)  ),"请输入数字!");
             pLineEdit->clear();
+        }
+    }
+}
+
+void CTabMain::btnSetClicked(){
+    QPushButton* pBtn = qobject_cast<QPushButton*>(sender());
+    QMap<QPushButton*,QTreeWidgetItem*>::iterator it = m_btnMap.find(pBtn);
+    if( it != m_btnMap.end() ){
+        QTreeWidgetItem* pEntItem = it.value();
+        if( NULL != pEntItem ){
+            int nAttrs = pEntItem->childCount();
+            for( int i=0;i<nAttrs;i++ ){
+                QTreeWidgetItem* pAttrItem = pEntItem->child(i);
+                QWidget* pAttr = m_pCurTree->itemWidget(pAttrItem,0);
+                if( "Lable" == pAttr->objectName() ){
+                    QLabel* pLabel = (QLabel*)pAttr;
+                    qDebug()<<pLabel->text();
+                }
+                QWidget* pValue = m_pCurTree->itemWidget(pAttrItem,1);
+                if( "LineEdit" == pValue->objectName() ){
+                    QLineEdit* pLineEdit = (QLineEdit*)pValue;
+                    qDebug()<<pLineEdit->text();
+                }
+                else if( "ComboBox" == pValue->objectName() ){
+                    QComboBox* pComboBox = (QComboBox*)pValue;
+                    qDebug()<<pComboBox->currentText();
+                }
+            }
         }
     }
 }

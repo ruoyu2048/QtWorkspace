@@ -21,6 +21,7 @@ private:
     QTreeWidget*        m_pCurTree;
     QList<QTreeWidget*> m_treeWidgetList;
     QMap<QLineEdit*,QString> m_lineEditMap;
+    QMap<QPushButton*,QTreeWidgetItem*>m_btnMap;
 signals:
 
 public slots:
@@ -29,6 +30,7 @@ private slots:
     void currentTabChanged(int index);
     void itemClicked(QModelIndex modelIndex);
     void lineTextEdited(QString strText);
+    void btnSetClicked();
 };
 
 #endif // CTABMAIN_H
