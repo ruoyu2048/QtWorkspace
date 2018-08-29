@@ -21,7 +21,6 @@ private:
     QGridLayout*        m_pGLayout;
     QHBoxLayout*        m_pHLayout_Main;
     QHBoxLayout*        m_pHLayout;
-    QPushButton*        m_pBtnSaveSet;//保存设置
     CTabMain*           m_pTabMain;
 signals:
 

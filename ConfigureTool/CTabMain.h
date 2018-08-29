@@ -20,15 +20,12 @@ private:
     QTabWidget*         m_pTabMain;
     QTreeWidget*        m_pCurTree;
     QList<QTreeWidget*> m_treeWidgetList;
-    QMap<QLineEdit*,QString> m_lineEditMap;
+    QMap<QLineEdit*,QStringList>m_lineEditTips;
     QMap<QPushButton*,QTreeWidgetItem*>m_btnMap;
 signals:
 
-public slots:
-    void saveConfigureInfo();
 private slots:
     void currentTabChanged(int index);
-    void itemClicked(QModelIndex modelIndex);
     void lineTextEdited(QString strText);
     void btnSetClicked();
 };

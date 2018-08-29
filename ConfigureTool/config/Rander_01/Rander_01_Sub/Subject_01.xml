@@ -3,7 +3,7 @@
     <subjectInfo name="control" displayName="控制" type="control">
         <entity name="CtrlChannel" displayName="可控制通道">
             <attribute displayType="select" name="diffCode1" displayName="通道1差分编码" dataType="byte" paramType="1:允许;2:禁止"/>
-            <attribute displayType="text" name="TDMAFrameNum1" displayName="通道1TDMA帧数" dataType="byte" validator="0-9" tips="请输入数字"/>
+            <attribute displayType="text" name="TDMAFrameNum1" displayName="通道1TDMA帧数" dataType="byte" value="100" validator="[0-9]+$" tips="请输入数字"/>
         </entity>
     </subjectInfo>
     <subjectInfo name="monitor" displayName="监视" type="monitor">

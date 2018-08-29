@@ -13,8 +13,7 @@ CTabMain::CTabMain(QWidget *parent) : QTabWidget(parent)
     InitTabMain();
 }
 
-void CTabMain::InitTabMain()
-{
+void CTabMain::InitTabMain(){
     m_pXML = new XML();
     if(m_pXML->getConfigureInfo(":/config")){
         QList<Rader_Total>::iterator it = m_pXML->mRaderTotals.begin();
@@ -24,7 +23,6 @@ void CTabMain::InitTabMain()
             //qDebug()<<"A\t"<<raderTotal.displayName<<raderTotal.subjects.size();
             QTreeWidget* pCurTree = new QTreeWidget(this);
             pCurTree->setHeaderHidden(true);
-            connect(pCurTree,SIGNAL(clicked(QModelIndex)),this,SLOT(itemClicked(QModelIndex)));
             pCurTree->setColumnCount(3);
             pCurTree->setColumnWidth(0,300);
             this->addTab(pCurTree,raderTotal.displayName);
@@ -70,19 +68,20 @@ void CTabMain::InitTabMain()
                             QLabel* pLable = new QLabel(attr.displayName);
                             pLable->setObjectName("Lable");
                             pCurTree->setItemWidget(pAttr,0,pLable);
-                            if( "control" == subjectInfo.type )
-                            {
-                                if( "text" == attr.displayType )
-                                {
+                            if( "control" == subjectInfo.type ){
+                                if( "text" == attr.displayType ){
                                     QLineEdit* pLineEdit = new QLineEdit();
                                     pLineEdit->setObjectName("LineEdit");
                                     pLineEdit->setFrame(true);
                                     pLineEdit->setMaximumWidth(100);
+                                    pLineEdit->setText(attr.value);
                                     pCurTree->setItemWidget(pAttr,1,pLineEdit);
                                     connect(pLineEdit,SIGNAL(textEdited(QString)),this,SLOT(lineTextEdited(QString)));
+                                    QStringList strValidTips;
+                                    strValidTips<<attr.validator<<attr.tips;
+                                    m_lineEditTips.insert(pLineEdit,strValidTips);
                                 }
-                                else if("select"==attr.displayType)
-                                {
+                                else if("select"==attr.displayType){
                                     QComboBox* pCombo = new QComboBox();
                                     pCombo->setObjectName("ComboBox");
                                     pCombo->setFrame(true);
@@ -96,7 +95,7 @@ void CTabMain::InitTabMain()
                                 if( itAttr==attrs.end() ){
                                     QPushButton* pBtn = new QPushButton("设置",this);
                                     pBtn->setMaximumWidth(100);
-                                    connect(pBtn,SIGNAL(pressed()),this,SLOT(btnSetClicked()));
+                                    connect(pBtn,SIGNAL(clicked(bool)),this,SLOT(btnSetClicked()));
                                     pCurTree->setItemWidget(pAttr,2,pBtn);
                                     //将设置按钮与父Item关联
                                     m_btnMap.insert(pBtn,pEnt);
@@ -116,64 +115,24 @@ void CTabMain::InitTabMain()
     connect(this,SIGNAL(currentChanged(int)),this,SLOT(currentTabChanged(int)));
 }
 
-void CTabMain::saveConfigureInfo()
-{
-    QTreeWidgetItemIterator it(m_pCurTree);
-    while( *it )
-    {
-        QTreeWidgetItem* pItem = (*it);
-        if( 0 == pItem->childCount() )
-        {
-            QWidget* pAttr = m_pCurTree->itemWidget(pItem,0);
-            if( "Label" == pAttr->objectName() )
-            {
-                QLabel* pLabel = (QLabel*)m_pCurTree->itemWidget(pItem,0);
-                qDebug()<<pLabel->text();
-            }
-            QWidget* pValue = m_pCurTree->itemWidget(pItem,1);
-            if( "LineEdit" == pValue->objectName() )
-            {
-                QLineEdit* pLineEdit = (QLineEdit*)pValue;
-                qDebug()<<pLineEdit->text();
-            }
-            else if( "ComboBox" == pValue->objectName() )
-            {
-                QComboBox* pComboBox = (QComboBox*)pValue;
-                qDebug()<<pComboBox->currentText();
-            }
-        }
-        else
-        {
-            qDebug()<<pItem->text(0);
-        }
-        it++;
-    }
-}
-
-void CTabMain::currentTabChanged(int index)
-{
+void CTabMain::currentTabChanged(int index){
     m_pCurTree = m_treeWidgetList.at(index);
 }
 
-void CTabMain::itemClicked(QModelIndex modelIndex)
-{
-    qDebug()<<modelIndex.parent().row()<<modelIndex.row()<<modelIndex.column();
-}
-
-void CTabMain::lineTextEdited(QString strText)
-{
+void CTabMain::lineTextEdited(QString strText){
     QLineEdit* pLineEdit = qobject_cast<QLineEdit*>(sender());
-    QMap<QLineEdit*,QString>::iterator it = m_lineEditMap.find(pLineEdit);
-    if( it != m_lineEditMap.end() )
-    {
+    QMap<QLineEdit*,QStringList>::iterator it = m_lineEditTips.find(pLineEdit);
+    if( it != m_lineEditTips.end() ){
         //QRegExp regx("[0-9]+$");
-        QRegExp regx(it.value());
+        QStringList strValidTips = it.value();
+        QString strValid = strValidTips.at(0);
+        QString strTips = strValidTips.at(1);
+        QRegExp regx(strValid);
         QValidator *validator = new QRegExpValidator(regx, 0);
         int nPos = 0;
-        if( QValidator::Acceptable != validator->validate(strText,nPos) )
-        {
+        if( QValidator::Acceptable != validator->validate(strText,nPos) ){
             // 错误提示
-            QToolTip::showText(pLineEdit->mapToGlobal( QPoint(100, 0)  ),"请输入数字!");
+            QToolTip::showText(pLineEdit->mapToGlobal(QPoint(100, 0)),strTips);
             pLineEdit->clear();
         }
     }
