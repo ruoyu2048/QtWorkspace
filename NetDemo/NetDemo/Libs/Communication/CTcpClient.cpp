@@ -24,15 +24,13 @@ bool CTcpClient::ConnectToHost(QString strServerIP,quint16 nServerPort)
         QHostAddress hostAddr(strServerIP);
         m_pTSClient->connectToHost(hostAddr,nServerPort);
         emit UpdateConnectState("Connecting...");
-        if(m_pTSClient->waitForConnected(3000))
-        {
+        if(m_pTSClient->waitForConnected(3000)){
             //log:连接成功
             qDebug()<<"连接成功";
             StartTest();
             return true;
         }
-        else
-        {
+        else{
             //log:连接超时
             qDebug()<<"连接超时";
             m_pTSClient->close();

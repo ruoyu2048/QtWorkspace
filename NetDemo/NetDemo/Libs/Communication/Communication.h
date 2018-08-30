@@ -3,6 +3,13 @@
 
 #include <QObject>
 
+enum CommType{
+    TcpServer,
+    TcpClient,
+    UDP,
+    Serial
+};
+
 class CTcpServer;
 class CTcpClient;
 class Communication : public QObject
@@ -10,6 +17,7 @@ class Communication : public QObject
     Q_OBJECT
 public:
     explicit Communication(QObject *parent = nullptr);
+    bool startCommunication(CommType commType,QStringList cfg);
     bool startTcpServer(QString strIP,quint16 nPort);
     bool startTcpClient(QString strDstIP,quint16 nDstPort);
 
