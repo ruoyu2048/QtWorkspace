@@ -6,7 +6,6 @@
 #include <QTcpSocket>
 
 class CTcpThread;
-class CPacket;
 class CTcpServer : public QTcpServer
 {
     Q_OBJECT

@@ -25,7 +25,7 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor){
     qDebug()<<"new Connection:"<<socketDescriptor;
     CTcpThread* pThread = new CTcpThread(socketDescriptor, 0);
     //服务端向下发送报文
-    connect(this,&CTcpServer::writeData,pThread,&CTcpThread::wirteData);
+    connect(this,&CTcpServer::writeData,pThread,&CTcpThread::writeData);
     //接收各个客户端发送来的报文
     connect(pThread,&CTcpThread::sendDataToQueue,this,&CTcpServer::sendDataToQueue);
     connect(pThread,SIGNAL(disconnected(qintptr)),this,SLOT(slotDisconnected(qintptr)));
