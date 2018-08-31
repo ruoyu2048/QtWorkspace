@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <string.h>
+#include <QByteArray>
 
 using namespace std;
 enum ConnType{
@@ -13,10 +14,11 @@ enum ConnType{
     Disconnected
 };
 
-
-
-
-
+class DataPacket{
+public:
+    quint8      msgType;
+    QByteArray  msgData;
+};
 
 struct FrameHead{
     char cHead;             //帧头

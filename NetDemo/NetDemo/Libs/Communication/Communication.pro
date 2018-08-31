@@ -29,7 +29,9 @@ SOURCES += \
     PubFunc.cpp \
     CUdp.cpp \
     Communication.cpp \
-    CTcpThread.cpp
+    CTcpThread.cpp \
+    CSerialPort.cpp \
+    CDataPacket.cpp
 
 HEADERS += \
     CTcpClient.h \
@@ -38,7 +40,9 @@ HEADERS += \
     PubFunc.h \
     CUdp.h \
     Communication.h \
-    CTcpThread.h
+    CTcpThread.h \
+    CSerialPort.h \
+    CDataPacket.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

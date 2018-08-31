@@ -2,9 +2,10 @@
 #include "CTcpServer.h"
 #include "CTcpClient.h"
 #include "CUdp.h"
+#include "CSerialPort.h"
 
 Communication::Communication(QObject *parent) :
-    QObject(parent),m_pTS(NULL),m_pTC(NULL),m_pUDP(NULL){
+    QObject(parent),m_pTS(NULL),m_pTC(NULL),m_pUDP(NULL),m_pSP(NULL){
 }
 
 bool Communication::startCommunication(CommType commType,QStringList cfg){
@@ -18,6 +19,8 @@ bool Communication::startCommunication(CommType commType,QStringList cfg){
             QString strIP = cfg.at(0);
             quint16 nPort = cfg.at(1).toInt();
             bRet = m_pTS->startListen(strIP,nPort);
+            connect(this,&Communication::writData,m_pTS,&CTcpServer::writeData);
+            connect(m_pTS,&CTcpServer::sendDataToQueue,this,&Communication::readDataFromMsgQueue);
         }
         break;
     case TcpClient:
@@ -42,13 +45,37 @@ bool Communication::startCommunication(CommType commType,QStringList cfg){
         }
         break;
     case Serial:
+        if( cfg.size() >=2 ){
+            if( Q_NULLPTR == m_pSP ){
+                m_pSP = new CSerialPort(this);
+            }
 
+        }
         break;
     }
     return bRet;
 }
 
 void Communication::sendData(unsigned char* sendBuf,int nSendLen,quintptr handle){
-    emit sendDataToDown(sendBuf,nSendLen,handle);
+    //向下发送数据
+    emit writData(sendBuf,nSendLen,handle);
+}
+
+//中转所有数据报文
+void Communication::readDataFromMsgQueue(unsigned char* rcvBuf,int nRcvLen,qintptr handle){
+//    switch (commType) {
+//    case TcpServer:
+
+//        break;
+//    case TcpClient:
+
+//        break;
+//    case UDP:
+
+//        break;
+//    case Serial:
+
+//        break;
+//    }
 }
 

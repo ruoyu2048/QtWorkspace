@@ -5,8 +5,6 @@
 #include <QTimer>
 #include <QTcpSocket>
 #include "DataStruct.h"
-//#include "../PubDef/DataStruct.h"
-
 
 class CTcpClient:public QObject
 {

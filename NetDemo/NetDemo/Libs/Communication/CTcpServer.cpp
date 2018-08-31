@@ -7,13 +7,6 @@ CTcpServer::CTcpServer(QObject *parent) : QTcpServer(parent){
     qRegisterMetaType<qintptr>("qintptr");
 }
 
-/************************************************************************
-*函数名:	startListen
-*概述:启动TCP Server侦听
-*参数：strHostIP--TCP服务端IP地址
-*     nHostPort--TCP服务端端口
-*返回值：如果启动成功，则返回true，否则返回false
-************************************************************************/
 bool CTcpServer::startListen(QString strServerIP,quint16 nServerPort){
     QHostAddress hostAddr(strServerIP);
     if(true == this->listen(hostAddr,nServerPort)){
@@ -24,19 +17,6 @@ bool CTcpServer::startListen(QString strServerIP,quint16 nServerPort){
     return false;
 }
 
-/************************************************************************
-*函数名:	sendData
-*概述:向客户端发送数据报文
-*参数：handle--目标套接字标识符
-*     sendBuf--发送报文
-*     nSendLen--发送报文长度
-*返回值：如果启动成功，则返回true，否则返回false
-************************************************************************/
-void CTcpServer::sendData(qintptr handle,unsigned char* sendBuf,int nSendLen){
-    emit sendMsgToDown(handle,sendBuf,nSendLen);
-}
-
-
 void CTcpServer::stopListen(){
     this->close();
 }
@@ -45,9 +25,9 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor){
     qDebug()<<"new Connection:"<<socketDescriptor;
     CTcpThread* pThread = new CTcpThread(socketDescriptor, 0);
     //服务端向下发送报文
-    connect(this,&CTcpServer::sendMsgToDown,pThread,&CTcpThread::sendMsgToDown);
+    connect(this,&CTcpServer::writeData,pThread,&CTcpThread::wirteData);
     //接收各个客户端发送来的报文
-    connect(pThread,&CTcpThread::sendDataToUp,this,&CTcpServer::slotReadData);
+    connect(pThread,&CTcpThread::sendDataToQueue,this,&CTcpServer::sendDataToQueue);
     connect(pThread,SIGNAL(disconnected(qintptr)),this,SLOT(slotDisconnected(qintptr)));
     connect(pThread, SIGNAL(finished()), pThread, SLOT(deleteLater()));
 
@@ -56,30 +36,6 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor){
     mThreadMap.insert(socketDescriptor,pThread);
 }
 
-
-/************************************************************************
-*函数名:	slotReadData
-*概述:接收自定义套接字中的发送的报文
-*参数：handle--TCP套接字描述符
-*返回值：无
-************************************************************************/
-void CTcpServer::slotReadData(qintptr handle,unsigned char* rcvBuf,int nRcvLen){
-//    QMap<qintptr,cTcp*>::iterator it = mClientsMap.find(handle);
-//    if( it != mClientsMap.end() )
-//    {
-//        //eg:
-//        unsigned char cBuf[COMMAXLEN] = {'0'};
-//        memmove(cBuf,rcvBuf,nRcvLen);
-//        //qDebug()<<"SERVER:"<<cBuf[0]<<cBuf[1]<<cBuf[2]<<cBuf[3]<<nRcvLen;
-//    }
-}
-
-/************************************************************************
-*函数名:	slotDisconnected
-*概述:清除队列中断开连接的客户端套接字
-*参数：handle--TCP套接字描述符
-*返回值：无
-************************************************************************/
 void CTcpServer::slotDisconnected(qintptr handle){
     QMap<qintptr,CTcpThread*>::iterator it = mThreadMap.find(handle);
     if( it != mThreadMap.end() ){
@@ -96,12 +52,6 @@ CTcpSocket::CTcpSocket(qintptr socketDescriptor, QObject *parent):QTcpSocket(par
 }
 
 //slots
-/************************************************************************
-*函数名:	slotReadData
-*概述:接收数据报文。
-*参数：无
-*返回值：无
-************************************************************************/
 void CTcpSocket::readData(){
     if( this->bytesAvailable() > sizeof(FrameHead) ){
         QByteArray rcvAry = this->readAll();
@@ -114,6 +64,15 @@ void CTcpSocket::slotDisconnected(){
     emit disconnected(mSocketDescriptor);
     qDebug()<<mSocketDescriptor<<"断开连接...";
 }
+
+
+void CTcpSocket::writeData(unsigned char* sendBuf,int nSendLen,qintptr handle){
+    if( mSocketDescriptor == handle ){
+        //未作转码操作
+        this->write((char*)sendBuf,nSendLen);
+    }
+}
+
 
 void CTcpSocket::parseDatagram(QByteArray rcvAry){
     //将获取到的报文添加到缓存中
@@ -221,13 +180,6 @@ void CTcpSocket::switchDatagram(unsigned char* cRcvBuf,int nTotalLen){
     }
 
     //eg:
-    emit sendDataToQueue(mSocketDescriptor,(unsigned char*)&head,sizeof(FrameHead));
+    emit sendDataToQueue((unsigned char*)&head,sizeof(FrameHead),mSocketDescriptor);
 }
 
-
-void CTcpSocket::sendData(qintptr handle,unsigned char* sendBuf,int nSendLen){
-    if( mSocketDescriptor == handle ){
-        //未作转码操作
-        this->write((char*)sendBuf,nSendLen);
-    }
-}

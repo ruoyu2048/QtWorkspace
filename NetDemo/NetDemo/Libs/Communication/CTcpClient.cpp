@@ -16,8 +16,7 @@ CTcpClient::CTcpClient(QObject *parent) : QObject(parent)
 
 bool CTcpClient::ConnectToHost(QString strServerIP,quint16 nServerPort)
 {
-    if( NULL != m_pTSClient )
-    {
+    if( NULL != m_pTSClient ){
         emit UpdateConnectState("Ready to Connect...");
         qDebug()<<"Ready to Connect...";
         m_pTSClient->abort();
