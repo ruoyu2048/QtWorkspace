@@ -17,7 +17,8 @@ signals:
     *概述:将Socket的断开连接信号转发给TcpServer对象
     ************************************************************************/
     void disconnected(qintptr socketDesc);
-    void sendMsg(qintptr handle,unsigned char* sendBuf,int nSendLen);
+    void sendMsgToDown(qintptr handle,unsigned char* sendBuf,int nSendLen);
+    void sendDataToUp(qintptr handle,unsigned char* sendBuf,int nSendLen);
 
 private slots:
 

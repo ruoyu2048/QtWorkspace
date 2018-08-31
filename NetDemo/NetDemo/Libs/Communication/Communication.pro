@@ -28,7 +28,8 @@ SOURCES += \
     CTcpServer.cpp \
     PubFunc.cpp \
     CUdp.cpp \
-    Communication.cpp
+    Communication.cpp \
+    CTcpThread.cpp
 
 HEADERS += \
     CTcpClient.h \
@@ -36,7 +37,8 @@ HEADERS += \
     DataStruct.h \
     PubFunc.h \
     CUdp.h \
-    Communication.h
+    Communication.h \
+    CTcpThread.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

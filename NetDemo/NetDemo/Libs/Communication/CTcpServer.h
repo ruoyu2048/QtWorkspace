@@ -4,24 +4,21 @@
 #include <QMap>
 #include <QTcpServer>
 #include <QTcpSocket>
-#include "DataStruct.h"
-//#include "../PubDef/DataStruct.h"
 
-class CTcpSocket;
+class CTcpThread;
 class CTcpServer : public QTcpServer
 {
     Q_OBJECT
 public:
     explicit CTcpServer(QObject *parent = nullptr);
-
     /************************************************************************
-    *函数名:	StartListen
+    *函数名:	startListen
     *概述:启动TCP Server侦听
     *参数：strHostIP--TCP服务端IP地址
     *     nHostPort--TCP服务端端口
     *返回值：如果启动成功，则返回true，否则返回false
     ************************************************************************/
-    bool StartListen(QString strServerIP,quint16 nServerPort);
+    bool startListen(QString strServerIP,quint16 nServerPort);
 
     /************************************************************************
     *函数名:	SendData
@@ -29,9 +26,9 @@ public:
     *参数：handle--目标套接字标识符
     *     sendBuf--发送报文
     *     nSendLen--发送报文长度
-    *返回值：如果启动成功，则返回true，否则返回false
+    *返回值：无
     ************************************************************************/
-    bool SendData(qintptr handle,unsigned char* sendBuf,int nSendLen);
+    void sendData(qintptr handle,unsigned char* sendBuf,int nSendLen);
 
     /************************************************************************
     *函数名:	StopListen
@@ -39,7 +36,7 @@ public:
     *参数：无
     *返回值：无
     ************************************************************************/
-    void StopListen();
+    void stopListen();
 protected:
     /************************************************************************
     *函数名:	incomingConnection
@@ -49,17 +46,8 @@ protected:
     ************************************************************************/
     void incomingConnection(qintptr handle);
 
-private:
-    /************************************************************************
-    *变量名:	mClientsMap
-    *概述:连入客户端存储映射
-    * Key:连入的客户端套接字标识符
-    * Value:自定义TCP套接字对象
-    ************************************************************************/
-    QMap<qintptr,CTcpSocket*>mClientsMap;
-
-
 signals:
+    void sendMsgToDown(qintptr handle,unsigned char* sendBuf,int nSendLen);
 
 public slots:
 
@@ -81,74 +69,52 @@ private slots:
     *返回值：无
     ************************************************************************/
     void slotDisconnected(qintptr handle);
-
+private:
+    QMap<qintptr,CTcpThread*>mThreadMap;
 };
+
 
 class CTcpSocket : public QTcpSocket
 {
     Q_OBJECT
 public:
-    explicit CTcpSocket(QObject *parent = nullptr);
+    explicit CTcpSocket(qintptr socketDescriptor, QObject *parent = 0);
 
-    //Only used in TcpServer
-    /************************************************************************
-    *函数名:	SaveSocketDecriptor
-    *概述:将该套接字的描述符保存到成员变量，在TCPSever中要用到。
-    *参数：无
-    *返回值：无
-    ************************************************************************/
-    void SaveSocketDecriptor();
-
-    /************************************************************************
-    *函数名:	DisplaySocketDecriptor
-    *概述:打印套接字描述符(测试)。
-    *参数：无
-    *返回值：无
-    ************************************************************************/
-    void DisplaySocketDecriptor();
-
-    /************************************************************************
-    *函数名:	SendData
-    *概述:发送报文
-    *参数：sendBuf--要发送的报文
-    *     nSendLen--要发送报文的长度
-    *返回值：如果发送成功，则返回true，否则返回false.
-    ************************************************************************/
-    bool SendData(unsigned char* sendBuf,int nSendLen);
 private:
-    //套接字描述符
-    qintptr mSocketDecriptor;
     //接收数据缓存
     QByteArray mCacheAry;
+    //套接字描述符
+    qintptr mSocketDescriptor;
 
 signals:
     //Only used in TcpServer
     /************************************************************************
-    *函数名:	signalSendData
+    *函数名:	sendDataToQueue
     *概述:发送报文信号
     *参数：handle--客户端套接字描述符
     *     sendBuf--要发送的报文
     *     nSendLen--要发送报文的长度
     *返回值：如果发送成功，则返回true，否则返回false.
     ************************************************************************/
-    void signalSendData(qintptr handle,unsigned char* sendBuf,int nSendLen);
+    void sendDataToQueue(qintptr handle,unsigned char* sendBuf,int nSendLen);
 
     /************************************************************************
-    *函数名:	signalDisconnected
+    *函数名:	disconnected
     *概述:发送客户端断开连接的信号
     *参数：handle--客户端套接字标识符
     *返回值：无
     ************************************************************************/
-    void signalDisconnected(qintptr handle);
+    void disconnected(qintptr handle);
 
 public slots:
+    void sendData(qintptr handle,unsigned char* sendBuf,int nSendLen);
     /************************************************************************
-    *函数名:	slotReadData
+    *函数名:	readData
     *概述:客户端解析报文槽函数
     *参数：无
     *返回值：无
     ************************************************************************/
-    void slotReadData();
+    void readData();
 
     /************************************************************************
     *函数名:	slotDisconnected

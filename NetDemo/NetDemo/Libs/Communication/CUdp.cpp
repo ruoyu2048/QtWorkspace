@@ -15,13 +15,12 @@ CUdp::CUdp(QObject *parent) : QObject(parent)
     connect(m_pUdpCommon, SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(DisplayError(QAbstractSocket::SocketError)));
 
     //TEST
-    m_bFeedback = true;//默认服务端返回报文
-    m_pTimer = NULL;
+    m_bFeedback = true;//默认服务端返回报文
 }
 
 bool CUdp::Bind(QHostAddress localHost,quint16 nLocalPort)
 {
-    if( NULL != m_pUdpCommon )
+    if( Q_NULLPTR != m_pUdpCommon )
     {
         if( true == m_pUdpCommon->bind(localHost,nLocalPort) )
         {

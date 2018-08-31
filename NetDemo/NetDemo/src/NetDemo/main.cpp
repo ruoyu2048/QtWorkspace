@@ -4,9 +4,11 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+    QStringList strTS;
+    strTS<<"192.168.8.107"<<"8080";
     Communication* pCom = new Communication();
-    pCom->startTcpServer("127.0.0.1",9999);
-    //pCom->startTcpClient("127.0.0.1",9999);
+    pCom->startCommunication(TcpServer,strTS);
+    pCom->startCommunication(TcpClient,strTS);
 
     return a.exec();
 }

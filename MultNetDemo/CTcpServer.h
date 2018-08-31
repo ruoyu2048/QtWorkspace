@@ -12,7 +12,7 @@ class CTcpServer : public QTcpServer
 public:
     explicit CTcpServer(QObject *parent = nullptr);
     /************************************************************************
-    *函数名:	StartListen
+    *函数名:	startListen
     *概述:启动TCP Server侦听
     *参数：strHostIP--TCP服务端IP地址
     *     nHostPort--TCP服务端端口
@@ -47,7 +47,7 @@ protected:
     void incomingConnection(qintptr handle);
 
 signals:
-    void sendMsg(qintptr handle,unsigned char* sendBuf,int nSendLen);
+    void sendMsgToDown(qintptr handle,unsigned char* sendBuf,int nSendLen);
 
 public slots:
 
