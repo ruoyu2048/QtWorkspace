@@ -39,15 +39,6 @@ bool CTcpClient::ConnectToHost(QString strServerIP,quint16 nServerPort)
     return false;
 }
 
-bool CTcpClient::SendData(unsigned char* sendBuf,int nSendLen)
-{
-    qint64 nRet = m_pTSClient->write((char*)sendBuf,nSendLen);
-    if( -1 == nRet )
-        return false;
-
-    return true;
-}
-
 void CTcpClient::Close()
 {
     if( NULL != m_pTSClient )
@@ -59,6 +50,13 @@ void CTcpClient::StartTest()
     m_pTimer = new QTimer(this);
     connect(m_pTimer,SIGNAL(timeout()),this,SLOT(SendDataTest()));
     m_pTimer->start(1000);
+}
+
+void CTcpClient::writeData(CDataPacket* dataPkt,qintptr handle){
+    Q_UNUSED(handle);
+    if( NULL != dataPkt ){
+        m_pTSClient->write(dataPkt->msgData.data(),dataPkt->msgData.length());
+    }
 }
 
 void CTcpClient::ReadData()
@@ -157,29 +155,7 @@ void CTcpClient::parseDatagram(QByteArray rcvAry)
     }
 }
 
-void CTcpClient::switchDatagram(unsigned char* cRcvBuf,int nTotalLen)
-{
-    //信息区
-    short nInfoLen = 0;//信息长度=长度位(2)+信息区位长度(N)
-    unsigned char cInfoBuf[COMMAXLEN] = {'0'};//解码后的信息区缓存
-    RecvBufChange(cRcvBuf,cInfoBuf,nTotalLen,nInfoLen);
-
-    //帧头
-    FrameHead head;
-    memmove((unsigned char*)&head,cRcvBuf,sizeof(FrameHead));
-    //报头信息(帧头、目的地址、源地址、类型)
-    qDebug()<<head.cHead<<head.cDesAdd<<head.cSrcAdd<<head.cType;
-
-    switch (head.cType) {
-    case 0x32:{
-        MidInfo midInfo;
-        memmove((unsigned char*)&midInfo,cInfoBuf+sizeof(short),sizeof(MidInfo));
-        qDebug()<<midInfo.cLDState<<midInfo.cWorkMode<<midInfo.cPulseInput<<midInfo.cOLMid<<midInfo.cDSMid;
-    }
-        break;
-    case 0x33:
-        break;
-    }
+void CTcpClient::switchDatagram(unsigned char* cRcvBuf,int nTotalLen){
 
 }
 
@@ -195,8 +171,7 @@ void CTcpClient::Disconnected()
 
 void CTcpClient::DisplayError(QAbstractSocket::SocketError socketError)
 {
-    switch(socketError)
-    {
+    switch(socketError){
         case QAbstractSocket::RemoteHostClosedError:
             break;
         default :
@@ -247,5 +222,9 @@ void CTcpClient::SendDataTest()
     // 帧尾
     SendBuf[nSendLen] = 0xA5;
     ++nSendLen;//=报头(4)+转换后的(长度+信息区)长度(N)+校验位(1)+帧尾（1）
-    SendData(SendBuf,nSendLen);
+
+    CDataPacket dataPkt;
+    dataPkt.msgType = 0x32;
+    dataPkt.msgData.append((char*)SendBuf);
+    emit sendDataToQueue(&dataPkt,0);
 }

@@ -31,7 +31,7 @@ SOURCES += \
     Communication.cpp \
     CTcpThread.cpp \
     CSerialPort.cpp \
-    CDataPacket.cpp
+    CDataPacket*.cpp
 
 HEADERS += \
     CTcpClient.h \
@@ -42,7 +42,7 @@ HEADERS += \
     Communication.h \
     CTcpThread.h \
     CSerialPort.h \
-    CDataPacket.h
+    CDataPacket*.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

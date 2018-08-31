@@ -7,7 +7,7 @@
 class CDataPacket
 {
 public:
-    CDataPacket();
+    //CDataPacket();
     bool SendBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,short int PreLen,short int& AfterLen);
     bool RecvBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,short int PreLen,short int& AfterLen);
 public:

@@ -1,4 +1,5 @@
 #include "CTcpThread.h"
+#include "CDataPacket.h"
 
 CTcpThread::CTcpThread(qintptr socketDes,QObject *parent) : QThread(parent){
     mSocketDescriptor = socketDes;
@@ -14,9 +15,9 @@ void CTcpThread::run(){
     if ( false == m_pTcpSocket->setSocketDescriptor(mSocketDescriptor) )
         return ;
     //接收发送数据信号
-    connect(this,&CTcpThread::writeData,m_pTcpSocket,&CTcpSocket::writeData);
+    connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),m_pTcpSocket,SLOT(writeData(CDataPacket*,qintptr)));
     //
-    connect(m_pTcpSocket,&CTcpSocket::sendDataToQueue,this,&CTcpThread::sendDataToQueue);
+    connect(m_pTcpSocket,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)),this,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)));
     connect(m_pTcpSocket,SIGNAL(disconnected(qintptr)),this,SIGNAL(disconnected(qintptr)));
     connect(m_pTcpSocket,SIGNAL(disconnected()),this,SLOT(quit()));
 

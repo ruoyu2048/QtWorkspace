@@ -6,6 +6,7 @@
 #include <QTcpSocket>
 
 class CTcpThread;
+class CDataPacket;
 class CTcpServer : public QTcpServer
 {
     Q_OBJECT
@@ -37,6 +38,9 @@ protected:
     void incomingConnection(qintptr handle);
 
 signals:
+    void writeData(CDataPacket* dataPkt,qintptr handle);
+    void sendDataToQueue(CDataPacket* dataPkt,qintptr handle);
+
     void writeData(unsigned char* sendBuf,int nSendLen,qintptr handle);
     void sendDataToQueue(unsigned char* sendBuf,int nSendLen,qintptr handle);
 
@@ -69,6 +73,7 @@ private:
     qintptr mSocketDescriptor;
 
 signals:
+    void sendDataToQueue(CDataPacket* dataPkt,qintptr handle);
     /*@
     *函数名:	sendDataToQueue
     *概述:发送报文信号
@@ -88,6 +93,7 @@ signals:
     void disconnected(qintptr handle);
 
 public slots:
+    void writeData(CDataPacket* dataPkt,qintptr handle);
     void writeData(unsigned char* sendBuf,int nSendLen,qintptr handle);
 
     /*@

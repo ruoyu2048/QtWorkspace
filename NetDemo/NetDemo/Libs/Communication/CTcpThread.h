@@ -13,11 +13,13 @@ public:
     void run();
 
 signals:
-    void writeData(unsigned char* sendBuf,int nSendLen,quintptr handle);
+    void writeData(CDataPacket* dataPkt,qintptr handle);
+    void writeData(unsigned char* sendBuf,int nSendLen,qintptr handle);
 
     /*概述:将Socket的断开连接信号转发给TcpServer对象*/
     void disconnected(qintptr socketDesc);
 
+    void sendDataToQueue(CDataPacket* dataPkt,qintptr handle);
     /*函数名:	sendDataToQueue
      *概述:发送报文信号
      *参数：handle--客户端套接字描述符

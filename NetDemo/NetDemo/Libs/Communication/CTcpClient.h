@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QTcpSocket>
 #include "DataStruct.h"
+#include "CDataPacket.h"
 
 class CTcpClient:public QObject
 {
@@ -20,15 +21,6 @@ public:
     *返回值：如果连接成功，则返回true，否则返回false.
     ************************************************************************/
     bool ConnectToHost(QString strServerIP,quint16 nServerPort);
-
-    /************************************************************************
-    *函数名:	SendData
-    *概述:发送报文
-    *参数：sendBuf--要发送的报文
-    *     nSendLen--要发送报文的长度
-    *返回值：如果发送成功，则返回true，否则返回false.
-    ************************************************************************/
-    bool SendData(unsigned char* sendBuf,int nSendLen);
 
     /************************************************************************
     *函数名:	Close
@@ -71,6 +63,7 @@ private:
     QTimer* m_pTimer;           //发送报文定时器
 
 signals:
+    void sendDataToQueue(CDataPacket* dataPkt,qintptr handle=0);
     /************************************************************************
     *函数名:	UpdateConnectState
     *概述:发送客户端连接状态信息。
@@ -87,7 +80,7 @@ signals:
     void UpdateConnectState(ConnType emConnType);
 
 public slots:
-
+    void writeData(CDataPacket* dataPkt,qintptr handle=0);
 private slots:
     /************************************************************************
     *函数名:	ReadData

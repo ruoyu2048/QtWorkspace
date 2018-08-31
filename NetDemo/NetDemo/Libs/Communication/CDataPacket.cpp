@@ -3,10 +3,9 @@
 #include "PubFunc.h"
 //#include <windows.h>
 
-CDataPacket::CDataPacket()
-{
+//CDataPacket::CDataPacket(){
 
-}
+//}
 
 
 //添加附加字

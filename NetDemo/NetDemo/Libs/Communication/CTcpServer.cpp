@@ -2,6 +2,7 @@
 #include "CTcpThread.h"
 #include "DataStruct.h"
 #include "PubFunc.h"
+#include "CDataPacket.h"
 
 CTcpServer::CTcpServer(QObject *parent) : QTcpServer(parent){
     qRegisterMetaType<qintptr>("qintptr");
@@ -25,9 +26,10 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor){
     qDebug()<<"new Connection:"<<socketDescriptor;
     CTcpThread* pThread = new CTcpThread(socketDescriptor, 0);
     //服务端向下发送报文
-    connect(this,&CTcpServer::writeData,pThread,&CTcpThread::writeData);
+    connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),pThread,SIGNAL(writeData(CDataPacket*,qintptr)));
+    connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),pThread,SIGNAL(writeData(CDataPacket*,qintptr)));
     //接收各个客户端发送来的报文
-    connect(pThread,&CTcpThread::sendDataToQueue,this,&CTcpServer::sendDataToQueue);
+    connect(pThread,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)),this,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)));
     connect(pThread,SIGNAL(disconnected(qintptr)),this,SLOT(slotDisconnected(qintptr)));
     connect(pThread, SIGNAL(finished()), pThread, SLOT(deleteLater()));
 
@@ -65,6 +67,12 @@ void CTcpSocket::slotDisconnected(){
     qDebug()<<mSocketDescriptor<<"断开连接...";
 }
 
+void CTcpSocket::writeData(CDataPacket* dataPkt,qintptr handle){
+    if( mSocketDescriptor == handle ){
+        //未作转码操作
+        this->write(dataPkt->msgData.data(),dataPkt->msgData.length());
+    }
+}
 
 void CTcpSocket::writeData(unsigned char* sendBuf,int nSendLen,qintptr handle){
     if( mSocketDescriptor == handle ){
@@ -157,16 +165,21 @@ void CTcpSocket::parseDatagram(QByteArray rcvAry){
 }
 
 void CTcpSocket::switchDatagram(unsigned char* cRcvBuf,int nTotalLen){
-    //信息区
-    short nInfoLen = 0;//信息长度=长度位(2)+信息区位长度(N)
-    unsigned char cInfoBuf[COMMAXLEN] = {'0'};//解码后报文=转码后的长度+信息区
-    RecvBufChange(cRcvBuf,cInfoBuf,nTotalLen,nInfoLen);
-
     //帧头
     FrameHead head;
     memmove((unsigned char*)&head,cRcvBuf,sizeof(FrameHead));
     //报头信息(帧头、目的地址、源地址、类型)
     //qDebug()<<head.cHead<<head.cDesAdd<<head.cSrcAdd<<head.cType;
+
+    CDataPacket dataPkt;
+    dataPkt.msgType = head.cType;
+    dataPkt.msgData.append((char*)cRcvBuf);
+    emit sendDataToQueue(&dataPkt,mSocketDescriptor);
+
+    //信息区
+    short nInfoLen = 0;//信息长度=长度位(2)+信息区位长度(N)
+    unsigned char cInfoBuf[COMMAXLEN] = {'0'};//解码后报文=转码后的长度+信息区
+    RecvBufChange(cRcvBuf,cInfoBuf,nTotalLen,nInfoLen);
 
     switch (head.cType) {
     case 0x32:{
@@ -180,6 +193,6 @@ void CTcpSocket::switchDatagram(unsigned char* cRcvBuf,int nTotalLen){
     }
 
     //eg:
-    emit sendDataToQueue((unsigned char*)&head,sizeof(FrameHead),mSocketDescriptor);
+    //emit sendDataToQueue((unsigned char*)&head,sizeof(FrameHead),mSocketDescriptor);
 }
 
