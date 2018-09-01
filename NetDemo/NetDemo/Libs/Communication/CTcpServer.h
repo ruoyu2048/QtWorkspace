@@ -38,12 +38,14 @@ protected:
     void incomingConnection(qintptr handle);
 
 signals:
+    void writeData(CDataPacket* dataPkt);
+    void sendDataToQueue(CDataPacket* dataPkt);
+
     void writeData(CDataPacket* dataPkt,qintptr handle);
     void sendDataToQueue(CDataPacket* dataPkt,qintptr handle);
 
     void writeData(unsigned char* sendBuf,int nSendLen,qintptr handle);
     void sendDataToQueue(unsigned char* sendBuf,int nSendLen,qintptr handle);
-
 
 public slots:
 
@@ -67,12 +69,14 @@ public:
     explicit CTcpSocket(qintptr socketDescriptor, QObject *parent = 0);
 
 private:
+    quint8 mClientID;
     //接收数据缓存
     QByteArray mCacheAry;
     //套接字描述符
     qintptr mSocketDescriptor;
 
 signals:
+    void sendDataToQueue(CDataPacket* dataPkt);
     void sendDataToQueue(CDataPacket* dataPkt,qintptr handle);
     /*@
     *函数名:	sendDataToQueue
@@ -93,6 +97,7 @@ signals:
     void disconnected(qintptr handle);
 
 public slots:
+    void writeData(CDataPacket* dataPkt);
     void writeData(CDataPacket* dataPkt,qintptr handle);
     void writeData(unsigned char* sendBuf,int nSendLen,qintptr handle);
 

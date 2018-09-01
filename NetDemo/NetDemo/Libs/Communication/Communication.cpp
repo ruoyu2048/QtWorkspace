@@ -17,6 +17,9 @@ bool Communication::startCommunication(CommType commType,QStringList cfg){
         if( cfg.size() >=2 ){
             if( Q_NULLPTR == m_pTS ){
                 m_pTS = new CTcpServer(this);
+                connect(this,SIGNAL(writeData(CDataPacket*)),m_pTS,SIGNAL(writeData(CDataPacket*)));
+                connect(m_pTS,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
+
                 connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),m_pTS,SIGNAL(writeData(CDataPacket*,qintptr)));
                 connect(m_pTS,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)),this,SLOT(readDataFromMsgQueue(CDataPacket*,qintptr)));
             }
@@ -29,7 +32,10 @@ bool Communication::startCommunication(CommType commType,QStringList cfg){
         if( cfg.size() >=2 ){
             if( Q_NULLPTR == m_pTC ){
                 m_pTC = new CTcpClient(this);
-                connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),m_pTC,SLOT(writeData(CDataPacket*)));
+                connect(this,SIGNAL(writeData(CDataPacket*)),m_pTC,SLOT(writeData(CDataPacket*)));
+                connect(m_pTC,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
+
+                connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),m_pTC,SLOT(writeData(CDataPacket*,qintptr)));
                 connect(m_pTC,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)),this,SLOT(readDataFromMsgQueue(CDataPacket*,qintptr)));
             }
             QString strIP = cfg.at(0);
@@ -60,6 +66,10 @@ bool Communication::startCommunication(CommType commType,QStringList cfg){
     return bRet;
 }
 
+void Communication::sendData(CDataPacket* dataPkt){
+    emit writeData(dataPkt);
+}
+
 void Communication::sendData(CDataPacket* dataPkt,qintptr handle){
     emit writeData(dataPkt,handle);
 }
@@ -67,6 +77,12 @@ void Communication::sendData(CDataPacket* dataPkt,qintptr handle){
 void Communication::sendData(unsigned char* sendBuf,int nSendLen,qintptr handle){
     //向下发送数据
     emit writeData(sendBuf,nSendLen,handle);
+}
+
+void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
+    if( NULL != dataPkt ){
+        qDebug()<<dataPkt->msgType<<" "<<dataPkt->msgData;
+    }
 }
 
 void Communication::readDataFromMsgQueue(CDataPacket* dataPkt,qintptr handle){

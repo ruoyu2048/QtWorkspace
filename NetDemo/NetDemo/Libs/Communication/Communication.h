@@ -30,6 +30,7 @@ public:
      */
     bool startCommunication(CommType commType,QStringList cfg);
 
+	void sendData(CDataPacket* dataPkt);
     void sendData(CDataPacket* dataPkt,qintptr handle);
     /*！
      * 概述：向目标发送报文
@@ -47,10 +48,12 @@ private:
     CSerialPort*m_pSP;
 
 signals:
+    void writeData(CDataPacket* dataPkt);
     void writeData(CDataPacket* dataPkt,qintptr handle);
     void writeData(unsigned char* sendBuf,int nSendLen,qintptr handle);
 
 public slots:
+    void readDataFromMsgQueue(CDataPacket* dataPkt);
     void readDataFromMsgQueue(CDataPacket* dataPkt,qintptr handle);
     void readDataFromMsgQueue(unsigned char* rcvBuf,int nRcvLen,qintptr handle);
 };

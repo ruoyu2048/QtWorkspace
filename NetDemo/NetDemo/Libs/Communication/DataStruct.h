@@ -14,6 +14,14 @@ enum ConnType{
     Disconnected
 };
 
+struct ClientInfo{
+    quint8 clientID;
+    char   msgTypes[512];
+    ClientInfo(){
+        memset(&clientID,'0',sizeof(ClientInfo));
+    }
+};
+
 class DataPacket{
 public:
     quint8      msgType;

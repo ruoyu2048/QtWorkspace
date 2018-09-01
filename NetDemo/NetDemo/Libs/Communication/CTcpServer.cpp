@@ -25,11 +25,15 @@ void CTcpServer::stopListen(){
 void CTcpServer::incomingConnection(qintptr socketDescriptor){
     qDebug()<<"new Connection:"<<socketDescriptor;
     CTcpThread* pThread = new CTcpThread(socketDescriptor, 0);
+
     //服务端向下发送报文
-    connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),pThread,SIGNAL(writeData(CDataPacket*,qintptr)));
-    connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),pThread,SIGNAL(writeData(CDataPacket*,qintptr)));
+    connect(this,SIGNAL(writeData(CDataPacket*)),pThread,SIGNAL(writeData(CDataPacket*)));
     //接收各个客户端发送来的报文
+    connect(pThread,SIGNAL(sendDataToQueue(CDataPacket*)),this,SIGNAL(sendDataToQueue(CDataPacket*)));
+
+    connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),pThread,SIGNAL(writeData(CDataPacket*,qintptr)));
     connect(pThread,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)),this,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)));
+
     connect(pThread,SIGNAL(disconnected(qintptr)),this,SLOT(slotDisconnected(qintptr)));
     connect(pThread, SIGNAL(finished()), pThread, SLOT(deleteLater()));
 
@@ -65,6 +69,14 @@ void CTcpSocket::slotDisconnected(){
     //发送断开连接信号
     emit disconnected(mSocketDescriptor);
     qDebug()<<mSocketDescriptor<<"断开连接...";
+}
+
+void CTcpSocket::writeData(CDataPacket* dataPkt){
+    //屏蔽掉自己发出的信息
+    if( NULL != dataPkt ){
+        //未作转码操作
+        this->write(dataPkt->msgData.data(),dataPkt->msgData.length());
+    }
 }
 
 void CTcpSocket::writeData(CDataPacket* dataPkt,qintptr handle){
