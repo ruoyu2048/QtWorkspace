@@ -14,20 +14,6 @@ enum ConnType{
     Disconnected
 };
 
-struct ClientInfo{
-    quint8 clientID;
-    char   msgTypes[512];
-    ClientInfo(){
-        memset(&clientID,'0',sizeof(ClientInfo));
-    }
-};
-
-class DataPacket{
-public:
-    quint8      msgType;
-    QByteArray  msgData;
-};
-
 struct FrameHead{
     char cHead;             //帧头
     char cDesAdd;           //目的地址

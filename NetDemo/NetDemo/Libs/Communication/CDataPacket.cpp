@@ -7,6 +7,50 @@
 
 //}
 
+void CDataPacket::bytesToPacket(QByteArray rcvAry){
+    msgHead = rcvAry[0];
+    msgDst  = rcvAry[1];
+    msgSrc  = rcvAry[2];
+    msgType = rcvAry[3];
+    msgLen = ((uchar)rcvAry[4]<<8) + (uchar)rcvAry[5];
+    msgData = rcvAry.mid(6,msgLen);
+    msgCheck = rcvAry[rcvAry.length()-2];
+    msgEnd = rcvAry[rcvAry.length()-1];
+}
+
+QByteArray CDataPacket::packetToBytes(){
+    memset(&msgAry,'\0',sizeof(msgAry));
+    msgAry[0] = msgHead;
+    msgAry[1] = msgDst;
+    msgAry[2] = msgSrc;
+    msgAry[3] = msgType;
+    msgAry[4] = msgLen>>8;
+    msgAry[5] = msgLen&0x00ff;
+    memmove(msgAry+6,msgData.data(),msgLen);
+    msgAry[6+msgLen] = msgCheck;
+    msgAry[6+msgLen+1] = msgEnd;
+
+    QByteArray dataAry;
+    dataAry.append((char*)msgAry,4+2+msgLen+2);
+    return dataAry;
+}
+
+QByteArray CDataPacket::makeRegisterPacket( quint8 msgTypeReg,QList<quint8> dstIdList ){
+    msgHead = 0xAA;
+    msgDst = 0xAB;
+    msgSrc = 0xAB;
+    msgType = msgTypeReg;
+
+    msgLen = dstIdList.length();
+    foreach (quint8 dstId, dstIdList) {
+        char cDstId = dstId;
+        msgData.append(cDstId);
+    }
+    msgCheck = 0xA4;
+    msgEnd = 0xA5;
+
+    return packetToBytes();
+}
 
 //添加附加字
 bool CDataPacket::SendBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,short int PreLen,short int& AfterLen)
@@ -29,7 +73,7 @@ bool CDataPacket::SendBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,s
 //    DataBeforeTrans[1]=LOBYTE((WORD)(AfterLen-2));
     int nDataLen = AfterLen - 2;//转码后信息区的实际长度 = AfterLen - 长度（2字节=sizeof(short)）
     DataBeforeTrans[0]=(char)((nDataLen&0xff00)>>8);
-    DataBeforeTrans[0]=(char)(nDataLen&0x00ff);
+    DataBeforeTrans[1]=(char)(nDataLen&0x00ff);
     memmove(DataBeforeTrans+2,prefBuf,PreLen);
     //cout<<"AfterLen:"<<AfterLen<<" DBT:"<<DataBeforeTrans<<endl;
 
@@ -121,4 +165,3 @@ bool CDataPacket::RecvBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,s
 
     return true;
 }
-

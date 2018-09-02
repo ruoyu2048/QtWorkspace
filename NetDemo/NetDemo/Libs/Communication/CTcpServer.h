@@ -1,6 +1,7 @@
 #ifndef CTCPSERVER_H
 #define CTCPSERVER_H
 
+#include <QSet>
 #include <QMap>
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -69,12 +70,22 @@ public:
     explicit CTcpSocket(qintptr socketDescriptor, QObject *parent = 0);
 
 private:
-    quint8 mClientID;
+    bool registClientInfo(CDataPacket* dataPkt );
+    void updateDstIdSet(quint8 dstId);
+    bool isInDstIdSet(quint8 dstId);
+
+private:
     //接收数据缓存
     QByteArray mCacheAry;
     //套接字描述符
     qintptr mSocketDescriptor;
 
+    //客户端是否已注册
+    bool mbRegist;
+    //订阅数据类型
+    quint8 mMsgType;
+    //目的地址集合
+    QSet<quint8> mDstIdSet;
 signals:
     void sendDataToQueue(CDataPacket* dataPkt);
     void sendDataToQueue(CDataPacket* dataPkt,qintptr handle);

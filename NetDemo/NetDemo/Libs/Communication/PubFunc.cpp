@@ -21,7 +21,7 @@ bool SendBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,short int PreL
 //    DataBeforeTrans[1]=LOBYTE((WORD)(AfterLen-2));
     int nDataLen = AfterLen - 2;//转码后信息区的实际长度 = AfterLen - 长度（2字节=sizeof(short)）
     DataBeforeTrans[0]=(char)((nDataLen&0xff00)>>8);
-    DataBeforeTrans[0]=(char)(nDataLen&0x00ff);
+    DataBeforeTrans[1]=(char)(nDataLen&0x00ff);
     memmove(DataBeforeTrans+2,prefBuf,PreLen);
     //cout<<"AfterLen:"<<AfterLen<<" DBT:"<<DataBeforeTrans<<endl;
 

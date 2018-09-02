@@ -13,6 +13,7 @@ class CTcpClient:public QObject
 public:
     explicit CTcpClient(QObject *parent = nullptr);
 
+    void setClientInfo(QStringList clientInfo);
     /************************************************************************
     *函数名:	ConnectToHost
     *概述:连接到服务端
@@ -29,7 +30,9 @@ public:
     *返回值：无
     ************************************************************************/
     void Close();
+
 private:
+    quint8 hexStringToChar(QString hexStr);
     /************************************************************************
     *函数名:	StartTest
     *概述:定时发送报文测试
@@ -62,6 +65,10 @@ private:
     //TEST
     QTimer* m_pTimer;           //发送报文定时器
 
+    //订阅数据类型
+    quint8 mMsgType;
+    //目的地址集合
+    QSet<quint8> mDstIdSet;
 signals:
     void sendDataToQueue(CDataPacket* dataPkt,qintptr handle=0);
     /************************************************************************
@@ -81,6 +88,7 @@ signals:
 
 public slots:
     void writeData(CDataPacket* dataPkt,qintptr handle=0);
+
 private slots:
     /************************************************************************
     *函数名:	ReadData

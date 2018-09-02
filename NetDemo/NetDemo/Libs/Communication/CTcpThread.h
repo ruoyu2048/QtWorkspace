@@ -1,6 +1,7 @@
 #ifndef CTCPTHREAD_H
 #define CTCPTHREAD_H
 
+
 #include <QThread>
 #include "CTcpServer.h"
 

@@ -52,9 +52,35 @@ void CTcpServer::slotDisconnected(qintptr handle){
 
 /*---------------------------------CTcpSocket---------------------------------*/
 CTcpSocket::CTcpSocket(qintptr socketDescriptor, QObject *parent):QTcpSocket(parent){
+    mbRegist = false;
     mSocketDescriptor = socketDescriptor;
     connect(this, SIGNAL(readyRead()), this, SLOT(readData()));
     connect(this,SIGNAL(disconnected()),this,SLOT(slotDisconnected()));
+}
+
+bool CTcpSocket::registClientInfo(CDataPacket* dataPkt ){
+    if( NULL != dataPkt && dataPkt->msgDst == dataPkt->msgDst ){
+        mMsgType = dataPkt->msgType;
+        int nTypes = dataPkt->msgLen;
+        for(int i=0;i<nTypes;i++){
+            quint8 dstId = dataPkt->msgData.at(i);
+            updateDstIdSet(dstId);
+        }
+        return true;
+    }
+    return false;
+}
+
+void CTcpSocket::updateDstIdSet(quint8 dstId){
+    mDstIdSet.insert(dstId);
+}
+
+bool CTcpSocket::isInDstIdSet(quint8 dstId){
+    QSet<quint8>::iterator it = mDstIdSet.find(dstId);
+    if( it == mDstIdSet.end() )
+        return false;
+
+    return true;
 }
 
 //slots
@@ -72,10 +98,8 @@ void CTcpSocket::slotDisconnected(){
 }
 
 void CTcpSocket::writeData(CDataPacket* dataPkt){
-    //屏蔽掉自己发出的信息
-    if( NULL != dataPkt ){
-        //未作转码操作
-        this->write(dataPkt->msgData.data(),dataPkt->msgData.length());
+    if( NULL != dataPkt && mMsgType ==dataPkt->msgType && isInDstIdSet(dataPkt->msgDst)){
+        this->write(dataPkt->packetToBytes());
     }
 }
 
@@ -97,83 +121,108 @@ void CTcpSocket::writeData(unsigned char* sendBuf,int nSendLen,qintptr handle){
 void CTcpSocket::parseDatagram(QByteArray rcvAry){
     //将获取到的报文添加到缓存中
     mCacheAry.append(rcvAry);
-    //计算缓存长度
-    int nCacheLen = mCacheAry.length();
-    while( nCacheLen > 0 ){
-        //解析缓存
-        int nMaxRcvBufLen = nCacheLen;
-        unsigned char cRcvBuf[COMMAXLEN] = {'0'};
-        if( nCacheLen >= COMMAXLEN ){
-            nMaxRcvBufLen = COMMAXLEN;
-        }
-        memmove(cRcvBuf,(unsigned char*)mCacheAry.data(),nMaxRcvBufLen);
-        /*---------------------------------报文数据完整性验证---------------------------------*/
-        //先找帧头
-        bool bFindHead = true;
-        if( 0xAA != cRcvBuf[0] ){//帧头不正确
-            qDebug()<<"帧头不正确 [Head:"<<cRcvBuf[0]<<"]";
-            bFindHead = false;
-        }
-        //再找帧尾
-        int nTotalLen = 0;
-        bool bFindTail = false;
-        for( ;nTotalLen<nMaxRcvBufLen;nTotalLen++ ){
-            if( 0xA5 == cRcvBuf[nTotalLen] ){
-                ++nTotalLen;
-                bFindTail = true;
-                break;
-            }
-        }
-
-        //有效报文(有头有尾)
-        if( true == bFindHead && true ==bFindTail ){
-            //计算校验位
-//            unsigned char cCheck = cRcvBuf[1];
-//            for(int i=2;i<nTotalLen-2;i++){
-//                cCheck = cCheck^cRcvBuf[i];
-//            }
-
-            int nStartPos = 4;
-            unsigned char cCheck = cRcvBuf[nStartPos];
-            for(int i=nStartPos+1;i<nTotalLen-2;i++){
-                cCheck += cRcvBuf[i]&0xFF;
-            }
-            cCheck = cCheck&0xFF;
-
-            //比较校验位
-            if( cCheck != cRcvBuf[nTotalLen-2] ){//校验位判断
-                qDebug()<<"校验位错误 [cCheck:"<<cCheck<<"SrcCheck:"<<cRcvBuf[nTotalLen-2]<<"]";
-                qDebug()<<"mCacheAry:"<<mCacheAry<<"\n";
-                mCacheAry.remove(0,nTotalLen);//将错误信息丢弃
-                nCacheLen = mCacheAry.length();
-                continue;
-            }
-            /*---------------------------------解析报文---------------------------------*/
-            switchDatagram(cRcvBuf, nTotalLen);
-            //将解析过的报文数据从缓存中清除
-            mCacheAry.remove(0,nTotalLen);
-            //重新计算缓存中的报文数据长度
-            nCacheLen = mCacheAry.length();
-        }
-        else
-        {
-            //有头无尾，则跳过
-            if( true == bFindHead && false == bFindTail ){
-                break;
+    while( mCacheAry.length() > 0 ){
+        int nHeadPos = mCacheAry.indexOf(0xAA);
+        int nTailPos = mCacheAry.indexOf(0xA5);
+        if( nTailPos > nHeadPos ){
+            quint16 nDataLen = ((uchar)mCacheAry[4]<<8) + (uchar)mCacheAry[5];
+            QByteArray dataAry = mCacheAry.mid(nHeadPos,4+2+nDataLen+2);
+            CDataPacket* dataPkt = new CDataPacket();
+            dataPkt->bytesToPacket( dataAry );
+            if( !mbRegist ){
+                if( registClientInfo(dataPkt) )
+                    mbRegist = true;
             }
             else{
-                //无头无尾、无头有尾，则丢弃
-                QByteArray invalidData = mCacheAry.mid(0,nTotalLen);
-                qDebug()<<"InvalidDataLen:"<<nTotalLen<<"InvalidData:"<<invalidData;
-                //将无效的报文数据从缓存中丢弃
-                mCacheAry.remove(0,nTotalLen);
-                //重新计算缓存中的报文数据长度
-                nCacheLen = mCacheAry.length();
-                qDebug()<<"CurCacheLen:"<<nCacheLen<<"CurCacheData:"<<mCacheAry<<"\n";
-                continue;
+                if( dataPkt->msgType == mMsgType )
+                    emit sendDataToQueue(dataPkt);
             }
+            //移除已解析的报文
+            mCacheAry.remove(0,nHeadPos + dataAry.length());
+        }
+        else {
+            //将不完整数据从缓冲区清除
+            mCacheAry.remove(0,nHeadPos);
         }
     }
+
+//    //计算缓存长度
+//    int nCacheLen = mCacheAry.length();
+//    while( nCacheLen > 0 ){
+//        //解析缓存
+//        int nMaxRcvBufLen = nCacheLen;
+//        unsigned char cRcvBuf[COMMAXLEN] = {'0'};
+//        if( nCacheLen >= COMMAXLEN ){
+//            nMaxRcvBufLen = COMMAXLEN;
+//        }
+//        memmove(cRcvBuf,(unsigned char*)mCacheAry.data(),nMaxRcvBufLen);
+//        /*---------------------------------报文数据完整性验证---------------------------------*/
+//        //先找帧头
+//        bool bFindHead = true;
+//        if( 0xAA != cRcvBuf[0] ){//帧头不正确
+//            qDebug()<<"帧头不正确 [Head:"<<cRcvBuf[0]<<"]";
+//            bFindHead = false;
+//        }
+//        //再找帧尾
+//        int nTotalLen = 0;
+//        bool bFindTail = false;
+//        for( ;nTotalLen<nMaxRcvBufLen;nTotalLen++ ){
+//            if( 0xA5 == cRcvBuf[nTotalLen] ){
+//                ++nTotalLen;
+//                bFindTail = true;
+//                break;
+//            }
+//        }
+
+//        //有效报文(有头有尾)
+//        if( true == bFindHead && true ==bFindTail ){
+//            //计算校验位
+////            unsigned char cCheck = cRcvBuf[1];
+////            for(int i=2;i<nTotalLen-2;i++){
+////                cCheck = cCheck^cRcvBuf[i];
+////            }
+
+//            int nStartPos = 4;
+//            unsigned char cCheck = cRcvBuf[nStartPos];
+//            for(int i=nStartPos+1;i<nTotalLen-2;i++){
+//                cCheck += cRcvBuf[i]&0xFF;
+//            }
+//            cCheck = cCheck&0xFF;
+
+//            //比较校验位
+//            if( cCheck != cRcvBuf[nTotalLen-2] ){//校验位判断
+//                qDebug()<<"校验位错误 [cCheck:"<<cCheck<<"SrcCheck:"<<cRcvBuf[nTotalLen-2]<<"]";
+//                qDebug()<<"mCacheAry:"<<mCacheAry<<"\n";
+//                mCacheAry.remove(0,nTotalLen);//将错误信息丢弃
+//                nCacheLen = mCacheAry.length();
+//                continue;
+//            }
+//            /*---------------------------------解析报文---------------------------------*/
+//            switchDatagram(cRcvBuf, nTotalLen);
+//            //将解析过的报文数据从缓存中清除
+//            mCacheAry.remove(0,nTotalLen);
+//            //重新计算缓存中的报文数据长度
+//            nCacheLen = mCacheAry.length();
+//        }
+//        else
+//        {
+//            //有头无尾，则跳过
+//            if( true == bFindHead && false == bFindTail ){
+//                break;
+//            }
+//            else{
+//                //无头无尾、无头有尾，则丢弃
+//                QByteArray invalidData = mCacheAry.mid(0,nTotalLen);
+//                qDebug()<<"InvalidDataLen:"<<nTotalLen<<"InvalidData:"<<invalidData;
+//                //将无效的报文数据从缓存中丢弃
+//                mCacheAry.remove(0,nTotalLen);
+//                //重新计算缓存中的报文数据长度
+//                nCacheLen = mCacheAry.length();
+//                qDebug()<<"CurCacheLen:"<<nCacheLen<<"CurCacheData:"<<mCacheAry<<"\n";
+//                continue;
+//            }
+//        }
+//    }
 }
 
 void CTcpSocket::switchDatagram(unsigned char* cRcvBuf,int nTotalLen){

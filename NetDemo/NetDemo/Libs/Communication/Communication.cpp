@@ -19,9 +19,6 @@ bool Communication::startCommunication(CommType commType,QStringList cfg){
                 m_pTS = new CTcpServer(this);
                 connect(this,SIGNAL(writeData(CDataPacket*)),m_pTS,SIGNAL(writeData(CDataPacket*)));
                 connect(m_pTS,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
-
-                connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),m_pTS,SIGNAL(writeData(CDataPacket*,qintptr)));
-                connect(m_pTS,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)),this,SLOT(readDataFromMsgQueue(CDataPacket*,qintptr)));
             }
             QString strIP = cfg.at(0);
             quint16 nPort = cfg.at(1).toInt();
@@ -29,17 +26,17 @@ bool Communication::startCommunication(CommType commType,QStringList cfg){
         }
         break;
     case TcpClient:
-        if( cfg.size() >=2 ){
+        if( cfg.size() >= 4 ){
             if( Q_NULLPTR == m_pTC ){
                 m_pTC = new CTcpClient(this);
                 connect(this,SIGNAL(writeData(CDataPacket*)),m_pTC,SLOT(writeData(CDataPacket*)));
                 connect(m_pTC,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
-
-                connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),m_pTC,SLOT(writeData(CDataPacket*,qintptr)));
-                connect(m_pTC,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)),this,SLOT(readDataFromMsgQueue(CDataPacket*,qintptr)));
             }
+
             QString strIP = cfg.at(0);
             quint16 nPort = cfg.at(1).toInt();
+            QStringList clientInfo = cfg.mid(2);
+            m_pTC->setClientInfo(clientInfo);
             bRet = m_pTC->ConnectToHost(strIP,nPort);
         }
         break;
@@ -82,12 +79,35 @@ void Communication::sendData(unsigned char* sendBuf,int nSendLen,qintptr handle)
 void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
     if( NULL != dataPkt ){
         qDebug()<<dataPkt->msgType<<" "<<dataPkt->msgData;
+        switch (dataPkt->msgType) {
+        case 0x10:
+
+            break;
+        case 0x20:
+
+            break;
+        case 0x30:
+
+            break;
+        case 0x40:
+
+            break;
+        }
     }
 }
 
 void Communication::readDataFromMsgQueue(CDataPacket* dataPkt,qintptr handle){
     if( NULL != dataPkt ){
-        qDebug()<<dataPkt->msgType<<" "<<dataPkt->msgData;
+        switch (dataPkt->msgType) {
+        case 0x10:
+            break;
+        case 0x20:
+            break;
+        case 0x30:
+            break;
+        case 0x40:
+            break;
+        }
     }
 }
 

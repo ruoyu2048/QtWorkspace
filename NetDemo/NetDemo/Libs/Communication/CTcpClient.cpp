@@ -14,6 +14,14 @@ CTcpClient::CTcpClient(QObject *parent) : QObject(parent)
     connect(m_pTSClient,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(DisplayError(QAbstractSocket::SocketError)));
 }
 
+void CTcpClient::setClientInfo(QStringList clientInfo){
+    mMsgType = hexStringToChar(clientInfo.at(0));
+    for(int i=1;i<clientInfo.size();++i){
+        quint8 nDstId = hexStringToChar(clientInfo.at(i));
+        mDstIdSet.insert(nDstId);
+    }
+}
+
 bool CTcpClient::ConnectToHost(QString strServerIP,quint16 nServerPort)
 {
     if( NULL != m_pTSClient ){
@@ -26,7 +34,7 @@ bool CTcpClient::ConnectToHost(QString strServerIP,quint16 nServerPort)
         if(m_pTSClient->waitForConnected(3000)){
             //log:连接成功
             qDebug()<<"连接成功";
-            StartTest();
+            //StartTest();
             return true;
         }
         else{
@@ -43,6 +51,23 @@ void CTcpClient::Close()
 {
     if( NULL != m_pTSClient )
         m_pTSClient->close();
+}
+
+
+quint8 CTcpClient::hexStringToChar(QString hexStr){
+    quint8 nChar = 0;
+    //0x12 0X12
+    if(hexStr.indexOf('x')>=0 || hexStr.indexOf('X')>=0){
+        for (int i=2;i<hexStr.length();++i){
+            if (hexStr.at(i) > '9'){
+                nChar = 16 * nChar + (10 + hexStr.at(i).toLatin1() - 'A' );
+            }
+            else{
+                nChar = 16 * nChar +( hexStr.at(i).toLatin1() - '0' );
+            }
+        }
+    }
+    return nChar;
 }
 
 void CTcpClient::StartTest()
@@ -72,87 +97,7 @@ void CTcpClient::ReadData()
 
 void CTcpClient::parseDatagram(QByteArray rcvAry)
 {
-    //将获取到的报文添加到缓存中
-    mCacheAry.append(rcvAry);
-    //计算缓存长度
-    int nCacheLen = mCacheAry.length();
-    while( nCacheLen > 0 )
-    {
-        //解析缓存
-        int nMaxRcvBufLen = nCacheLen;
-        unsigned char cRcvBuf[COMMAXLEN] = {'0'};
-        if( nCacheLen >= COMMAXLEN ){
-            nMaxRcvBufLen = COMMAXLEN;
-        }
-        memmove(cRcvBuf,(unsigned char*)mCacheAry.data(),nMaxRcvBufLen);
-        /*---------------------------------报文数据完整性验证---------------------------------*/
-        //先找帧头
-        bool bFindHead = true;
-        if( 0xAA != cRcvBuf[0] ){//帧头不正确
-            qDebug()<<"帧头不正确 [Head:"<<cRcvBuf[0]<<"]";
-            bFindHead = false;
-        }
-        //再找帧尾
-        int nTotalLen = 0;
-        bool bFindTail = false;
-        for( ;nTotalLen<nMaxRcvBufLen;nTotalLen++ ){
-            if( 0xA5 == cRcvBuf[nTotalLen] ){
-                ++nTotalLen;
-                bFindTail = true;
-                break;
-            }
-        }
 
-        //有效报文(有头有尾)
-        if( true == bFindHead && true ==bFindTail )
-        {
-            //计算校验位
-//            unsigned char cCheck = cRcvBuf[1];
-//            for(int i=2;i<nTotalLen-2;i++){
-//                cCheck = cCheck^cRcvBuf[i];
-//            }
-
-            int nStartPos = 4;
-            unsigned char cCheck = cRcvBuf[nStartPos];
-            for(int i=nStartPos+1;i<nTotalLen-2;i++){
-                cCheck += cRcvBuf[i]&0xFF;
-            }
-            cCheck = cCheck&0xFF;
-
-            //比较校验位
-            if( cCheck != cRcvBuf[nTotalLen-2] ){//校验位判断
-                qDebug()<<"校验位错误 [cCheck:"<<cCheck<<"SrcCheck:"<<cRcvBuf[nTotalLen-2]<<"]";
-                qDebug()<<"mCacheAry:"<<mCacheAry<<"\n";
-                mCacheAry.remove(0,nTotalLen);//将错误信息丢弃
-                nCacheLen = mCacheAry.length();
-                continue;
-            }
-            /*---------------------------------解析报文---------------------------------*/
-            switchDatagram(cRcvBuf, nTotalLen);
-            //将解析过的报文数据从缓存中清除
-            mCacheAry.remove(0,nTotalLen);
-            //重新计算缓存中的报文数据长度
-            nCacheLen = mCacheAry.length();
-        }
-        else
-        {
-            //有头无尾，则跳过
-            if( true == bFindHead && false == bFindTail ){
-                break;
-            }
-            else{
-                //无头无尾、无头有尾，则丢弃
-                QByteArray invalidData = mCacheAry.mid(0,nTotalLen);
-                qDebug()<<"InvalidDataLen:"<<nTotalLen<<"InvalidData:"<<invalidData;
-                //将无效的报文数据从缓存中丢弃
-                mCacheAry.remove(0,nTotalLen);
-                //重新计算缓存中的报文数据长度
-                nCacheLen = mCacheAry.length();
-                qDebug()<<"CurCacheLen:"<<nCacheLen<<"CurCacheData:"<<mCacheAry;
-                continue;
-            }
-        }
-    }
 }
 
 void CTcpClient::switchDatagram(unsigned char* cRcvBuf,int nTotalLen){
@@ -162,6 +107,9 @@ void CTcpClient::switchDatagram(unsigned char* cRcvBuf,int nTotalLen){
 void CTcpClient::Connected()
 {
     emit UpdateConnectState("Connected");
+    CDataPacket dataPkt;
+    QByteArray dataAry = dataPkt.makeRegisterPacket(mMsgType,mDstIdSet.toList());
+    m_pTSClient->write(dataAry);
 }
 
 void CTcpClient::Disconnected()
