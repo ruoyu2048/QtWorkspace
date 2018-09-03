@@ -18,11 +18,12 @@ void CTcpThread::run(){
     connect(this,SIGNAL(writeData(CDataPacket*)),m_pTcpSocket,SLOT(writeData(CDataPacket*)));
     connect(m_pTcpSocket,SIGNAL(sendDataToQueue(CDataPacket*)),this,SIGNAL(sendDataToQueue(CDataPacket*)));
 
-    connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),m_pTcpSocket,SLOT(writeData(CDataPacket*,qintptr)));
-    connect(m_pTcpSocket,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)),this,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)));
-
     connect(m_pTcpSocket,SIGNAL(disconnected(qintptr)),this,SIGNAL(disconnected(qintptr)));
     connect(m_pTcpSocket,SIGNAL(disconnected()),this,SLOT(quit()));
 
     exec();
+}
+
+void CTcpThread::publishData( CDataPacket* dataPkt ){
+    emit writeData(dataPkt);
 }

@@ -17,7 +17,7 @@ bool Communication::startCommunication(CommType commType,QStringList cfg){
         if( cfg.size() >=2 ){
             if( Q_NULLPTR == m_pTS ){
                 m_pTS = new CTcpServer(this);
-                connect(this,SIGNAL(writeData(CDataPacket*)),m_pTS,SIGNAL(writeData(CDataPacket*)));
+                connect(this,SIGNAL(writeData(CDataPacket*)),m_pTS,SLOT(dispatchData(CDataPacket*)));
                 connect(m_pTS,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
             }
             QString strIP = cfg.at(0);
@@ -67,10 +67,6 @@ void Communication::sendData(CDataPacket* dataPkt){
     emit writeData(dataPkt);
 }
 
-void Communication::sendData(CDataPacket* dataPkt,qintptr handle){
-    emit writeData(dataPkt,handle);
-}
-
 void Communication::sendData(unsigned char* sendBuf,int nSendLen,qintptr handle){
     //向下发送数据
     emit writeData(sendBuf,nSendLen,handle);
@@ -78,36 +74,7 @@ void Communication::sendData(unsigned char* sendBuf,int nSendLen,qintptr handle)
 
 void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
     if( NULL != dataPkt ){
-        qDebug()<<dataPkt->msgType<<" "<<dataPkt->msgData;
-        switch (dataPkt->msgType) {
-        case 0x10:
-
-            break;
-        case 0x20:
-
-            break;
-        case 0x30:
-
-            break;
-        case 0x40:
-
-            break;
-        }
-    }
-}
-
-void Communication::readDataFromMsgQueue(CDataPacket* dataPkt,qintptr handle){
-    if( NULL != dataPkt ){
-        switch (dataPkt->msgType) {
-        case 0x10:
-            break;
-        case 0x20:
-            break;
-        case 0x30:
-            break;
-        case 0x40:
-            break;
-        }
+        emit writeData(dataPkt);
     }
 }
 

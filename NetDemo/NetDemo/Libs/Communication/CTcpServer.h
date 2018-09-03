@@ -42,13 +42,11 @@ signals:
     void writeData(CDataPacket* dataPkt);
     void sendDataToQueue(CDataPacket* dataPkt);
 
-    void writeData(CDataPacket* dataPkt,qintptr handle);
-    void sendDataToQueue(CDataPacket* dataPkt,qintptr handle);
-
     void writeData(unsigned char* sendBuf,int nSendLen,qintptr handle);
     void sendDataToQueue(unsigned char* sendBuf,int nSendLen,qintptr handle);
 
 public slots:
+    void dispatchData( CDataPacket* dataPkt );
 
 private slots:
     /*@
@@ -60,6 +58,7 @@ private slots:
     void slotDisconnected(qintptr handle);
 
 private:
+    QMap<quint8,qintptr>mMsgTypeMap;
     QMap<qintptr,CTcpThread*>mThreadMap;
 };
 
@@ -80,15 +79,13 @@ private:
     //套接字描述符
     qintptr mSocketDescriptor;
 
-    //客户端是否已注册
-    bool mbRegist;
     //订阅数据类型
     quint8 mMsgType;
     //目的地址集合
     QSet<quint8> mDstIdSet;
 signals:
+    void registerMsgType(quint8 msgType,qintptr socketDesc );
     void sendDataToQueue(CDataPacket* dataPkt);
-    void sendDataToQueue(CDataPacket* dataPkt,qintptr handle);
     /*@
     *函数名:	sendDataToQueue
     *概述:发送报文信号
@@ -109,7 +106,6 @@ signals:
 
 public slots:
     void writeData(CDataPacket* dataPkt);
-    void writeData(CDataPacket* dataPkt,qintptr handle);
     void writeData(unsigned char* sendBuf,int nSendLen,qintptr handle);
 
     /*@

@@ -49,12 +49,10 @@ private:
 
 signals:
     void writeData(CDataPacket* dataPkt);
-    void writeData(CDataPacket* dataPkt,qintptr handle);
     void writeData(unsigned char* sendBuf,int nSendLen,qintptr handle);
 
 public slots:
     void readDataFromMsgQueue(CDataPacket* dataPkt);
-    void readDataFromMsgQueue(CDataPacket* dataPkt,qintptr handle);
     void readDataFromMsgQueue(unsigned char* rcvBuf,int nRcvLen,qintptr handle);
 };
 

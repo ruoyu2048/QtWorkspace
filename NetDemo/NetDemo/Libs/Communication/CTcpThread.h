@@ -13,12 +13,10 @@ public:
     ~CTcpThread();
     void run();
 
+    void publishData( CDataPacket* dataPkt );
 signals:
     void writeData(CDataPacket* dataPkt);
     void sendDataToQueue(CDataPacket* dataPkt);
-
-    void writeData(CDataPacket* dataPkt,qintptr handle);
-    void sendDataToQueue(CDataPacket* dataPkt,qintptr handle);
 
     void writeData(unsigned char* sendBuf,int nSendLen,qintptr handle);
     /*函数名:	sendDataToQueue

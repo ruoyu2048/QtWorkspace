@@ -26,13 +26,8 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor){
     qDebug()<<"new Connection:"<<socketDescriptor;
     CTcpThread* pThread = new CTcpThread(socketDescriptor, 0);
 
-    //服务端向下发送报文
-    connect(this,SIGNAL(writeData(CDataPacket*)),pThread,SIGNAL(writeData(CDataPacket*)));
-    //接收各个客户端发送来的报文
+    //将客户端报文发送到上层消息队列
     connect(pThread,SIGNAL(sendDataToQueue(CDataPacket*)),this,SIGNAL(sendDataToQueue(CDataPacket*)));
-
-    connect(this,SIGNAL(writeData(CDataPacket*,qintptr)),pThread,SIGNAL(writeData(CDataPacket*,qintptr)));
-    connect(pThread,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)),this,SIGNAL(sendDataToQueue(CDataPacket*,qintptr)));
 
     connect(pThread,SIGNAL(disconnected(qintptr)),this,SLOT(slotDisconnected(qintptr)));
     connect(pThread, SIGNAL(finished()), pThread, SLOT(deleteLater()));
@@ -40,6 +35,18 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor){
     pThread->start();
 
     mThreadMap.insert(socketDescriptor,pThread);
+}
+
+void CTcpServer::dispatchData( CDataPacket* dataPkt ){
+    if( NULL != dataPkt ){
+        QMap<quint8,qintptr>::iterator itMsgType = mMsgTypeMap.find(dataPkt->msgType);
+        if( itMsgType != mMsgTypeMap.end() ){
+            QMap<qintptr,CTcpThread*>::iterator itThread = mThreadMap.find(itMsgType.value());
+            if( itThread != mThreadMap.end() ){
+                itThread.value()->writeData(dataPkt);
+            }
+        }
+    }
 }
 
 void CTcpServer::slotDisconnected(qintptr handle){
@@ -52,23 +59,24 @@ void CTcpServer::slotDisconnected(qintptr handle){
 
 /*---------------------------------CTcpSocket---------------------------------*/
 CTcpSocket::CTcpSocket(qintptr socketDescriptor, QObject *parent):QTcpSocket(parent){
-    mbRegist = false;
     mSocketDescriptor = socketDescriptor;
     connect(this, SIGNAL(readyRead()), this, SLOT(readData()));
     connect(this,SIGNAL(disconnected()),this,SLOT(slotDisconnected()));
 }
 
 bool CTcpSocket::registClientInfo(CDataPacket* dataPkt ){
-    if( NULL != dataPkt && dataPkt->msgDst == dataPkt->msgDst ){
+    if( NULL != dataPkt && dataPkt->msgDst == dataPkt->msgSrc ){
         mMsgType = dataPkt->msgType;
         int nTypes = dataPkt->msgLen;
         for(int i=0;i<nTypes;i++){
             quint8 dstId = dataPkt->msgData.at(i);
             updateDstIdSet(dstId);
         }
-        return true;
+        emit registerMsgType(mMsgType,mSocketDescriptor);
+
+        return false;
     }
-    return false;
+    return true;
 }
 
 void CTcpSocket::updateDstIdSet(quint8 dstId){
@@ -98,15 +106,9 @@ void CTcpSocket::slotDisconnected(){
 }
 
 void CTcpSocket::writeData(CDataPacket* dataPkt){
-    if( NULL != dataPkt && mMsgType ==dataPkt->msgType && isInDstIdSet(dataPkt->msgDst)){
+    //if( NULL != dataPkt && mMsgType ==dataPkt->msgType && isInDstIdSet(dataPkt->msgDst)){
+    if( NULL != dataPkt ){
         this->write(dataPkt->packetToBytes());
-    }
-}
-
-void CTcpSocket::writeData(CDataPacket* dataPkt,qintptr handle){
-    if( mSocketDescriptor == handle ){
-        //未作转码操作
-        this->write(dataPkt->msgData.data(),dataPkt->msgData.length());
     }
 }
 
@@ -121,28 +123,36 @@ void CTcpSocket::writeData(unsigned char* sendBuf,int nSendLen,qintptr handle){
 void CTcpSocket::parseDatagram(QByteArray rcvAry){
     //将获取到的报文添加到缓存中
     mCacheAry.append(rcvAry);
-    while( mCacheAry.length() > 0 ){
+    while( mCacheAry.length() >= 8 ){
+
         int nHeadPos = mCacheAry.indexOf(0xAA);
-        int nTailPos = mCacheAry.indexOf(0xA5);
-        if( nTailPos > nHeadPos ){
-            quint16 nDataLen = ((uchar)mCacheAry[4]<<8) + (uchar)mCacheAry[5];
-            QByteArray dataAry = mCacheAry.mid(nHeadPos,4+2+nDataLen+2);
-            CDataPacket* dataPkt = new CDataPacket();
-            dataPkt->bytesToPacket( dataAry );
-            if( !mbRegist ){
-                if( registClientInfo(dataPkt) )
-                    mbRegist = true;
-            }
-            else{
-                if( dataPkt->msgType == mMsgType )
-                    emit sendDataToQueue(dataPkt);
-            }
-            //移除已解析的报文
-            mCacheAry.remove(0,nHeadPos + dataAry.length());
+        if( nHeadPos >=0 ){
+                //必须保证报尾在报头后面
+                int nTailPos = mCacheAry.indexOf(0xA5,nHeadPos);
+                if( nTailPos >=0 ){//有头有尾
+                    //quint16 nDataLen = ((uchar)mCacheAry[4]<<8) + (uchar)mCacheAry[5];
+                    //QByteArray dataAry = mCacheAry.mid(nHeadPos,4+2+nDataLen+2);
+                    QByteArray dataAry = mCacheAry.mid(nHeadPos,nTailPos-nHeadPos+1);
+                    CDataPacket* dataPkt = new CDataPacket();
+                    dataPkt->bytesToPacket( dataAry );
+                    if( registClientInfo(dataPkt) ){
+                        emit sendDataToQueue(dataPkt);
+                    }
+                    //移除已解析的报文
+                    mCacheAry.remove( 0, nTailPos+1 );
+                }
+                else{//有头无尾,
+                    break;
+                }
         }
         else {
-            //将不完整数据从缓冲区清除
-            mCacheAry.remove(0,nHeadPos);
+            int nTailPos = mCacheAry.indexOf(0xA5);
+            if( nTailPos >= 0 ){//无头有尾
+                mCacheAry.remove( 0,nTailPos+1 );
+            }
+            else{//无头无尾
+                mCacheAry.clear();
+            }
         }
     }
 
@@ -235,7 +245,7 @@ void CTcpSocket::switchDatagram(unsigned char* cRcvBuf,int nTotalLen){
     CDataPacket dataPkt;
     dataPkt.msgType = head.cType;
     dataPkt.msgData.append((char*)cRcvBuf);
-    emit sendDataToQueue(&dataPkt,mSocketDescriptor);
+    emit sendDataToQueue(&dataPkt);
 
     //信息区
     short nInfoLen = 0;//信息长度=长度位(2)+信息区位长度(N)

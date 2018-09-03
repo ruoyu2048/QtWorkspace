@@ -12,7 +12,13 @@ void CDataPacket::bytesToPacket(QByteArray rcvAry){
     msgDst  = rcvAry[1];
     msgSrc  = rcvAry[2];
     msgType = rcvAry[3];
-    msgLen = ((uchar)rcvAry[4]<<8) + (uchar)rcvAry[5];
+
+    /*-------字节序：前高后低-------*/
+    //msgLen = ((uchar)rcvAry[4]<<8) + (uchar)rcvAry[5];
+
+    /*-------字节序：前低后高-------*/
+    msgLen = (uchar)rcvAry[4]+((uchar)rcvAry[5]<<8);
+
     msgData = rcvAry.mid(6,msgLen);
     msgCheck = rcvAry[rcvAry.length()-2];
     msgEnd = rcvAry[rcvAry.length()-1];
@@ -24,8 +30,15 @@ QByteArray CDataPacket::packetToBytes(){
     msgAry[1] = msgDst;
     msgAry[2] = msgSrc;
     msgAry[3] = msgType;
-    msgAry[4] = msgLen>>8;
-    msgAry[5] = msgLen&0x00ff;
+
+    /*-------字节序：前高后低-------*/
+    //msgAry[4] = msgLen>>8;
+    //msgAry[5] = msgLen&0x00ff;
+
+    /*-------字节序：前低后高-------*/
+    msgAry[4] = msgLen&0x00ff;
+    msgAry[5] = (msgLen&0xff00)>>8;
+
     memmove(msgAry+6,msgData.data(),msgLen);
     msgAry[6+msgLen] = msgCheck;
     msgAry[6+msgLen+1] = msgEnd;
@@ -63,19 +76,20 @@ bool CDataPacket::SendBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,s
     memset(DataAfterTrans,0,COMMAXLEN);
 
     // 计算转换后发送数据的长度
-    short int DataLen= PreLen + 2;//信息区长度（PreLen）+长度（2字节）=sizeof(short)
+    quint16 DataLen= PreLen + 2;//信息区长度（PreLen）+长度（2字节）=sizeof(short)
     AfterLen =DataLen + ((DataLen) / 7);
     if ((DataLen % 7) > 0){
         AfterLen = AfterLen + 1;
     }
-//    cout<<"AfterLen:"<<AfterLen<<" PreBuf:"<<prefBuf<<endl;
 //    DataBeforeTrans[0]=HIBYTE((WORD)(AfterLen-2));
 //    DataBeforeTrans[1]=LOBYTE((WORD)(AfterLen-2));
     int nDataLen = AfterLen - 2;//转码后信息区的实际长度 = AfterLen - 长度（2字节=sizeof(short)）
-    DataBeforeTrans[0]=(char)((nDataLen&0xff00)>>8);
-    DataBeforeTrans[1]=(char)(nDataLen&0x00ff);
+//    DataBeforeTrans[0]=(uchar)((nDataLen&0xff00)>>8);
+//    DataBeforeTrans[1]=(uchar)(nDataLen&0x00ff);
+    //低字节在前，高字节在后
+    DataBeforeTrans[0] = nDataLen&0x00ff;
+    DataBeforeTrans[1] = (nDataLen&0xff00)>>8;
     memmove(DataBeforeTrans+2,prefBuf,PreLen);
-    //cout<<"AfterLen:"<<AfterLen<<" DBT:"<<DataBeforeTrans<<endl;
 
     // 数据长度-信息区：数据转换，得到附加字
     int j = 0;
