@@ -23,9 +23,7 @@ void CTcpServer::stopListen(){
 }
 
 void CTcpServer::incomingConnection(qintptr socketDescriptor){
-    qDebug()<<"new Connection:"<<socketDescriptor;
     CTcpThread* pThread = new CTcpThread(socketDescriptor, 0);
-
     //将客户端报文发送到上层消息队列
     connect(pThread,SIGNAL(registerMsgType(quint8,qintptr)),this,SLOT(registerMsgType(quint8,qintptr)));
     connect(pThread,SIGNAL(sendDataToQueue(CDataPacket*)),this,SIGNAL(sendDataToQueue(CDataPacket*)));
@@ -40,6 +38,7 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor){
 
 void CTcpServer::registerMsgType(quint8 msgType, qintptr socketDesc){
     mMsgTypeMap.insert(msgType,socketDesc);
+    qDebug()<<"【服务器客户端注册中心】客户端注册标识:"<<socketDesc<<"订阅消息类型:"<<msgType;
 }
 
 void CTcpServer::dispatchData( CDataPacket* dataPkt ){
@@ -48,7 +47,7 @@ void CTcpServer::dispatchData( CDataPacket* dataPkt ){
         if( itMsgType != mMsgTypeMap.end() ){
             QMap<qintptr,CTcpThread*>::iterator itThread = mThreadMap.find(itMsgType.value());
             if( itThread != mThreadMap.end() ){
-                qDebug()<<"Dispatch Data to "<<itMsgType.value()<<"MsgType:"<<itMsgType.key();
+                qDebug()<<"【服务端报文发布中心】客户端注册标识:"<<itMsgType.value()<<"发布报文类型:"<<itMsgType.key();
                 itThread.value()->writeData(dataPkt);
             }
         }
@@ -99,7 +98,7 @@ bool CTcpSocket::isInDstIdSet(quint8 dstId){
 
 //slots
 void CTcpSocket::readData(){
-    if( this->bytesAvailable() > sizeof(FrameHead) ){
+    if( this->bytesAvailable() > 0 ){
         QByteArray rcvAry = this->readAll();
         parseDatagram(rcvAry);
     }
@@ -121,7 +120,6 @@ void CTcpSocket::parseDatagram(QByteArray rcvAry){
     //将获取到的报文添加到缓存中
     mCacheAry.append(rcvAry);
     while( mCacheAry.length() >= 8 ){
-
         int nHeadPos = mCacheAry.indexOf(0xAA);
         if( nHeadPos >=0 ){
                 //必须保证报尾在报头后面

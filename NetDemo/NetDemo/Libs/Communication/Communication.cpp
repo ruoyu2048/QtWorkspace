@@ -88,10 +88,11 @@ void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
     if( NULL != dataPkt ){
         switch (m_commType) {
         case TcpServer:
+            qDebug()<<"【TCP_SERVER_总控转发中心】收到报文，报文类型："<<dataPkt->msgType;
             emit writeData(dataPkt);
             break;
         case TcpClient:
-
+            qDebug()<<"【TCP_CLIENT_总控转发中心】收到报文，报文类型："<<dataPkt->msgType;
             break;
         case UDP:
 

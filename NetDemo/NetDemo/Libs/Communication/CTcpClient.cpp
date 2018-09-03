@@ -24,19 +24,22 @@ void CTcpClient::setClientInfo(QStringList clientInfo){
 bool CTcpClient::ConnectToHost(QString strServerIP,quint16 nServerPort)
 {
     if( NULL != m_pTSClient ){
-        emit UpdateConnectState("Ready to Connect...");
-        qDebug()<<"Ready to Connect...";
+        emit updateConnectState(ConnType::Ready);
+        emit updateConnectState("Ready to Connect...");
         m_pTSClient->abort();
         QHostAddress hostAddr(strServerIP);
         m_pTSClient->connectToHost(hostAddr,nServerPort);
-        emit UpdateConnectState("Connecting...");
-        if(m_pTSClient->waitForConnected(3000)){
+        emit updateConnectState(ConnType::Connecting);
+        emit updateConnectState("Connecting...");
+        if(m_pTSClient->waitForConnected(600000)){
             //log:连接成功
             qDebug()<<"连接成功";
             StartTest();
             return true;
         }
         else{
+            emit updateConnectState(ConnType::Timeout);
+            emit updateConnectState("Cconnection Timeout...");
             //log:连接超时
             qDebug()<<"连接超时";
             m_pTSClient->close();
@@ -85,8 +88,7 @@ void CTcpClient::writeData(CDataPacket* dataPkt){
 void CTcpClient::ReadData()
 {
     if( NULL != m_pTSClient ){
-        if( m_pTSClient->bytesAvailable() > sizeof(FrameHead) )
-        {
+        if( m_pTSClient->bytesAvailable()>0 ){
             QByteArray rcvAry = m_pTSClient->readAll();
             parseDatagram(rcvAry);
         }
@@ -98,7 +100,6 @@ void CTcpClient::parseDatagram(QByteArray rcvAry)
     //将获取到的报文添加到缓存中
     mCacheAry.append(rcvAry);
     while( mCacheAry.length() >= 8 ){
-
         int nHeadPos = mCacheAry.indexOf(0xAA);
         if( nHeadPos >=0 ){
                 //必须保证报尾在报头后面
@@ -112,7 +113,7 @@ void CTcpClient::parseDatagram(QByteArray rcvAry)
                     emit sendDataToQueue(dataPkt);
                     //移除已解析的报文
                     mCacheAry.remove( 0, nTailPos+1 );
-                    qDebug()<<"订阅消息类型:"<<mMsgType<<"接收到消息类型:"<<dataPkt->msgType;
+                    qDebug()<<"【客户端】订阅消息类型:"<<mMsgType<<"接收到消息类型:"<<dataPkt->msgType;
                 }
                 else{//有头无尾,
                     break;
@@ -136,7 +137,8 @@ void CTcpClient::switchDatagram(unsigned char* cRcvBuf,int nTotalLen){
 
 void CTcpClient::Connected()
 {
-    emit UpdateConnectState("Connected");
+    emit updateConnectState(ConnType::Connected);
+    emit updateConnectState("Connected");
     CDataPacket dataPkt;
     QByteArray dataAry = dataPkt.makeRegisterPacket(mMsgType,mDstIdSet.toList());
     m_pTSClient->write(dataAry);
@@ -144,7 +146,8 @@ void CTcpClient::Connected()
 
 void CTcpClient::Disconnected()
 {
-    emit UpdateConnectState("Disconnected");
+    emit updateConnectState(ConnType::Disconnected);
+    emit updateConnectState("Disconnected");
 }
 
 void CTcpClient::DisplayError(QAbstractSocket::SocketError socketError)
@@ -156,9 +159,12 @@ void CTcpClient::DisplayError(QAbstractSocket::SocketError socketError)
             qDebug() << m_pTSClient->errorString();
     }
 }
-
+static int aaa=0;
 void CTcpClient::SendDataTest()
 {
+    if( aaa >= 10 )
+        m_pTimer->stop();
+    ++aaa;
     CDataPacket dataPkt;
     dataPkt.msgHead = 0xAA;
     if(mMsgType == 0x10 ){

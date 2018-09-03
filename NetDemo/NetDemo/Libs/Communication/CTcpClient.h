@@ -76,14 +76,14 @@ signals:
     *参数：strConnectState--连接状态描述符(准备连接、正在连接、连接超时、已连接、断开连接)
     *返回值：无
     ************************************************************************/
-    void UpdateConnectState(QString strConnectState);
+    void updateConnectState(QString strConnectState);
     /************************************************************************
     *函数名:	UpdateConnectState
     *概述:发送客户端连接状态信息。
     *参数：emConnType--连接状态枚举
     *返回值：无
     ************************************************************************/
-    void UpdateConnectState(ConnType emConnType);
+    void updateConnectState(ConnType emConnType);
 
 public slots:
     void writeData(CDataPacket* dataPkt);
