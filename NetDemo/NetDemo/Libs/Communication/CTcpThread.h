@@ -14,19 +14,11 @@ public:
     void run();
 
     void publishData( CDataPacket* dataPkt );
+
 signals:
+    void registerMsgType(quint8 msgType,qintptr socketDesc );
     void writeData(CDataPacket* dataPkt);
     void sendDataToQueue(CDataPacket* dataPkt);
-
-    void writeData(unsigned char* sendBuf,int nSendLen,qintptr handle);
-    /*函数名:	sendDataToQueue
-     *概述:发送报文信号
-     *参数：handle--客户端套接字描述符
-     *     sendBuf--要发送的报文
-     *     nSendLen--要发送报文的长度
-     *返回值：如果发送成功，则返回true，否则返回false.
-    **/
-    void sendDataToQueue(unsigned char* sendBuf,int nSendLen,qintptr handle);
 
     /*概述:将Socket的断开连接信号转发给TcpServer对象*/
     void disconnected(qintptr socketDesc);

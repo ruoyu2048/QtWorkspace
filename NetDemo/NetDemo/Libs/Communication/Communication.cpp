@@ -12,6 +12,7 @@ Communication::Communication(QObject *parent) :
 
 bool Communication::startCommunication(CommType commType,QStringList cfg){
     bool bRet = false;
+    m_commType = commType;
     switch (commType) {
     case TcpServer:
         if( cfg.size() >=2 ){
@@ -36,6 +37,7 @@ bool Communication::startCommunication(CommType commType,QStringList cfg){
             QString strIP = cfg.at(0);
             quint16 nPort = cfg.at(1).toInt();
             QStringList clientInfo = cfg.mid(2);
+            //设置客户端注册信息
             m_pTC->setClientInfo(clientInfo);
             bRet = m_pTC->ConnectToHost(strIP,nPort);
         }
@@ -64,35 +66,39 @@ bool Communication::startCommunication(CommType commType,QStringList cfg){
 }
 
 void Communication::sendData(CDataPacket* dataPkt){
-    emit writeData(dataPkt);
-}
+    if( NULL != dataPkt ){
+        switch (m_commType) {
+        case TcpServer:
+            emit writeData(dataPkt);
+            break;
+        case TcpClient:
 
-void Communication::sendData(unsigned char* sendBuf,int nSendLen,qintptr handle){
-    //向下发送数据
-    emit writeData(sendBuf,nSendLen,handle);
+            break;
+        case UDP:
+
+            break;
+        case Serial:
+
+            break;
+        }
+    }
 }
 
 void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
     if( NULL != dataPkt ){
-        emit writeData(dataPkt);
+        switch (m_commType) {
+        case TcpServer:
+            emit writeData(dataPkt);
+            break;
+        case TcpClient:
+
+            break;
+        case UDP:
+
+            break;
+        case Serial:
+
+            break;
+        }
     }
 }
-
-//中转所有数据报文
-void Communication::readDataFromMsgQueue(unsigned char* rcvBuf,int nRcvLen,qintptr handle){
-//    switch (commType) {
-//    case TcpServer:
-
-//        break;
-//    case TcpClient:
-
-//        break;
-//    case UDP:
-
-//        break;
-//    case Serial:
-
-//        break;
-//    }
-}
-

@@ -6,7 +6,6 @@
 
 CTcpClient::CTcpClient(QObject *parent) : QObject(parent)
 {
-    mSocketDecriptor = 0;
     m_pTSClient = new QTcpSocket(this);
     connect(m_pTSClient,SIGNAL(readyRead()),this,SLOT(ReadData()));
     connect(m_pTSClient,SIGNAL(connected()),this,SLOT(Connected()));
@@ -34,7 +33,7 @@ bool CTcpClient::ConnectToHost(QString strServerIP,quint16 nServerPort)
         if(m_pTSClient->waitForConnected(3000)){
             //log:连接成功
             qDebug()<<"连接成功";
-            //StartTest();
+            StartTest();
             return true;
         }
         else{
@@ -74,13 +73,12 @@ void CTcpClient::StartTest()
 {
     m_pTimer = new QTimer(this);
     connect(m_pTimer,SIGNAL(timeout()),this,SLOT(SendDataTest()));
-    m_pTimer->start(1000);
+    m_pTimer->start(3000);
 }
 
-void CTcpClient::writeData(CDataPacket* dataPkt,qintptr handle){
-    Q_UNUSED(handle);
+void CTcpClient::writeData(CDataPacket* dataPkt){
     if( NULL != dataPkt ){
-        m_pTSClient->write(dataPkt->msgData.data(),dataPkt->msgData.length());
+        m_pTSClient->write(dataPkt->packetToBytes());
     }
 }
 
@@ -97,7 +95,39 @@ void CTcpClient::ReadData()
 
 void CTcpClient::parseDatagram(QByteArray rcvAry)
 {
+    //将获取到的报文添加到缓存中
+    mCacheAry.append(rcvAry);
+    while( mCacheAry.length() >= 8 ){
 
+        int nHeadPos = mCacheAry.indexOf(0xAA);
+        if( nHeadPos >=0 ){
+                //必须保证报尾在报头后面
+                int nTailPos = mCacheAry.indexOf(0xA5,nHeadPos);
+                if( nTailPos >=0 ){//有头有尾
+                    //quint16 nDataLen = ((uchar)mCacheAry[4]<<8) + (uchar)mCacheAry[5];
+                    //QByteArray dataAry = mCacheAry.mid(nHeadPos,4+2+nDataLen+2);
+                    QByteArray dataAry = mCacheAry.mid(nHeadPos,nTailPos-nHeadPos+1);
+                    CDataPacket* dataPkt = new CDataPacket();
+                    dataPkt->bytesToPacket( dataAry );
+                    emit sendDataToQueue(dataPkt);
+                    //移除已解析的报文
+                    mCacheAry.remove( 0, nTailPos+1 );
+                    qDebug()<<"订阅消息类型:"<<mMsgType<<"接收到消息类型:"<<dataPkt->msgType;
+                }
+                else{//有头无尾,
+                    break;
+                }
+        }
+        else {
+            int nTailPos = mCacheAry.indexOf(0xA5);
+            if( nTailPos >= 0 ){//无头有尾
+                mCacheAry.remove( 0,nTailPos+1 );
+            }
+            else{//无头无尾
+                mCacheAry.clear();
+            }
+        }
+    }
 }
 
 void CTcpClient::switchDatagram(unsigned char* cRcvBuf,int nTotalLen){
@@ -129,50 +159,72 @@ void CTcpClient::DisplayError(QAbstractSocket::SocketError socketError)
 
 void CTcpClient::SendDataTest()
 {
-    FrameHead head;
-    head.cHead = 0xAA;
-    head.cDesAdd = 0x30;
-    head.cSrcAdd = 0x31;
-    head.cType   = 0x32;
-
-    MidInfo midInfo;
-    midInfo.cLDState    = 'A';
-    midInfo.cWorkMode   = 'B';
-    midInfo.cPulseInput = 'C';
-    midInfo.cOLMid      = 'D';
-    midInfo.cDSMid      = 'E';
-
-    /*---------------------------发送转换---------------------------*/
-    //报头(4)+转换后的信息区(N)+校验(1)+帧尾(1)
-    short nSendLen = 0;
-    unsigned char SendBuf[COMMAXLEN] = {'0'};
-    memmove(SendBuf,(char*)&head,sizeof(FrameHead));
-    //nSendLen += 4;//+报头
-    nSendLen += sizeof(FrameHead);//=报头
-
-    short nAftLen = 0;
-    unsigned char AftBuf[COMMAXLEN] = {'0'};
-    SendBufChange((unsigned char*)&midInfo,AftBuf,sizeof(MidInfo),nAftLen);
-    // 拷贝到发送数组中
-    //memmove(SendBuf+4,AftBuf,nAftLen);
-    memmove(SendBuf+sizeof(FrameHead),AftBuf,nAftLen);
-    nSendLen += nAftLen;//=报头(4)+转换后的(长度+信息区)长度(N)
-
-    // 校验：
-    SendBuf[nSendLen] = SendBuf[1];//初始化校验位=目的地址位
-    //校验计算(从目的地址字节到数据区最后一个字节的异或值)
-    for (int i = 2; i < nSendLen; i++)
-    {
-        SendBuf[nSendLen] ^= SendBuf[i];
-    }
-    ++nSendLen;//=报头(4)+转换后的(长度+信息区)长度(N)+校验位(1)
-
-    // 帧尾
-    SendBuf[nSendLen] = 0xA5;
-    ++nSendLen;//=报头(4)+转换后的(长度+信息区)长度(N)+校验位(1)+帧尾（1）
-
     CDataPacket dataPkt;
-    dataPkt.msgType = 0x32;
-    dataPkt.msgData.append((char*)SendBuf);
-    emit sendDataToQueue(&dataPkt,0);
+    dataPkt.msgHead = 0xAA;
+    if(mMsgType == 0x10 ){
+        //dataPkt.msgDst = mDstIdSet.toList().at(0);//0x30
+        dataPkt.msgDst = 0x30;
+        dataPkt.msgSrc = 0x31;
+        dataPkt.msgType = 0x20;
+    }
+
+    if(mMsgType == 0x20 ){
+        //dataPkt.msgDst = mDstIdSet.toList().at(0);//0x32
+        dataPkt.msgDst = 0x32;
+        dataPkt.msgSrc = 0x33;
+        dataPkt.msgType = 0x10;
+    }
+
+    dataPkt.msgData.append(0x41).append(0x42);
+    dataPkt.msgLen = dataPkt.msgData.length();
+    dataPkt.msgCheck=0xA4;
+    dataPkt.msgEnd=0xA5;
+    writeData(&dataPkt);
+
+//    FrameHead head;
+//    head.cHead = 0xAA;
+//    head.cDesAdd = 0x30;
+//    head.cSrcAdd = 0x31;
+//    head.cType   = 0x32;
+
+//    MidInfo midInfo;
+//    midInfo.cLDState    = 'A';
+//    midInfo.cWorkMode   = 'B';
+//    midInfo.cPulseInput = 'C';
+//    midInfo.cOLMid      = 'D';
+//    midInfo.cDSMid      = 'E';
+
+//    /*---------------------------发送转换---------------------------*/
+//    //报头(4)+转换后的信息区(N)+校验(1)+帧尾(1)
+//    short nSendLen = 0;
+//    unsigned char SendBuf[COMMAXLEN] = {'0'};
+//    memmove(SendBuf,(char*)&head,sizeof(FrameHead));
+//    //nSendLen += 4;//+报头
+//    nSendLen += sizeof(FrameHead);//=报头
+
+//    short nAftLen = 0;
+//    unsigned char AftBuf[COMMAXLEN] = {'0'};
+//    SendBufChange((unsigned char*)&midInfo,AftBuf,sizeof(MidInfo),nAftLen);
+//    // 拷贝到发送数组中
+//    //memmove(SendBuf+4,AftBuf,nAftLen);
+//    memmove(SendBuf+sizeof(FrameHead),AftBuf,nAftLen);
+//    nSendLen += nAftLen;//=报头(4)+转换后的(长度+信息区)长度(N)
+
+//    // 校验：
+//    SendBuf[nSendLen] = SendBuf[1];//初始化校验位=目的地址位
+//    //校验计算(从目的地址字节到数据区最后一个字节的异或值)
+//    for (int i = 2; i < nSendLen; i++)
+//    {
+//        SendBuf[nSendLen] ^= SendBuf[i];
+//    }
+//    ++nSendLen;//=报头(4)+转换后的(长度+信息区)长度(N)+校验位(1)
+
+//    // 帧尾
+//    SendBuf[nSendLen] = 0xA5;
+//    ++nSendLen;//=报头(4)+转换后的(长度+信息区)长度(N)+校验位(1)+帧尾（1）
+
+//    CDataPacket dataPkt;
+//    dataPkt.msgType = 0x32;
+//    dataPkt.msgData.append((char*)SendBuf);
+//    emit sendDataToQueue(&dataPkt);
 }

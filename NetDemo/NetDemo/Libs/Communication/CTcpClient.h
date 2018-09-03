@@ -60,7 +60,6 @@ private:
 private:
     QByteArray  mCacheAry;      //报文缓存
     QTcpSocket* m_pTSClient;    //客户端TcpSocket
-    qintptr mSocketDecriptor;   //客户端TcpSocket描述符(保留)
 
     //TEST
     QTimer* m_pTimer;           //发送报文定时器
@@ -70,7 +69,7 @@ private:
     //目的地址集合
     QSet<quint8> mDstIdSet;
 signals:
-    void sendDataToQueue(CDataPacket* dataPkt,qintptr handle=0);
+    void sendDataToQueue(CDataPacket* dataPkt);
     /************************************************************************
     *函数名:	UpdateConnectState
     *概述:发送客户端连接状态信息。
@@ -87,7 +86,7 @@ signals:
     void UpdateConnectState(ConnType emConnType);
 
 public slots:
-    void writeData(CDataPacket* dataPkt,qintptr handle=0);
+    void writeData(CDataPacket* dataPkt);
 
 private slots:
     /************************************************************************

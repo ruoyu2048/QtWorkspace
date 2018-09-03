@@ -27,6 +27,7 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor){
     CTcpThread* pThread = new CTcpThread(socketDescriptor, 0);
 
     //将客户端报文发送到上层消息队列
+    connect(pThread,SIGNAL(registerMsgType(quint8,qintptr)),this,SLOT(registerMsgType(quint8,qintptr)));
     connect(pThread,SIGNAL(sendDataToQueue(CDataPacket*)),this,SIGNAL(sendDataToQueue(CDataPacket*)));
 
     connect(pThread,SIGNAL(disconnected(qintptr)),this,SLOT(slotDisconnected(qintptr)));
@@ -37,12 +38,17 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor){
     mThreadMap.insert(socketDescriptor,pThread);
 }
 
+void CTcpServer::registerMsgType(quint8 msgType, qintptr socketDesc){
+    mMsgTypeMap.insert(msgType,socketDesc);
+}
+
 void CTcpServer::dispatchData( CDataPacket* dataPkt ){
     if( NULL != dataPkt ){
         QMap<quint8,qintptr>::iterator itMsgType = mMsgTypeMap.find(dataPkt->msgType);
         if( itMsgType != mMsgTypeMap.end() ){
             QMap<qintptr,CTcpThread*>::iterator itThread = mThreadMap.find(itMsgType.value());
             if( itThread != mThreadMap.end() ){
+                qDebug()<<"Dispatch Data to "<<itMsgType.value()<<"MsgType:"<<itMsgType.key();
                 itThread.value()->writeData(dataPkt);
             }
         }
@@ -106,19 +112,10 @@ void CTcpSocket::slotDisconnected(){
 }
 
 void CTcpSocket::writeData(CDataPacket* dataPkt){
-    //if( NULL != dataPkt && mMsgType ==dataPkt->msgType && isInDstIdSet(dataPkt->msgDst)){
     if( NULL != dataPkt ){
         this->write(dataPkt->packetToBytes());
     }
 }
-
-void CTcpSocket::writeData(unsigned char* sendBuf,int nSendLen,qintptr handle){
-    if( mSocketDescriptor == handle ){
-        //未作转码操作
-        this->write((char*)sendBuf,nSendLen);
-    }
-}
-
 
 void CTcpSocket::parseDatagram(QByteArray rcvAry){
     //将获取到的报文添加到缓存中
