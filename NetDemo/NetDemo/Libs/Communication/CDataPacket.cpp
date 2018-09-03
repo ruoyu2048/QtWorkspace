@@ -48,11 +48,11 @@ QByteArray CDataPacket::packetToBytes(){
     return dataAry;
 }
 
-QByteArray CDataPacket::makeRegisterPacket( quint8 msgTypeReg,QList<quint8> dstIdList ){
+QByteArray CDataPacket::makeRegisterPacket( QList<quint8> dstIdList ){
     msgHead = 0xAA;
     msgDst = 0xAB;
     msgSrc = 0xAB;
-    msgType = msgTypeReg;
+    msgType = 0xFF;
 
     msgLen = dstIdList.length();
     foreach (quint8 dstId, dstIdList) {

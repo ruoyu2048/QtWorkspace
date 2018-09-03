@@ -44,7 +44,6 @@ signals:
     void sendDataToQueue(CDataPacket* dataPkt);
 
 public slots:
-    void registerMsgType(quint8 msgType,qintptr socketDesc );
     void registerDstId(QSet<quint8>dstIDs,qintptr socketDesc );
     void dispatchData( CDataPacket* dataPkt );
 

@@ -50,11 +50,6 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor){
     mThreadMap.insert(socketDescriptor,pThread);
 }
 
-void CTcpServer::registerMsgType(quint8 msgType, qintptr socketDesc){
-    mDstIdMap.insert(msgType,socketDesc);
-    qDebug()<<"【服务器客户端注册中心】客户端注册标识:"<<socketDesc<<"订阅消息类型:"<<msgType;
-}
-
 void CTcpServer::registerDstId(QSet<quint8>dstIDs,qintptr socketDesc ){
     foreach (quint8 dstId, dstIDs) {
         mDstIdMap.insert(dstId,socketDesc);

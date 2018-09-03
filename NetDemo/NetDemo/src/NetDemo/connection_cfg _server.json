@@ -1,0 +1,9 @@
+{
+	"connnection_config":[
+		{
+            "conn_type":"TcpServer",
+			"conn_para":"127.0.0.1:9999",
+            "conn_other":""
+		}
+	]
+}

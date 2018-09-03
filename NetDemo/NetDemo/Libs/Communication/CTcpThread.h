@@ -20,7 +20,6 @@ public:
     void publishData( CDataPacket* dataPkt );
 
 signals:
-    void registerMsgType(quint8 msgType,qintptr socketDesc );
     void registerDstId(QSet<quint8>dstIDs,qintptr socketDesc );
     void writeData(CDataPacket* dataPkt);
     void sendDataToQueue(CDataPacket* dataPkt);

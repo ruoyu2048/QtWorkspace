@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>connection_cfg _server.json</file>
+        <file>connection_cfg_client.json</file>
+    </qresource>
+</RCC>

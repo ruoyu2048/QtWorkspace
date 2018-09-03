@@ -28,3 +28,6 @@ LIBS += $$OUT_PWD/../../Libs/libCommunication.a
 INCLUDEPATH += $$PWD/../../Libs/Communication
 DEPENDPATH += $$PWD/../../Libs/Communication
 
+RESOURCES += \
+    src.qrc
+

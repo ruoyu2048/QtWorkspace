@@ -9,6 +9,7 @@
 Communication::Communication(QObject *parent) :
     QObject(parent),m_pTS(NULL),m_pTC(NULL),m_pUDP(NULL),m_pSP(NULL){
     qRegisterMetaType<qintptr>("qintptr");
+    qRegisterMetaType<QSet<quint8>>("QSet<quint8>");
 }
 
 Communication::~Communication(){

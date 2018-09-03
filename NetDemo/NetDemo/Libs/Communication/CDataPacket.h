@@ -3,8 +3,6 @@
 #include <QList>
 #include <QByteArray>
 
-//#define COMMAXLEN 1024
-
 class CDataPacket
 {
 public:
@@ -27,7 +25,7 @@ public:
      * @param dstIdList--目的地址列表
      * @return --注册报文字节序
      */
-    QByteArray makeRegisterPacket( quint8 msgTypeReg,QList<quint8> dstIdList );
+    QByteArray makeRegisterPacket( QList<quint8> dstIdList );
 
     bool SendBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,short int PreLen,short int& AfterLen);
     bool RecvBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,short int PreLen,short int& AfterLen);

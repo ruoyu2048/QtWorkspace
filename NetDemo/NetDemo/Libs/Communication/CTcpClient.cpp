@@ -144,7 +144,7 @@ void CTcpClient::parseDatagram(QByteArray rcvAry)
                     emit sendDataToQueue(dataPkt);
                     //移除已解析的报文
                     mCacheAry.remove( 0, nTailPos+1 );
-                    qDebug()<<"【客户端】订阅消息类型:"<<mMsgType<<"接收到消息类型:"<<dataPkt->msgType;
+                    qDebug()<<"【客户端接收到消息信宿类型:"<<dataPkt->msgType;
                 }
                 else{//有头无尾,
                     break;
@@ -171,7 +171,7 @@ void CTcpClient::Connected()
     emit updateConnectState(ConnType::Connected);
     emit updateConnectState("Connected");
     CDataPacket dataPkt;
-    QByteArray dataAry = dataPkt.makeRegisterPacket(mMsgType,mDstIdSet.toList());
+    QByteArray dataAry = dataPkt.makeRegisterPacket( mDstIdSet.toList() );
     m_pTSClient->write(dataAry);
 }
 
@@ -193,30 +193,30 @@ void CTcpClient::DisplayError(QAbstractSocket::SocketError socketError)
 static int aaa=0;
 void CTcpClient::SendDataTest()
 {
-    if( aaa >= 10 )
-        m_pTimer->stop();
-    ++aaa;
-    CDataPacket dataPkt;
-    dataPkt.msgHead = 0xAA;
-    if(mMsgType == 0x10 ){
-        //dataPkt.msgDst = mDstIdSet.toList().at(0);//0x30
-        dataPkt.msgDst = 0x30;
-        dataPkt.msgSrc = 0x31;
-        dataPkt.msgType = 0x20;
-    }
+//    if( aaa >= 10 )
+//        m_pTimer->stop();
+//    ++aaa;
+//    CDataPacket dataPkt;
+//    dataPkt.msgHead = 0xAA;
+//    if(mMsgType == 0x10 ){
+//        //dataPkt.msgDst = mDstIdSet.toList().at(0);//0x30
+//        dataPkt.msgDst = 0x30;
+//        dataPkt.msgSrc = 0x31;
+//        dataPkt.msgType = 0x20;
+//    }
 
-    if(mMsgType == 0x20 ){
-        //dataPkt.msgDst = mDstIdSet.toList().at(0);//0x32
-        dataPkt.msgDst = 0x32;
-        dataPkt.msgSrc = 0x33;
-        dataPkt.msgType = 0x10;
-    }
+//    if(mMsgType == 0x20 ){
+//        //dataPkt.msgDst = mDstIdSet.toList().at(0);//0x32
+//        dataPkt.msgDst = 0x32;
+//        dataPkt.msgSrc = 0x33;
+//        dataPkt.msgType = 0x10;
+//    }
 
-    dataPkt.msgData.append(0x41).append(0x42);
-    dataPkt.msgLen = dataPkt.msgData.length();
-    dataPkt.msgCheck=0xA4;
-    dataPkt.msgEnd=0xA5;
-    writeData(&dataPkt);
+//    dataPkt.msgData.append(0x41).append(0x42);
+//    dataPkt.msgLen = dataPkt.msgData.length();
+//    dataPkt.msgCheck=0xA4;
+//    dataPkt.msgEnd=0xA5;
+//    writeData(&dataPkt);
 
 //    FrameHead head;
 //    head.cHead = 0xAA;

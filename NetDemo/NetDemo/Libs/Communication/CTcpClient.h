@@ -76,8 +76,6 @@ private:
     //TEST
     QTimer* m_pTimer;           //发送报文定时器
 
-    //订阅数据类型
-    quint8 mMsgType;
     //目的地址集合
     QSet<quint8> mDstIdSet;
 signals:
