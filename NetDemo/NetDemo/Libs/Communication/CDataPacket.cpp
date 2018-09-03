@@ -1,6 +1,6 @@
 #include "CDataPacket.h"
 #include <cstring>
-#include "PubFunc.h"
+#include "DataStruct.h"
 //#include <windows.h>
 
 //CDataPacket::CDataPacket(){

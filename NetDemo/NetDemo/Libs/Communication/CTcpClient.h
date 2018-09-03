@@ -14,10 +14,18 @@ public:
     explicit CTcpClient(QObject *parent = nullptr);
 
     /**
-     * @brief setClientInfo--设置客户端订阅报文类型等信息
-     * @param clientInfo--订阅报文信息列表
+     * @brief setDestinationIDs--设置客户订阅的信宿
+     * @param strDstsList--信宿列表字符串
      */
-    void setClientInfo(QStringList clientInfo);
+    void setDestinationIDs(QString strDstsList);
+
+
+    /**
+     * @brief connectToHost--连接到服务端
+     * @param strUrl--服务端b绑定链接(格式=IP:Port)
+     * @return
+     */
+    bool connectToHost(QString sttUrl);
     /************************************************************************
     *函数名:	ConnectToHost
     *概述:连接到服务端
@@ -25,7 +33,7 @@ public:
     *     nServerPort--服务端端口
     *返回值：如果连接成功，则返回true，否则返回false.
     ************************************************************************/
-    bool ConnectToHost(QString strServerIP,quint16 nServerPort);
+    bool connectToHost(QString strServerIP,quint16 nServerPort);
 
     /************************************************************************
     *函数名:	Close

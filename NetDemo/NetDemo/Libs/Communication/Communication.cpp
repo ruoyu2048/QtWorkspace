@@ -4,6 +4,7 @@
 #include "CUdp.h"
 #include "CSerialPort.h"
 #include "CDataPacket.h"
+#include "CCommCfg.h"
 
 Communication::Communication(QObject *parent) :
     QObject(parent),m_pTS(NULL),m_pTC(NULL),m_pUDP(NULL),m_pSP(NULL){
@@ -13,56 +14,44 @@ Communication::Communication(QObject *parent) :
 Communication::~Communication(){
 }
 
-bool Communication::startCommunication(CommType commType,QStringList cfg){
+bool Communication::startCommunication(CCommCfg* pCommCfg){
+    if( NULL == pCommCfg ){
+        qDebug()<<"Invalide Connmunication Configure Infomation...";
+        return false;
+    }
     bool bRet = false;
-    m_commType = commType;
-    switch (commType) {
+    m_commType = pCommCfg->commType;
+    switch (m_commType) {
     case TcpServer:
-        if( cfg.size() >=2 ){
-            if( Q_NULLPTR == m_pTS ){
-                m_pTS = new CTcpServer(this);
-                connect(this,SIGNAL(writeData(CDataPacket*)),m_pTS,SLOT(dispatchData(CDataPacket*)));
-                connect(m_pTS,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
-            }
-            QString strIP = cfg.at(0);
-            quint16 nPort = cfg.at(1).toInt();
-            bRet = m_pTS->startListen(strIP,nPort);
+        if( Q_NULLPTR == m_pTS ){
+            m_pTS = new CTcpServer(this);
+            connect(this,SIGNAL(writeData(CDataPacket*)),m_pTS,SLOT(dispatchData(CDataPacket*)));
+            connect(m_pTS,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
+        bRet = m_pTS->startListen(pCommCfg->strCommPara);
         break;
     case TcpClient:
-        if( cfg.size() >= 4 ){
-            if( Q_NULLPTR == m_pTC ){
-                m_pTC = new CTcpClient(this);
-                connect(this,SIGNAL(writeData(CDataPacket*)),m_pTC,SLOT(writeData(CDataPacket*)));
-                connect(m_pTC,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
-            }
-
-            QString strIP = cfg.at(0);
-            quint16 nPort = cfg.at(1).toInt();
-            QStringList clientInfo = cfg.mid(2);
-            //设置客户端注册信息
-            m_pTC->setClientInfo(clientInfo);
-            bRet = m_pTC->ConnectToHost(strIP,nPort);
+        if( Q_NULLPTR == m_pTC ){
+            m_pTC = new CTcpClient(this);
+            connect(this,SIGNAL(writeData(CDataPacket*)),m_pTC,SLOT(writeData(CDataPacket*)));
+            connect(m_pTC,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
+        //设置客户端注册信息
+        m_pTC->setDestinationIDs(pCommCfg->strCommOther);
+        bRet = m_pTC->connectToHost(pCommCfg->strCommPara);
         break;
     case UDP:
-        if( cfg.size() >=2 ){
-            if( Q_NULLPTR == m_pUDP ){
-                m_pUDP = new CUdp(this);
-            }
-            QString strIP = cfg.at(0);
-            quint16 nPort = cfg.at(1).toInt();
-            QHostAddress hostAddr(strIP);
-            bRet = m_pUDP->Bind(hostAddr,nPort);
+        if( Q_NULLPTR == m_pUDP ){
+            m_pUDP = new CUdp(this);
         }
+        //////////////////////////
         break;
     case Serial:
-        if( cfg.size() >=2 ){
-            if( Q_NULLPTR == m_pSP ){
-                m_pSP = new CSerialPort(this);
-            }
-
+        if( Q_NULLPTR == m_pSP ){
+            m_pSP = new CSerialPort(this);
         }
+        //////////////////////////
+
         break;
     }
     return bRet;

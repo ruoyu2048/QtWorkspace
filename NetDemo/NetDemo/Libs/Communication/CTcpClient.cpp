@@ -1,8 +1,5 @@
 #include "CTcpClient.h"
 #include <QHostAddress>
-#include "PubFunc.h"
-//#include "../PubDef/PubFunc.h"
-
 
 CTcpClient::CTcpClient(QObject *parent) : QObject(parent)
 {
@@ -13,15 +10,49 @@ CTcpClient::CTcpClient(QObject *parent) : QObject(parent)
     connect(m_pTSClient,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(DisplayError(QAbstractSocket::SocketError)));
 }
 
-void CTcpClient::setClientInfo(QStringList clientInfo){
-    mMsgType = hexStringToChar(clientInfo.at(0));
-    for(int i=1;i<clientInfo.size();++i){
-        quint8 nDstId = hexStringToChar(clientInfo.at(i));
+void CTcpClient::setDestinationIDs(QString strDstsList){
+    QStringList dstList = strDstsList.split(",");
+    foreach (QString strDst, dstList) {
+        quint8 nDstId = hexStringToChar(strDst);
         mDstIdSet.insert(nDstId);
     }
 }
 
-bool CTcpClient::ConnectToHost(QString strServerIP,quint16 nServerPort)
+bool CTcpClient::connectToHost(QString strUrl)
+{
+    if( NULL != m_pTSClient ){
+        QStringList netInfo=strUrl.split(":");
+        if( netInfo.size() >=2 ){
+            emit updateConnectState(ConnType::Ready);
+            emit updateConnectState("Ready to Connect...");
+            m_pTSClient->abort();
+
+            QHostAddress hostAddr(netInfo.at(0));
+            m_pTSClient->connectToHost(hostAddr,netInfo.at(1).toInt());
+            emit updateConnectState(ConnType::Connecting);
+            emit updateConnectState("Connecting...");
+            if(m_pTSClient->waitForConnected(600000)){
+                //log:连接成功
+                qDebug()<<"连接成功";
+                //StartTest();
+                return true;
+            }
+            else{
+                emit updateConnectState(ConnType::Timeout);
+                emit updateConnectState("Cconnection Timeout...");
+                //log:连接超时
+                qDebug()<<"连接超时";
+                m_pTSClient->close();
+                return false;
+            }
+        }
+        qDebug()<<"The TcpClient connectToHost Info is not commplete,cfg:"<<strUrl;
+        return false;
+    }
+    return false;
+}
+
+bool CTcpClient::connectToHost(QString strServerIP,quint16 nServerPort)
 {
     if( NULL != m_pTSClient ){
         emit updateConnectState(ConnType::Ready);

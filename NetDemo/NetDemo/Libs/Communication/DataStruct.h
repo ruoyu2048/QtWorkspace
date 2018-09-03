@@ -6,6 +6,16 @@
 #include <QByteArray>
 
 using namespace std;
+
+#define COMMAXLEN 1024
+
+enum CommType{
+    TcpServer,
+    TcpClient,
+    UDP,
+    Serial
+};
+
 enum ConnType{
     Ready,
     Connecting,

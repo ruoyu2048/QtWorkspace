@@ -1,11 +1,25 @@
 #include "CTcpServer.h"
 #include "CTcpThread.h"
 #include "DataStruct.h"
-#include "PubFunc.h"
 #include "CDataPacket.h"
 
 CTcpServer::CTcpServer(QObject *parent) : QTcpServer(parent){
     qRegisterMetaType<qintptr>("qintptr");
+}
+
+bool CTcpServer::startListen(QString strUrl){
+    QStringList netInfo=strUrl.split(":");
+    if( netInfo.size() >=2 ){
+        QHostAddress hostAddr(netInfo.at(0));
+        if( this->listen(hostAddr,netInfo.at(1).toInt()) ){
+            qDebug()<<"Server Started Sucessfully !";
+            return true;
+        }
+        qDebug()<<"Tcp Server Started Failed !";
+        return false;
+    }
+    qDebug()<<"The TcpServer listen info is not commplete,cfg:"<<strUrl;
+    return false;
 }
 
 bool CTcpServer::startListen(QString strServerIP,quint16 nServerPort){
@@ -25,7 +39,7 @@ void CTcpServer::stopListen(){
 void CTcpServer::incomingConnection(qintptr socketDescriptor){
     CTcpThread* pThread = new CTcpThread(socketDescriptor, 0);
     //将客户端报文发送到上层消息队列
-    connect(pThread,SIGNAL(registerMsgType(quint8,qintptr)),this,SLOT(registerMsgType(quint8,qintptr)));
+    connect(pThread,SIGNAL(registerDstId(QSet<quint8>,qintptr)),this,SLOT(registerDstId(QSet<quint8>,qintptr)));
     connect(pThread,SIGNAL(sendDataToQueue(CDataPacket*)),this,SIGNAL(sendDataToQueue(CDataPacket*)));
 
     connect(pThread,SIGNAL(disconnected(qintptr)),this,SLOT(slotDisconnected(qintptr)));
@@ -37,17 +51,24 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor){
 }
 
 void CTcpServer::registerMsgType(quint8 msgType, qintptr socketDesc){
-    mMsgTypeMap.insert(msgType,socketDesc);
+    mDstIdMap.insert(msgType,socketDesc);
     qDebug()<<"【服务器客户端注册中心】客户端注册标识:"<<socketDesc<<"订阅消息类型:"<<msgType;
+}
+
+void CTcpServer::registerDstId(QSet<quint8>dstIDs,qintptr socketDesc ){
+    foreach (quint8 dstId, dstIDs) {
+        mDstIdMap.insert(dstId,socketDesc);
+        qDebug()<<"【服务器客户端注册中心】客户端注册标识:"<<socketDesc<<"订阅消息信宿:"<<dstId;
+    }
 }
 
 void CTcpServer::dispatchData( CDataPacket* dataPkt ){
     if( NULL != dataPkt ){
-        QMap<quint8,qintptr>::iterator itMsgType = mMsgTypeMap.find(dataPkt->msgType);
-        if( itMsgType != mMsgTypeMap.end() ){
-            QMap<qintptr,CTcpThread*>::iterator itThread = mThreadMap.find(itMsgType.value());
+        QMap<quint8,qintptr>::iterator itDstId = mDstIdMap.find(dataPkt->msgType);
+        if( itDstId != mDstIdMap.end() ){
+            QMap<qintptr,CTcpThread*>::iterator itThread = mThreadMap.find(itDstId.value());
             if( itThread != mThreadMap.end() ){
-                qDebug()<<"【服务端报文发布中心】客户端注册标识:"<<itMsgType.value()<<"发布报文类型:"<<itMsgType.key();
+                qDebug()<<"【服务端报文发布中心】客户端注册标识:"<<itDstId.value()<<"发布报文类型:"<<itDstId.key();
                 itThread.value()->writeData(dataPkt);
             }
         }
@@ -70,29 +91,16 @@ CTcpSocket::CTcpSocket(qintptr socketDescriptor, QObject *parent):QTcpSocket(par
 }
 
 bool CTcpSocket::registClientInfo(CDataPacket* dataPkt ){
-    if( NULL != dataPkt && dataPkt->msgDst == dataPkt->msgSrc ){
-        mMsgType = dataPkt->msgType;
+    if( NULL != dataPkt && dataPkt->msgType == 0xFF ){
         int nTypes = dataPkt->msgLen;
         for(int i=0;i<nTypes;i++){
             quint8 dstId = dataPkt->msgData.at(i);
-            updateDstIdSet(dstId);
+            mDstIdSet.insert(dstId);
         }
-        emit registerMsgType(mMsgType,mSocketDescriptor);
+        emit registerDstId(mDstIdSet,mSocketDescriptor);
 
         return false;
     }
-    return true;
-}
-
-void CTcpSocket::updateDstIdSet(quint8 dstId){
-    mDstIdSet.insert(dstId);
-}
-
-bool CTcpSocket::isInDstIdSet(quint8 dstId){
-    QSet<quint8>::iterator it = mDstIdSet.find(dstId);
-    if( it == mDstIdSet.end() )
-        return false;
-
     return true;
 }
 
@@ -231,34 +239,34 @@ void CTcpSocket::parseDatagram(QByteArray rcvAry){
 }
 
 void CTcpSocket::switchDatagram(unsigned char* cRcvBuf,int nTotalLen){
-    //帧头
-    FrameHead head;
-    memmove((unsigned char*)&head,cRcvBuf,sizeof(FrameHead));
-    //报头信息(帧头、目的地址、源地址、类型)
-    //qDebug()<<head.cHead<<head.cDesAdd<<head.cSrcAdd<<head.cType;
+//    //帧头
+//    FrameHead head;
+//    memmove((unsigned char*)&head,cRcvBuf,sizeof(FrameHead));
+//    //报头信息(帧头、目的地址、源地址、类型)
+//    //qDebug()<<head.cHead<<head.cDesAdd<<head.cSrcAdd<<head.cType;
 
-    CDataPacket dataPkt;
-    dataPkt.msgType = head.cType;
-    dataPkt.msgData.append((char*)cRcvBuf);
-    emit sendDataToQueue(&dataPkt);
+//    CDataPacket dataPkt;
+//    dataPkt.msgType = head.cType;
+//    dataPkt.msgData.append((char*)cRcvBuf);
+//    emit sendDataToQueue(&dataPkt);
 
-    //信息区
-    short nInfoLen = 0;//信息长度=长度位(2)+信息区位长度(N)
-    unsigned char cInfoBuf[COMMAXLEN] = {'0'};//解码后报文=转码后的长度+信息区
-    RecvBufChange(cRcvBuf,cInfoBuf,nTotalLen,nInfoLen);
+//    //信息区
+//    short nInfoLen = 0;//信息长度=长度位(2)+信息区位长度(N)
+//    unsigned char cInfoBuf[COMMAXLEN] = {'0'};//解码后报文=转码后的长度+信息区
+//    RecvBufChange(cRcvBuf,cInfoBuf,nTotalLen,nInfoLen);
 
-    switch (head.cType) {
-    case 0x32:{
-        MidInfo midInfo;
-        memmove((unsigned char*)&midInfo,cInfoBuf+sizeof(short),sizeof(MidInfo));
-        qDebug()<<midInfo.cLDState<<midInfo.cWorkMode<<midInfo.cPulseInput<<midInfo.cOLMid<<midInfo.cDSMid;
-    }
-        break;
-    case 0x33:
-        break;
-    }
+//    switch (head.cType) {
+//    case 0x32:{
+//        MidInfo midInfo;
+//        memmove((unsigned char*)&midInfo,cInfoBuf+sizeof(short),sizeof(MidInfo));
+//        qDebug()<<midInfo.cLDState<<midInfo.cWorkMode<<midInfo.cPulseInput<<midInfo.cOLMid<<midInfo.cDSMid;
+//    }
+//        break;
+//    case 0x33:
+//        break;
+//    }
 
-    //eg:
-    //emit sendDataToQueue((unsigned char*)&head,sizeof(FrameHead),mSocketDescriptor);
+//    //eg:
+//    //emit sendDataToQueue((unsigned char*)&head,sizeof(FrameHead),mSocketDescriptor);
 }
 

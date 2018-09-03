@@ -16,6 +16,12 @@ public:
 
     /**
      * @brief startListen--启动TCP Server侦听
+     * @param strUrl--服务端b绑定链接(格式=IP:Port)
+     * @return
+     */
+    bool startListen(QString strUrl);
+    /**
+     * @brief startListen--启动TCP Server侦听
      * @param strServerIP--TCP服务端IP地址
      * @param nServerPort--TCP服务端端口
      * @return --如果启动成功，则返回true，否则返回false
@@ -39,6 +45,7 @@ signals:
 
 public slots:
     void registerMsgType(quint8 msgType,qintptr socketDesc );
+    void registerDstId(QSet<quint8>dstIDs,qintptr socketDesc );
     void dispatchData( CDataPacket* dataPkt );
 
 private slots:
@@ -51,7 +58,7 @@ private slots:
     void slotDisconnected(qintptr handle);
 
 private:
-    QMap<quint8,qintptr>mMsgTypeMap;
+    QMap<quint8,qintptr>mDstIdMap;
     QMap<qintptr,CTcpThread*>mThreadMap;
 };
 
@@ -68,18 +75,6 @@ private:
      * @return --是注册新则返回false,否则返回true
      */
     bool registClientInfo(CDataPacket* dataPkt );
-    /**
-     * @brief updateDstIdSet--更新目的地址集合
-     * @param dstId--报文目的地址
-     */
-    void updateDstIdSet(quint8 dstId);
-
-    /**
-     * @brief isInDstIdSet--当前目的地址是否在该集合中
-     * @param dstId--报文目的地址
-     * @return --在返回true,否则返回false
-     */
-    bool isInDstIdSet(quint8 dstId);
 
 private:
     /**
@@ -94,16 +89,11 @@ private:
     qintptr mSocketDescriptor;
 
     /**
-     * @brief mMsgType--订阅数据类型
-     */
-    quint8 mMsgType;
-
-    /**
      * @brief mDstIdSet--目的地址集合
      */
     QSet<quint8> mDstIdSet;
 signals:
-    void registerMsgType(quint8 msgType,qintptr socketDesc );
+    void registerDstId(QSet<quint8>dstIDs,qintptr socketDesc );
     void sendDataToQueue(CDataPacket* dataPkt);
 
     /*@

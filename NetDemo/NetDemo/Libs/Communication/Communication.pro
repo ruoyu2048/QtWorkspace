@@ -26,23 +26,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     CTcpClient.cpp \
     CTcpServer.cpp \
-    PubFunc.cpp \
     CUdp.cpp \
     Communication.cpp \
     CTcpThread.cpp \
     CSerialPort.cpp \
-    CDataPacket*.cpp
+    CDataPacket*.cpp \
+    CCommCfg.cpp
 
 HEADERS += \
     CTcpClient.h \
     CTcpServer.h \
     DataStruct.h \
-    PubFunc.h \
     CUdp.h \
     Communication.h \
     CTcpThread.h \
     CSerialPort.h \
-    CDataPacket*.h
+    CDataPacket*.h \
+    CCommCfg.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

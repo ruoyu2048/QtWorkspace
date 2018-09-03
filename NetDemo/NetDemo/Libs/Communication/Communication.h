@@ -2,19 +2,14 @@
 #define COMMUNICATION_H
 
 #include <QObject>
-
-enum CommType{
-    TcpServer,
-    TcpClient,
-    UDP,
-    Serial
-};
+#include "DataStruct.h"
 
 class CTcpServer;
 class CTcpClient;
 class CUdp;
 class CSerialPort;
 class CDataPacket;
+class CCommCfg;
 
 class Communication : public QObject
 {
@@ -22,18 +17,12 @@ class Communication : public QObject
 public:
     explicit Communication(QObject *parent = nullptr);
     ~Communication();
-
     /**
      * @brief startCommunication--启动通信
-     * @param commType--通信方式
-     * @param cfg--配置信息，配置格式如下：
-     *          TcpServer:ServerIP|ServerPort|
-     *          TcpClient:ServerIp|ServerPort|MsgType|DstId|...
-     *          UdpServer:ServerIP|ServerPort|
-     *          UdpClient:ServerIp|ServerPort|MsgType|DstId|...
+     * @param pCommCfg--配置信息对象
      * @return
      */
-    bool startCommunication(CommType commType,QStringList cfg);
+    bool startCommunication(CCommCfg* pCommCfg);
 
     /**
      * @brief sendData--发送包报文
