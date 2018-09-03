@@ -13,6 +13,10 @@ class CTcpClient:public QObject
 public:
     explicit CTcpClient(QObject *parent = nullptr);
 
+    /**
+     * @brief setClientInfo--设置客户端订阅报文类型等信息
+     * @param clientInfo--订阅报文信息列表
+     */
     void setClientInfo(QStringList clientInfo);
     /************************************************************************
     *函数名:	ConnectToHost

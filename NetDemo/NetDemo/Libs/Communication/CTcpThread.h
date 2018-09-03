@@ -13,6 +13,10 @@ public:
     ~CTcpThread();
     void run();
 
+    /**
+     * @brief publishData--给当前绑定的客户端发布报文
+     * @param dataPkt--报文对象
+     */
     void publishData( CDataPacket* dataPkt );
 
 signals:

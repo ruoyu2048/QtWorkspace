@@ -21,15 +21,24 @@ class Communication : public QObject
     Q_OBJECT
 public:
     explicit Communication(QObject *parent = nullptr);
+    ~Communication();
 
-    /*！
-     * 概述：向目标发送报文
-     * 参数：commType--通信类型
-     *      QStringList--初始化参数列表
-     * 返回值：无
+    /**
+     * @brief startCommunication--启动通信
+     * @param commType--通信方式
+     * @param cfg--配置信息，配置格式如下：
+     *          TcpServer:ServerIP|ServerPort|
+     *          TcpClient:ServerIp|ServerPort|MsgType|DstId|...
+     *          UdpServer:ServerIP|ServerPort|
+     *          UdpClient:ServerIp|ServerPort|MsgType|DstId|...
+     * @return
      */
     bool startCommunication(CommType commType,QStringList cfg);
 
+    /**
+     * @brief sendData--发送包报文
+     * @param dataPkt--报文对象
+     */
 	void sendData(CDataPacket* dataPkt);
 
 private:

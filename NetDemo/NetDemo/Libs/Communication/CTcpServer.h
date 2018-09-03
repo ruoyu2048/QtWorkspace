@@ -13,29 +13,24 @@ class CTcpServer : public QTcpServer
     Q_OBJECT
 public:
     explicit CTcpServer(QObject *parent = nullptr);
-    /*@
-    *函数名:	startListen
-    *概述:启动TCP Server侦听
-    *参数：strHostIP--TCP服务端IP地址
-    *     nHostPort--TCP服务端端口
-    *返回值：如果启动成功，则返回true，否则返回false
-    **/
+
+    /**
+     * @brief startListen--启动TCP Server侦听
+     * @param strServerIP--TCP服务端IP地址
+     * @param nServerPort--TCP服务端端口
+     * @return --如果启动成功，则返回true，否则返回false
+     */
     bool startListen(QString strServerIP,quint16 nServerPort);
 
-    /*@
-    *函数名:	StopListen
-    *概述:关闭服务端
-    *参数：无
-    *返回值：无
-    **/
+    /**
+     * @brief stopListen--关闭服务端
+     */
     void stopListen();
-protected:
-    /*@
-    *函数名:	incomingConnection
-    *概述:基类函数
-    *参数：handle--连入的客户端套接字标识符
-    *返回值：无
-    **/
+protected:   
+    /**
+     * @brief incomingConnection--基类函数
+     * @param handle--连入的客户端套接字标识符
+     */
     void incomingConnection(qintptr handle);
 
 signals:
@@ -67,19 +62,45 @@ public:
     explicit CTcpSocket(qintptr socketDescriptor, QObject *parent = 0);
 
 private:
+    /**
+     * @brief registClientInfo--本地注册客户端订阅信息
+     * @param dataPkt--报文对象
+     * @return --是注册新则返回false,否则返回true
+     */
     bool registClientInfo(CDataPacket* dataPkt );
+    /**
+     * @brief updateDstIdSet--更新目的地址集合
+     * @param dstId--报文目的地址
+     */
     void updateDstIdSet(quint8 dstId);
+
+    /**
+     * @brief isInDstIdSet--当前目的地址是否在该集合中
+     * @param dstId--报文目的地址
+     * @return --在返回true,否则返回false
+     */
     bool isInDstIdSet(quint8 dstId);
 
 private:
-    //接收数据缓存
+    /**
+     * @brief mCacheAry--报文缓存
+     */
     QByteArray mCacheAry;
+
     //套接字描述符
+    /**
+     * @brief 套接字描述符
+     */
     qintptr mSocketDescriptor;
 
-    //订阅数据类型
+    /**
+     * @brief mMsgType--订阅数据类型
+     */
     quint8 mMsgType;
-    //目的地址集合
+
+    /**
+     * @brief mDstIdSet--目的地址集合
+     */
     QSet<quint8> mDstIdSet;
 signals:
     void registerMsgType(quint8 msgType,qintptr socketDesc );

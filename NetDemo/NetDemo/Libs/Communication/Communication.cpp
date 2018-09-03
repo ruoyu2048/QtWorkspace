@@ -10,6 +10,9 @@ Communication::Communication(QObject *parent) :
     qRegisterMetaType<qintptr>("qintptr");
 }
 
+Communication::~Communication(){
+}
+
 bool Communication::startCommunication(CommType commType,QStringList cfg){
     bool bRet = false;
     m_commType = commType;

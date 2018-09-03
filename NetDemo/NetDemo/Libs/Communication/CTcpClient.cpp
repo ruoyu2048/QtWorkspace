@@ -34,7 +34,7 @@ bool CTcpClient::ConnectToHost(QString strServerIP,quint16 nServerPort)
         if(m_pTSClient->waitForConnected(600000)){
             //log:连接成功
             qDebug()<<"连接成功";
-            StartTest();
+            //StartTest();
             return true;
         }
         else{
