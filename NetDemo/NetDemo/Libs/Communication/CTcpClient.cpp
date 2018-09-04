@@ -190,7 +190,7 @@ void CTcpClient::DisplayError(QAbstractSocket::SocketError socketError)
             qDebug() << m_pTSClient->errorString();
     }
 }
-static int aaa=0;
+//static int aaa=0;
 void CTcpClient::SendDataTest()
 {
 //    if( aaa >= 10 )

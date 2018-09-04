@@ -38,12 +38,12 @@ void CCommCfg::parseCommCfgFile(QString strCfgPath)
         strCommPara = commObj["comm_para"].toString();
         strCommOther = commObj["comm_other"].toString();
     }
-    if( strCommType == "TcpServr" )
-        commType == CommType::TcpServer;
-    if( strCommType == "TcpClient" )
-        commType == CommType::TcpClient;
-    if( strCommType == "UDP" )
-        commType == CommType::UDP;
-    if( strCommType == "Serial" )
-        commType == CommType::Serial;
+    if( "TcpServer" == strCommType )
+        commType = CommType::TcpServer;
+    if( "TcpClient" == strCommType )
+        commType = CommType::TcpClient;
+    if( "UDP" == strCommType )
+        commType = CommType::UDP;
+    if( "Serial" == strCommType )
+        commType = CommType::Serial;
 }
