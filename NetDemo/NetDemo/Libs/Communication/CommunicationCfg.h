@@ -37,10 +37,10 @@
  |-------------------------------------------------------------|
  |------------------------------------------------------------*/
 
-class CCommCfg
+class CommunicationCfg
 {
 public:
-    CCommCfg();
+    CommunicationCfg();
     void parseCommCfgFile(QString strCfgPath);
 
 public:

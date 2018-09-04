@@ -1,5 +1,7 @@
 #include "CTcpClient.h"
 #include <QHostAddress>
+#include "CDataPacket.h"
+#include "CommunicationCfg.h"
 
 CTcpClient::CTcpClient(QObject *parent) : QObject(parent)
 {
@@ -8,6 +10,12 @@ CTcpClient::CTcpClient(QObject *parent) : QObject(parent)
     connect(m_pTSClient,SIGNAL(connected()),this,SLOT(Connected()));
     connect(m_pTSClient,SIGNAL(disconnected()),this,SLOT(Disconnected()));
     connect(m_pTSClient,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(DisplayError(QAbstractSocket::SocketError)));
+}
+
+bool CTcpClient::startTcpClient(CommunicationCfg* pCommCfg){
+    //设置客户端注册信息
+    setDestinationIDs(pCommCfg->strCommOther);
+    return connectToHost(pCommCfg->strCommPara);
 }
 
 void CTcpClient::setDestinationIDs(QString strDstsList){
@@ -190,78 +198,8 @@ void CTcpClient::DisplayError(QAbstractSocket::SocketError socketError)
             qDebug() << m_pTSClient->errorString();
     }
 }
-//static int aaa=0;
+
 void CTcpClient::SendDataTest()
 {
-//    if( aaa >= 10 )
-//        m_pTimer->stop();
-//    ++aaa;
-//    CDataPacket dataPkt;
-//    dataPkt.msgHead = 0xAA;
-//    if(mMsgType == 0x10 ){
-//        //dataPkt.msgDst = mDstIdSet.toList().at(0);//0x30
-//        dataPkt.msgDst = 0x30;
-//        dataPkt.msgSrc = 0x31;
-//        dataPkt.msgType = 0x20;
-//    }
 
-//    if(mMsgType == 0x20 ){
-//        //dataPkt.msgDst = mDstIdSet.toList().at(0);//0x32
-//        dataPkt.msgDst = 0x32;
-//        dataPkt.msgSrc = 0x33;
-//        dataPkt.msgType = 0x10;
-//    }
-
-//    dataPkt.msgData.append(0x41).append(0x42);
-//    dataPkt.msgLen = dataPkt.msgData.length();
-//    dataPkt.msgCheck=0xA4;
-//    dataPkt.msgEnd=0xA5;
-//    writeData(&dataPkt);
-
-//    FrameHead head;
-//    head.cHead = 0xAA;
-//    head.cDesAdd = 0x30;
-//    head.cSrcAdd = 0x31;
-//    head.cType   = 0x32;
-
-//    MidInfo midInfo;
-//    midInfo.cLDState    = 'A';
-//    midInfo.cWorkMode   = 'B';
-//    midInfo.cPulseInput = 'C';
-//    midInfo.cOLMid      = 'D';
-//    midInfo.cDSMid      = 'E';
-
-//    /*---------------------------发送转换---------------------------*/
-//    //报头(4)+转换后的信息区(N)+校验(1)+帧尾(1)
-//    short nSendLen = 0;
-//    unsigned char SendBuf[COMMAXLEN] = {'0'};
-//    memmove(SendBuf,(char*)&head,sizeof(FrameHead));
-//    //nSendLen += 4;//+报头
-//    nSendLen += sizeof(FrameHead);//=报头
-
-//    short nAftLen = 0;
-//    unsigned char AftBuf[COMMAXLEN] = {'0'};
-//    SendBufChange((unsigned char*)&midInfo,AftBuf,sizeof(MidInfo),nAftLen);
-//    // 拷贝到发送数组中
-//    //memmove(SendBuf+4,AftBuf,nAftLen);
-//    memmove(SendBuf+sizeof(FrameHead),AftBuf,nAftLen);
-//    nSendLen += nAftLen;//=报头(4)+转换后的(长度+信息区)长度(N)
-
-//    // 校验：
-//    SendBuf[nSendLen] = SendBuf[1];//初始化校验位=目的地址位
-//    //校验计算(从目的地址字节到数据区最后一个字节的异或值)
-//    for (int i = 2; i < nSendLen; i++)
-//    {
-//        SendBuf[nSendLen] ^= SendBuf[i];
-//    }
-//    ++nSendLen;//=报头(4)+转换后的(长度+信息区)长度(N)+校验位(1)
-
-//    // 帧尾
-//    SendBuf[nSendLen] = 0xA5;
-//    ++nSendLen;//=报头(4)+转换后的(长度+信息区)长度(N)+校验位(1)+帧尾（1）
-
-//    CDataPacket dataPkt;
-//    dataPkt.msgType = 0x32;
-//    dataPkt.msgData.append((char*)SendBuf);
-//    emit sendDataToQueue(&dataPkt);
 }

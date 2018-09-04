@@ -9,7 +9,7 @@ class CTcpClient;
 class CUdp;
 class CSerialPort;
 class CDataPacket;
-class CCommCfg;
+class CommunicationCfg;
 
 class Communication : public QObject
 {
@@ -22,7 +22,7 @@ public:
      * @param pCommCfg--配置信息对象
      * @return
      */
-    bool startCommunication(CCommCfg* pCommCfg);
+    bool startCommunication(CommunicationCfg* pCommCfg);
 
     /**
      * @brief sendData--发送包报文

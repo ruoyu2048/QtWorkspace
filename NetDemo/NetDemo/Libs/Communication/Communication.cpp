@@ -4,7 +4,7 @@
 #include "CUdp.h"
 #include "CSerialPort.h"
 #include "CDataPacket.h"
-#include "CCommCfg.h"
+#include "CommunicationCfg.h"
 
 Communication::Communication(QObject *parent) :
     QObject(parent),m_pTS(NULL),m_pTC(NULL),m_pUDP(NULL),m_pSP(NULL){
@@ -15,7 +15,7 @@ Communication::Communication(QObject *parent) :
 Communication::~Communication(){
 }
 
-bool Communication::startCommunication(CCommCfg* pCommCfg){
+bool Communication::startCommunication(CommunicationCfg* pCommCfg){
     if( NULL == pCommCfg ){
         qDebug()<<"Invalide Connmunication Configure Infomation...";
         return false;
@@ -29,7 +29,7 @@ bool Communication::startCommunication(CCommCfg* pCommCfg){
             connect(this,SIGNAL(writeData(CDataPacket*)),m_pTS,SLOT(dispatchData(CDataPacket*)));
             connect(m_pTS,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
-        bRet = m_pTS->startListen(pCommCfg->strCommPara);
+        bRet = m_pTS->startTcpServer(pCommCfg);
         break;
     case TcpClient:
         if( Q_NULLPTR == m_pTC ){
@@ -37,9 +37,7 @@ bool Communication::startCommunication(CCommCfg* pCommCfg){
             connect(this,SIGNAL(writeData(CDataPacket*)),m_pTC,SLOT(writeData(CDataPacket*)));
             connect(m_pTC,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
-        //设置客户端注册信息
-        m_pTC->setDestinationIDs(pCommCfg->strCommOther);
-        bRet = m_pTC->connectToHost(pCommCfg->strCommPara);
+        bRet = m_pTC->startTcpClient(pCommCfg);
         break;
     case UDP:
         if( Q_NULLPTR == m_pUDP ){

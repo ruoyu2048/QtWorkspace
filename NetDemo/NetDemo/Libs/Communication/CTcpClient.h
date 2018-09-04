@@ -5,7 +5,9 @@
 #include <QTimer>
 #include <QTcpSocket>
 #include "DataStruct.h"
-#include "CDataPacket.h"
+
+class CDataPacket;
+class CommunicationCfg;
 
 class CTcpClient:public QObject
 {
@@ -13,6 +15,9 @@ class CTcpClient:public QObject
 public:
     explicit CTcpClient(QObject *parent = nullptr);
 
+    bool startTcpClient(CommunicationCfg* pCommCfg);
+
+private:
     /**
      * @brief setDestinationIDs--设置客户订阅的信宿
      * @param strDstsList--信宿列表字符串
@@ -43,7 +48,11 @@ public:
     ************************************************************************/
     void Close();
 
-private:
+    /**
+     * @brief hexStringToChar--16进制字符串转无符号类型
+     * @param hexStr--16进制字符串
+     * @return --无符号类型数据
+     */
     quint8 hexStringToChar(QString hexStr);
     /************************************************************************
     *函数名:	StartTest

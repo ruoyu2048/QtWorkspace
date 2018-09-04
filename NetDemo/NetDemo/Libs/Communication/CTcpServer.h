@@ -8,12 +8,16 @@
 
 class CTcpThread;
 class CDataPacket;
+class CommunicationCfg;
+
 class CTcpServer : public QTcpServer
 {
     Q_OBJECT
 public:
     explicit CTcpServer(QObject *parent = nullptr);
 
+    bool startTcpServer( CommunicationCfg* pCommCfg);
+private:
     /**
      * @brief startListen--启动TCP Server侦听
      * @param strUrl--服务端b绑定链接(格式=IP:Port)

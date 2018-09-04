@@ -3,64 +3,64 @@
 #include "DataStruct.h"
 //#include <windows.h>
 
-//CDataPacket::CDataPacket(){
+CDataPacket::CDataPacket(){
 
-//}
+}
 
 void CDataPacket::bytesToPacket(QByteArray rcvAry){
     msgHead = rcvAry[0];
     msgDst  = rcvAry[1];
     msgSrc  = rcvAry[2];
     msgType = rcvAry[3];
-
-    /*-------字节序：前高后低-------*/
-    //msgLen = ((uchar)rcvAry[4]<<8) + (uchar)rcvAry[5];
-
-    /*-------字节序：前低后高-------*/
+    /*信息区长度字节序：前低后高*/
     msgLen = (uchar)rcvAry[4]+((uchar)rcvAry[5]<<8);
-
     msgData = rcvAry.mid(6,msgLen);
     msgCheck = rcvAry[rcvAry.length()-2];
     msgEnd = rcvAry[rcvAry.length()-1];
 }
 
 QByteArray CDataPacket::packetToBytes(){
-    memset(&msgAry,'\0',sizeof(msgAry));
-    msgAry[0] = msgHead;
-    msgAry[1] = msgDst;
-    msgAry[2] = msgSrc;
-    msgAry[3] = msgType;
-
-    /*-------字节序：前高后低-------*/
-    //msgAry[4] = msgLen>>8;
-    //msgAry[5] = msgLen&0x00ff;
-
-    /*-------字节序：前低后高-------*/
-    msgAry[4] = msgLen&0x00ff;
-    msgAry[5] = (msgLen&0xff00)>>8;
-
-    memmove(msgAry+6,msgData.data(),msgLen);
-    msgAry[6+msgLen] = msgCheck;
-    msgAry[6+msgLen+1] = msgEnd;
-
     QByteArray dataAry;
-    dataAry.append((char*)msgAry,4+2+msgLen+2);
+    dataAry.append(msgHead);
+    dataAry.append(msgDst);
+    dataAry.append(msgSrc);
+    dataAry.append(msgType);
+    //信息区长度字节序：低位在前，高位在后
+    dataAry.append(getLowByte(msgLen));
+    dataAry.append(getHighByte(msgLen));
+    dataAry.append(msgData);
+    dataAry.append(msgCheck);
+    dataAry.append(msgEnd);
+
     return dataAry;
+}
+
+void CDataPacket::encodeData(){
+    //完整报文
+    QByteArray msgAry = packetToBytes();
+}
+
+bool CDataPacket::decodeData(){
+    //校验位检验
+    if( !checkBitTest() )
+        return false;
+    //对信息区进行解码
+
 }
 
 QByteArray CDataPacket::makeRegisterPacket( QList<quint8> dstIdList ){
     msgHead = 0xAA;
-    msgDst = 0xAB;
-    msgSrc = 0xAB;
+    msgDst  = 0xAB;
+    msgSrc  = 0xAB;
     msgType = 0xFF;
+    msgLen  = dstIdList.length();
 
-    msgLen = dstIdList.length();
     foreach (quint8 dstId, dstIdList) {
-        char cDstId = dstId;
-        msgData.append(cDstId);
+        msgData.append(dstId);
     }
+
     msgCheck = 0xA4;
-    msgEnd = 0xA5;
+    msgEnd   = 0xA5;
 
     return packetToBytes();
 }
@@ -178,4 +178,16 @@ bool CDataPacket::RecvBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,s
     AfterLen=BufLen;
 
     return true;
+}
+
+bool CDataPacket::checkBitTest(){
+
+}
+
+quint8 CDataPacket::getLowByte(quint16 val){
+    return val&0xFF;
+}
+
+quint8 CDataPacket::getHighByte(quint16 val){
+    return (val>>8)&0xFF;
 }

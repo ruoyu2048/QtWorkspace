@@ -1,18 +1,18 @@
 #include <QCoreApplication>
 #include "Communication.h"
-#include "CCommCfg.h"
+#include "CommunicationCfg.h"
 #include <QDebug>
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    CCommCfg cfgTS;
+    CommunicationCfg cfgTS;
     cfgTS.parseCommCfgFile(":/config/connection_cfg _server.json");
     Communication* pCommTS = new Communication();
     pCommTS->startCommunication(&cfgTS);
 
-    CCommCfg cfgTC;
+    CommunicationCfg cfgTC;
     cfgTC.parseCommCfgFile(":/config/connection_cfg_client.json");
     Communication* pCommTC = new Communication();
     pCommTC->startCommunication(&cfgTC);

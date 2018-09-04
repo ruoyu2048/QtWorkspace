@@ -1,4 +1,4 @@
-#include "CCommCfg.h"
+#include "CommunicationCfg.h"
 #include <QFile>
 #include <QDebug>
 #include <QByteArray>
@@ -6,12 +6,12 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-CCommCfg::CCommCfg()
+CommunicationCfg::CommunicationCfg()
 {
 
 }
 
-void CCommCfg::parseCommCfgFile(QString strCfgPath)
+void CommunicationCfg::parseCommCfgFile(QString strCfgPath)
 {
     QFile cfgFile(strCfgPath);
     if( !cfgFile.open(QIODevice::ReadOnly) ){

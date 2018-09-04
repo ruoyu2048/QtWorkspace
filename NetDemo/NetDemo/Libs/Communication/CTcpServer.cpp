@@ -2,9 +2,14 @@
 #include "CTcpThread.h"
 #include "DataStruct.h"
 #include "CDataPacket.h"
+#include "CommunicationCfg.h"
 
 CTcpServer::CTcpServer(QObject *parent) : QTcpServer(parent){
     qRegisterMetaType<qintptr>("qintptr");
+}
+
+bool CTcpServer::startTcpServer( CommunicationCfg* pCommCfg){
+    return startListen(pCommCfg->strCommPara);
 }
 
 bool CTcpServer::startListen(QString strUrl){
