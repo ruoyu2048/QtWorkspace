@@ -46,6 +46,7 @@ bool CDataPacket::decodeData(){
         return false;
     //对信息区进行解码
 
+    return true;
 }
 
 QByteArray CDataPacket::makeRegisterPacket( QList<quint8> dstIdList ){

@@ -3,18 +3,35 @@
 
 #include <QTimer>
 #include <QObject>
-//#include <QUdpSocket>
 #include <QtNetwork/QUdpSocket>
 #include <QtNetwork/QHostAddress>
 #include "DataStruct.h"
-//#include "../PubDef/DataStruct.h"
 
+struct DstUdp{
+    QHostAddress dstAddr;
+    quint16      dstPort;
+};
 
+class CDataPacket;
+class CommunicationCfg;
 class CUdp : public QObject
 {
     Q_OBJECT
 public:
     explicit CUdp(QObject *parent = nullptr);
+
+    bool startUdp(CommunicationCfg* pCommCfg);
+
+private:
+    /**
+     * @brief setDestinationIDs--设置客户订阅的信宿
+     * @param strDstsList--信宿列表字符串
+     */
+    void setDestinationIDs(QString strDstsList);
+
+    quint8 hexStringToChar(QString hexStr);
+
+    bool bind(QString strUrl);
     /************************************************************************
     *函数名:	Bind
     *概述:绑定IP和端口
@@ -44,26 +61,21 @@ public:
     void StartTest();
 
 private:
-    /************************************************************************
-    *函数名:	processTheDatagram
-    *概述:处理接收的报文
-    *参数：srcHost--发送UDP报文的主机IP
-    *     nSrcPort--发送UDP报文的主机端口
-    *     datagram--接收到的报文
-    *返回值：如果发送成功，则返回true，否则返回false.
-    ************************************************************************/
-    bool processTheDatagram(QHostAddress srcHost,quint16 nSrcPort,QByteArray &datagram);
+    void parseDatagram(QByteArray rcvAry);
 
  private:
+    QByteArray  mCacheAry;      //报文缓存
     QUdpSocket* m_pUdpCommon;//通用的UDP对象
-
+    QSet<quint8>mDstIdSet;
+    QList<DstUdp>mDstUdpList;
     //TEST
     bool m_bFeedback;       //是否发送应答报文(测试用）
     QTimer* m_pTimer;       //发送测试报文定时器(测试用)
+
 signals:
-
+    void sendDataToQueue(CDataPacket* dataPkt);
 public slots:
-
+    void dispatchData( CDataPacket* dataPkt );
 private slots:
     /************************************************************************
     *函数名:	Connected

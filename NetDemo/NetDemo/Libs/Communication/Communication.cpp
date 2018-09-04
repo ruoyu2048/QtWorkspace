@@ -42,8 +42,10 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
     case UDP:
         if( Q_NULLPTR == m_pUDP ){
             m_pUDP = new CUdp(this);
+            connect(this,SIGNAL(writeData(CDataPacket*)),m_pTC,SLOT(writeData(CDataPacket*)));
+            connect(m_pUDP,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
-        //////////////////////////
+        bRet = m_pUDP->startUdp(pCommCfg);
         break;
     case Serial:
         if( Q_NULLPTR == m_pSP ){
@@ -63,7 +65,7 @@ void Communication::sendData(CDataPacket* dataPkt){
             emit writeData(dataPkt);
             break;
         case TcpClient:
-
+            emit writeData(dataPkt);
             break;
         case UDP:
 

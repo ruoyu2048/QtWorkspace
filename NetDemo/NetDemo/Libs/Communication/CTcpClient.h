@@ -1,6 +1,7 @@
 #ifndef CTCPCLIENT_H
 #define CTCPCLIENT_H
 
+#include <QList>
 #include <QObject>
 #include <QTimer>
 #include <QTcpSocket>
@@ -87,6 +88,7 @@ private:
 
     //目的地址集合
     QSet<quint8> mDstIdSet;
+
 signals:
     void sendDataToQueue(CDataPacket* dataPkt);
     /************************************************************************
