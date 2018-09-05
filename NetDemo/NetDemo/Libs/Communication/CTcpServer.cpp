@@ -92,6 +92,7 @@ CTcpSocket::CTcpSocket(qintptr socketDescriptor, QObject *parent):QTcpSocket(par
 
 bool CTcpSocket::registClientInfo(CDataPacket* dataPkt ){
     if( NULL != dataPkt && dataPkt->msgType == 0xFF ){
+        dataPkt->decodeData();
         int nTypes = dataPkt->msgLen;
         for(int i=0;i<nTypes;i++){
             quint8 dstId = dataPkt->msgData.at(i);
@@ -120,7 +121,8 @@ void CTcpSocket::slotDisconnected(){
 
 void CTcpSocket::writeData(CDataPacket* dataPkt){
     if( NULL != dataPkt ){
-        this->write(dataPkt->packetToBytes());
+        //this->write(dataPkt->packetToBytes());
+        this->write(dataPkt->encodePacketToBytes());
     }
 }
 
@@ -137,7 +139,8 @@ void CTcpSocket::parseDatagram(QByteArray rcvAry){
                     //QByteArray dataAry = mCacheAry.mid(nHeadPos,4+2+nDataLen+2);
                     QByteArray dataAry = mCacheAry.mid(nHeadPos,nTailPos-nHeadPos+1);
                     CDataPacket* dataPkt = new CDataPacket();
-                    dataPkt->bytesToPacket( dataAry );
+                    //dataPkt->bytesToPacket( dataAry );
+                    dataPkt->encodeBytesToPacket(dataAry);
                     if( registClientInfo(dataPkt) ){
                         emit sendDataToQueue(dataPkt);
                     }

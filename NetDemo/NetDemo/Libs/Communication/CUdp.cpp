@@ -89,7 +89,8 @@ void CUdp::parseDatagram(QByteArray rcvAry){
                 if( nTailPos >=0 ){//有头有尾
                     QByteArray dataAry = mCacheAry.mid(nHeadPos,nTailPos-nHeadPos+1);
                     CDataPacket* dataPkt = new CDataPacket();
-                    dataPkt->bytesToPacket( dataAry );
+                    //dataPkt->bytesToPacket( dataAry );
+                    dataPkt->encodeBytesToPacket(dataAry);
                     emit sendDataToQueue(dataPkt);
 
                     //移除已解析的报文
@@ -120,7 +121,8 @@ void CUdp::StartTest()
 
 void CUdp::dispatchData( CDataPacket* dataPkt ){
     if( NULL != dataPkt ){
-        QByteArray dataAry = dataPkt->packetToBytes();
+        //QByteArray dataAry = dataPkt->packetToBytes();
+        QByteArray dataAry = dataPkt->encodePacketToBytes();
         QMap<QString,QSet<quint8>>::iterator it = mDstMap.begin();
         for( ; it!=mDstMap.end(); it++ ) {
             QString strUrl = it.key();

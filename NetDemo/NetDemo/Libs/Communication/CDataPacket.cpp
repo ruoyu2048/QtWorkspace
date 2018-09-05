@@ -1,5 +1,6 @@
 #include "CDataPacket.h"
 #include <cstring>
+#include <QDebug>
 #include "DataStruct.h"
 //#include <windows.h>
 
@@ -7,49 +8,87 @@ CDataPacket::CDataPacket(){
 
 }
 
-void CDataPacket::bytesToPacket(QByteArray rcvAry){
-    msgHead = rcvAry[0];
-    msgDst  = rcvAry[1];
-    msgSrc  = rcvAry[2];
-    msgType = rcvAry[3];
-    /*信息区长度字节序：前低后高*/
-    msgLen = (uchar)rcvAry[4]+((uchar)rcvAry[5]<<8);
-    msgData = rcvAry.mid(6,msgLen);
-    msgCheck = rcvAry[rcvAry.length()-2];
-    msgEnd = rcvAry[rcvAry.length()-1];
-}
+//void CDataPacket::bytesToPacket(QByteArray rcvAry){
+//    msgHead = rcvAry[0];
+//    msgDst  = rcvAry[1];
+//    msgSrc  = rcvAry[2];
+//    msgType = rcvAry[3];
+//    /*信息区长度字节序：前低后高*/
+//    msgLen = (uchar)rcvAry[4]+((uchar)rcvAry[5]<<8);
+//    msgData = rcvAry.mid(6,msgLen);
+//    msgCheck = rcvAry[rcvAry.length()-2];
+//    msgEnd = rcvAry[rcvAry.length()-1];
+//}
 
-QByteArray CDataPacket::packetToBytes(){
-    QByteArray dataAry;
-    dataAry.append(msgHead);
-    dataAry.append(msgDst);
-    dataAry.append(msgSrc);
-    dataAry.append(msgType);
-    //信息区长度字节序：低位在前，高位在后
-    dataAry.append(getLowByte(msgLen));
-    dataAry.append(getHighByte(msgLen));
-    dataAry.append(msgData);
-    dataAry.append(msgCheck);
-    dataAry.append(msgEnd);
+//QByteArray CDataPacket::packetToBytes(){
+//    QByteArray dataAry;
+//    dataAry.append(msgHead);
+//    dataAry.append(msgDst);
+//    dataAry.append(msgSrc);
+//    dataAry.append(msgType);
+//    //信息区长度字节序：低位在前，高位在后
+//    dataAry.append(getLowByte(msgLen));
+//    dataAry.append(getHighByte(msgLen));
+//    dataAry.append(msgData);
+//    dataAry.append(msgCheck);
+//    dataAry.append(msgEnd);
 
-    return dataAry;
-}
+//    return dataAry;
+//}
 
 void CDataPacket::encodeBytesToPacket(QByteArray encodeAry)
 {
-
+    msgHead  = encodeAry[0];
+    msgDst   = encodeAry[1];
+    msgSrc   = encodeAry[2];
+    msgType  = encodeAry[3];
+    msgData  = encodeAry.mid(4,encodeAry.length()-4-1-1);
+    msgLen   = msgData.length();//长度位 + 转码后的信息区长度
+    msgCheck = encodeAry[encodeAry.length()-2];
+    msgEnd   = encodeAry[encodeAry.length()-1];
 }
 
 QByteArray CDataPacket::encodePacketToBytes(){
+    QByteArray encodeAry;
+    encodeAry.append(msgHead);
+    encodeAry.append(msgDst);
+    encodeAry.append(msgSrc);
+    encodeAry.append(msgType);
+    //encodeAry.append(getLowByte(msgLen));
+    //encodeAry.append(getHighByte(msgLen));
+    encodeAry.append(msgData);//转码后的msgData包含msgLen
+    encodeAry.append(msgCheck);
+    encodeAry.append(msgEnd);
 
+    return encodeAry;
 }
 
 void CDataPacket::decodeBytesToPacket(QByteArray realAry){
-
+    msgHead = realAry[0];
+    msgDst  = realAry[1];
+    msgSrc  = realAry[2];
+    msgType = realAry[3];
+    /*信息区长度字节序：前低后高*/
+    msgLen = (uchar)realAry[4]+((uchar)realAry[5]<<8);
+    msgData = realAry.mid(6,msgLen);
+    msgCheck = realAry[realAry.length()-2];
+    msgEnd = realAry[realAry.length()-1];
 }
 
 QByteArray CDataPacket::decodePacketToBytes(){
+    QByteArray realAry;
+    realAry.append(msgHead);
+    realAry.append(msgDst);
+    realAry.append(msgSrc);
+    realAry.append(msgType);
+    //信息区长度字节序：低位在前，高位在后
+    realAry.append(getLowByte(msgLen));
+    realAry.append(getHighByte(msgLen));
+    realAry.append(msgData);
+    realAry.append(msgCheck);
+    realAry.append(msgEnd);
 
+    return realAry;
 }
 
 void CDataPacket::encodeData(){
@@ -114,15 +153,83 @@ void CDataPacket::encodeData(){
 
     msgData.clear();
     msgData.append((char*)DataAfterTrans,nTotalAfterLen);
+
+    //校验位计算
+    QByteArray checkAry;
+    checkAry.append(msgDst);
+    checkAry.append(msgSrc);
+    checkAry.append(msgType);
+    checkAry.append(msgData);//转码后的msgData包含msgLen
+    quint16 nTotalLen = checkAry.length();
+    quint8  nCheck    = checkAry.at(0);
+    for( int i=1; i<nTotalLen; i++ ){
+        nCheck ^= (quint8)checkAry.at(i);
+    }
+    msgCheck = nCheck;
+    msgHead  = 0xAA;
+    msgEnd   = 0xA5;
 }
 
 bool CDataPacket::decodeData(){
+    //将报文对象转换成字节序
+    QByteArray encodeAry = encodePacketToBytes();
+    msgHead = encodeAry.at(0);
+    msgDst  = encodeAry.at(1);
+    msgSrc  = encodeAry.at(2);
+    msgType = encodeAry.at(3);
+
     //校验位检验
-    if( !checkBitTest() )
+    if( !checkBitTest( encodeAry ) )
         return false;
-    //对信息区进行解码
+
+   //对信息区进行解码
+    quint16 nPreLen = encodeAry.length();
+    // 提取长度区和信息区实际数据
+    unsigned char RecvBuf[COMMAXLEN];
+    short BufLen = 0;
 
 
+    unsigned char BeforeBuf[COMMAXLEN];
+    //计算接收到报文的长度与信息区的总长度 = (接收到的报文总长度-报头(帧头+目的+源+类型)-校验位-帧尾)
+    int iBeforeLen = nPreLen-6;//==nPreLen-4-1-1;
+    QByteArray lenData=encodeAry.mid(4,nPreLen-6);
+    memmove(BeforeBuf,(unsigned char*)lenData.data(),lenData.length());//长度和信息区
+    short sTemp = iBeforeLen/8;//需要几次循环
+    for (int j=0;j<sTemp;j++){
+        unsigned char cTemp[8];
+        memmove(cTemp,BeforeBuf+8*j,8);
+        for (int k=0;k<7;k++){
+            if ((cTemp[7]&0x01) != 0){
+                RecvBuf[BufLen] = cTemp[k] + 0x80;
+            }
+            else{
+                RecvBuf[BufLen] = cTemp[k];
+            }
+            cTemp[7] = cTemp[7]>>1;
+            BufLen++;
+        }
+    }
+    sTemp = iBeforeLen%8;//如果有余数
+    if (sTemp != 0){
+        unsigned char cTemp[8];
+        memmove(cTemp,BeforeBuf+(iBeforeLen - sTemp),sTemp);
+        for (int k=0;k<sTemp-1;k++){
+            if ((cTemp[sTemp-1]&0x01) != 0){
+                RecvBuf[BufLen] = cTemp[k] + 0x80;
+            }
+            else{
+                RecvBuf[BufLen] = cTemp[k];
+            }
+            cTemp[sTemp-1] = cTemp[sTemp-1]>>1;
+            BufLen++;
+        }
+    }
+
+    msgData.clear();
+    msgLen = BufLen-sizeof(quint16);
+    msgData.append((char*)RecvBuf+2,msgLen);//明文
+    msgCheck = encodeAry[encodeAry.length()-2];
+    msgEnd = encodeAry[encodeAry.length()-1];
 
     return true;
 }
@@ -141,7 +248,9 @@ QByteArray CDataPacket::makeRegisterPacket( QList<quint8> dstIdList ){
     msgCheck = 0xA4;
     msgEnd   = 0xA5;
 
-    return packetToBytes();
+    //return decodePacketToBytes();
+    encodeData();
+    return encodePacketToBytes();
 }
 
 //添加附加字
@@ -258,8 +367,18 @@ bool CDataPacket::RecvBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,s
     return true;
 }
 
-bool CDataPacket::checkBitTest(){
+bool CDataPacket::checkBitTest( QByteArray encodeAry ){
+    quint16 nTotalLen  = encodeAry.length();
+    quint8  nCheck = encodeAry.at(1);
+    for( int i=2;i<nTotalLen-2;i++ ){
+        nCheck ^= (quint8)encodeAry.at(i);
+    }
 
+    if( nCheck == (quint8)encodeAry.at(nTotalLen-2) )
+        return true;
+
+    qDebug()<<"校验位错误";
+    return false;
 }
 
 quint8 CDataPacket::getLowByte(quint16 val){

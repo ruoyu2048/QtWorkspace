@@ -7,17 +7,17 @@ class CDataPacket
 {
 public:
     CDataPacket();
-    /**
-     * @brief bytesToPacket--将字加后>的节序转换成数据报文对象
-     * @param rcvAry--接受到的字节序
-     */
-    void bytesToPacket(QByteArray rcvAry);
+//    /**
+//     * @brief bytesToPacket--将字加后>的节序转换成数据报文对象
+//     * @param rcvAry--接受到的字节序
+//     */
+//    void bytesToPacket(QByteArray rcvAry);
 
-    /**
-     * @brief packetToBytes--将报文对象转换成字节序
-     * @return
-     */
-    QByteArray packetToBytes();
+//    /**
+//     * @brief packetToBytes--将报文对象转换成字节序
+//     * @return
+//     */
+//    QByteArray packetToBytes();
 
     /**
      * @brief encodeBytesToPacket--执行转码后的完整报文字节序转成CDataPacket对象
@@ -31,8 +31,16 @@ public:
      */
     QByteArray encodePacketToBytes();
 
+    /**
+     * @brief decodeBytesToPacket--解码码后的(明文)完整报文字节序转成CDataPacket对象
+     * @param realAry--解码码后的(明文)完整报文字节序
+     */
     void decodeBytesToPacket(QByteArray realAry);
 
+    /**
+     * @brief decodePacketToBytes--解码后的(明文)CDataPacket对象转成完整报文字节序
+     * @return --解码后的(明文)完整报文字节序
+     */
     QByteArray decodePacketToBytes();
 
     /**
@@ -60,9 +68,10 @@ public:
 private:
     /**
      * @brief checkBitTest--校验位检验
+     * @param encodeAry--转码后的完整报文字节序
      * @return --校验位正确返回true,否则返回false
      */
-    bool checkBitTest();
+    bool checkBitTest(QByteArray encodeAry);
     /**
      * @brief getLowByte--获取低字节
      * @param val--无符号短整型数值

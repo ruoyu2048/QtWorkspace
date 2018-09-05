@@ -120,7 +120,8 @@ void CTcpClient::StartTest()
 
 void CTcpClient::writeData(CDataPacket* dataPkt){
     if( NULL != dataPkt ){
-        m_pTSClient->write(dataPkt->packetToBytes());
+        //m_pTSClient->write(dataPkt->packetToBytes());
+        m_pTSClient->write(dataPkt->encodePacketToBytes());
     }
 }
 
@@ -148,7 +149,8 @@ void CTcpClient::parseDatagram(QByteArray rcvAry)
                     //QByteArray dataAry = mCacheAry.mid(nHeadPos,4+2+nDataLen+2);
                     QByteArray dataAry = mCacheAry.mid(nHeadPos,nTailPos-nHeadPos+1);
                     CDataPacket* dataPkt = new CDataPacket();
-                    dataPkt->bytesToPacket( dataAry );
+                    //dataPkt->bytesToPacket( dataAry );
+                    dataPkt->encodeBytesToPacket(dataAry);
                     emit sendDataToQueue(dataPkt);
                     //移除已解析的报文
                     mCacheAry.remove( 0, nTailPos+1 );
