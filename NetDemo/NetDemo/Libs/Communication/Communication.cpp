@@ -51,8 +51,9 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
         if( Q_NULLPTR == m_pSP ){
             m_pSP = new CSerialPort(this);
         }
-        //////////////////////////
-
+        connect(this,SIGNAL(writeData(CDataPacket*)),m_pSP,SLOT(writeData(CDataPacket*)));
+        connect(m_pSP,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
+        bRet = m_pSP->startSerialPort(pCommCfg);
         break;
     }
     return bRet;
@@ -68,10 +69,10 @@ void Communication::sendData(CDataPacket* dataPkt){
             emit writeData(dataPkt);
             break;
         case UDP:
-
+            emit writeData(dataPkt);
             break;
         case Serial:
-
+            emit writeData(dataPkt);
             break;
         }
     }
@@ -88,10 +89,10 @@ void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
             qDebug()<<"【TCP_CLIENT_总控转发中心】收到报文，报文类型："<<dataPkt->msgType;
             break;
         case UDP:
-
+            qDebug()<<"【UDP_总控】收到报文，报文类型："<<dataPkt->msgType;
             break;
         case Serial:
-
+            qDebug()<<"【Serial_总控】收到报文，报文类型："<<dataPkt->msgType;
             break;
         }
     }

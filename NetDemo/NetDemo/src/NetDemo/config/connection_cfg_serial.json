@@ -3,7 +3,7 @@
 		{
             "simm_data":"false",
             "comm_type":"Serial",
-            "comm_para":"9600,8,0,1,0",
+            "comm_para":"COM1,9600,8,0,1,0",
             "comm_other":""
 		}
 	]

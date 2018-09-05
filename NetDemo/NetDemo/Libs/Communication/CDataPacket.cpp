@@ -36,8 +36,67 @@ QByteArray CDataPacket::packetToBytes(){
 }
 
 void CDataPacket::encodeData(){
-    //完整报文
-    QByteArray msgAry = packetToBytes();
+    unsigned char DataBeforeTrans[COMMAXLEN] = {'\0'};
+    unsigned char DataAfterTrans[COMMAXLEN] = {'\0'};
+
+    //转码前的实际数据长度
+    quint16 nMsgBeforeLen = msgData.length();
+    //长度位 + 转码<前>信息区的总长度
+    quint16 nTotalBeforeLen = sizeof(quint16) + nMsgBeforeLen;
+    //长度位 + 转码<后>信息区的总长度
+    quint16 nTotalAfterLen = nTotalBeforeLen + ((nTotalBeforeLen)/7);
+    if( nTotalBeforeLen%7 > 0 ){
+        nTotalAfterLen = nTotalAfterLen + 1;
+    }
+
+    //转码<后>信息区长度
+    int nMsgAfterLen = nTotalAfterLen - sizeof(quint16);
+    //低字节在前，高字节在后
+    //DataBeforeTrans[0] = getLowByte(nMsgAfterLen);
+    //DataBeforeTrans[1] = getHighByte(nMsgAfterLen);
+    DataBeforeTrans[0] = getHighByte(nMsgAfterLen);
+    DataBeforeTrans[1] = getLowByte(nMsgAfterLen);
+
+    memmove(DataBeforeTrans+2,(unsigned char*)msgData.data(),nMsgBeforeLen);
+
+    // 数据长度-信息区：数据转换，得到附加字
+    int j = 0;
+    for (int i = 0; i < nTotalAfterLen; i++){
+        DataAfterTrans[j++] = DataBeforeTrans[i];
+        // 每7个字节，进行数据转换，得到附加字
+        if ((i + 1) % 7 == 0){
+            int k = j - 7;
+            int n = 1;
+            for (int m = 0; m < 7; m++){
+                //判断操作系统的字节序
+                if((DataAfterTrans[k] | 0x80) == DataAfterTrans[k]){
+                    DataAfterTrans[k] &= 0x7f;
+                    DataAfterTrans[j] |= n % 256;
+                }
+                k++;
+                n = n * 2;
+            }
+            j++;
+        }
+        //不足7字节处理
+        else if (j== nTotalAfterLen - 1){
+            int s = nTotalAfterLen % 7;
+            int k = j - s;
+            int n = 1;
+            for (int m = 0; m < s; m++){
+                if((DataAfterTrans[k] | 0x80) == DataAfterTrans[k]){
+                    DataAfterTrans[k] &= 0x7f;
+                    DataAfterTrans[j] |= n % 256;
+                }
+                k++;
+                n = n * 2;
+            }
+            j++;
+        }
+    }
+
+    msgData.clear();
+    msgData.append((char*)DataAfterTrans,nTotalAfterLen);
 }
 
 bool CDataPacket::decodeData(){
@@ -45,6 +104,8 @@ bool CDataPacket::decodeData(){
     if( !checkBitTest() )
         return false;
     //对信息区进行解码
+
+
 
     return true;
 }
@@ -82,14 +143,14 @@ bool CDataPacket::SendBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,s
     if ((DataLen % 7) > 0){
         AfterLen = AfterLen + 1;
     }
-//    DataBeforeTrans[0]=HIBYTE((WORD)(AfterLen-2));
-//    DataBeforeTrans[1]=LOBYTE((WORD)(AfterLen-2));
+
     int nDataLen = AfterLen - 2;//转码后信息区的实际长度 = AfterLen - 长度（2字节=sizeof(short)）
-//    DataBeforeTrans[0]=(uchar)((nDataLen&0xff00)>>8);
-//    DataBeforeTrans[1]=(uchar)(nDataLen&0x00ff);
     //低字节在前，高字节在后
-    DataBeforeTrans[0] = nDataLen&0x00ff;
-    DataBeforeTrans[1] = (nDataLen&0xff00)>>8;
+    //DataBeforeTrans[0] = getLowByte(nDataLen);
+    //DataBeforeTrans[1] = getHighByte(nDataLen);
+    DataBeforeTrans[0] = getHighByte(nDataLen);
+    DataBeforeTrans[1] = getLowByte(nDataLen);
+
     memmove(DataBeforeTrans+2,prefBuf,PreLen);
 
     // 数据长度-信息区：数据转换，得到附加字
@@ -126,7 +187,6 @@ bool CDataPacket::SendBufChange(unsigned char* prefBuf,unsigned char* AfterBuf,s
             }
             j++;
         }
-        //cout<<"B__AfterLen:"<<AfterLen<<" DAT:"<<DataAfterTrans+((i/7)*8)<<"|"<<i<<" "<<j<<endl<<endl;
     }
     memmove(AfterBuf,DataAfterTrans,AfterLen);
 
