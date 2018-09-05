@@ -13,30 +13,35 @@ CUdp::CUdp(QObject *parent) : QObject(parent)
     connect(m_pUdpCommon, SIGNAL(connected()),this,SLOT(Connected()));
     connect(m_pUdpCommon, SIGNAL(disconnected()),this,SLOT(Disconnected()));
     connect(m_pUdpCommon, SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(DisplayError(QAbstractSocket::SocketError)));
-
-    //TEST
-    m_bFeedback = true;//默认服务端返回报文
 }
 
 bool CUdp::startUdp(CommunicationCfg* pCommCfg){
-    QStringList strParaList = pCommCfg->strCommPara.split(",");
-    if( strParaList.size() >=2 ){
-
-
-        return bind(strParaList.at(0));
+    //127.0.0.1:9998+0x11,0x12|127.0.0.1:9999+0x13,0x14
+    QStringList strParaList = pCommCfg->strCommOther.split("|");
+    foreach (QString strKeyPair,strParaList ){
+        QStringList pairList = strKeyPair.split("+");
+        if( 2 == pairList.size() ){
+            QString strUrl = pairList.at(0);
+            QString strDstIDs = pairList.at(1);
+            //当前Url订阅的目的地址集合
+            QSet<quint8>dstIdSet=setDestinationIDs(strDstIDs);
+            mDstMap.insert(strUrl,dstIdSet);
+        }
+        else
+            qDebug()<<strParaList<<" is invalid !";
     }
-    else
-        qDebug()<<"Invalide Communication cfg:"<<pCommCfg->strCommPara;
 
-    return false;
+    return bind(pCommCfg->strCommPara);
 }
 
-void CUdp::setDestinationIDs(QString strDstsList){
-    QStringList dstList = strDstsList.split(",");
+QSet<quint8> CUdp::setDestinationIDs(QString strDstIDs){
+    QSet<quint8> dstIdSet;
+    QStringList dstList = strDstIDs.split(",");
     foreach (QString strDst, dstList) {
         quint8 nDstId = hexStringToChar(strDst);
-        mDstIdSet.insert(nDstId);
+        dstIdSet.insert(nDstId);
     }
+    return dstIdSet;
 }
 
 quint8 CUdp::hexStringToChar(QString hexStr){
@@ -71,28 +76,6 @@ bool CUdp::bind(QString strUrl)
     }
 
     return false;
-}
-
-bool CUdp::Bind(QHostAddress localHost,quint16 nLocalPort)
-{
-    if( Q_NULLPTR != m_pUdpCommon ){
-        if( m_pUdpCommon->bind(localHost,nLocalPort) ){
-            qDebug()<<"IP="<<localHost.toString()<<"Port="<<nLocalPort<<"Bind Sucessfufl !";
-            return true;
-        }
-    }
-
-    qDebug()<<"IP="<<localHost.toString()<<"Port="<<nLocalPort<<"Bind failed !";
-    return false;
-}
-
-bool CUdp::SendData(QHostAddress desHost,quint16 nDesPort,unsigned char* sendBuf,int nSendLen)
-{
-    int nRet = m_pUdpCommon->writeDatagram((char*)sendBuf,nSendLen,desHost,nDesPort);
-    if( -1 == nRet )
-        return false;
-
-    return true;
 }
 
 void CUdp::parseDatagram(QByteArray rcvAry){
@@ -133,17 +116,23 @@ void CUdp::StartTest()
     m_pTimer = new QTimer();
     connect(m_pTimer,SIGNAL(timeout()),this,SLOT(SendDataTest()));
     m_pTimer->start(1000);
-
-    m_bFeedback = false;
 }
 
 void CUdp::dispatchData( CDataPacket* dataPkt ){
     if( NULL != dataPkt ){
-        QSet<quint8>::iterator it = mDstIdSet.find(dataPkt->msgDst);
-        if( it != mDstIdSet.end() ){
-            QByteArray dataAry = dataPkt->packetToBytes();
-            foreach (DstUdp dstUdp, mDstUdpList) {
-                m_pUdpCommon->writeDatagram(dataAry,dstUdp.dstAddr,dstUdp.dstPort);
+        QByteArray dataAry = dataPkt->packetToBytes();
+        QMap<QString,QSet<quint8>>::iterator it = mDstMap.begin();
+        for( ; it!=mDstMap.end(); it++ ) {
+            QString strUrl = it.key();
+            QSet<quint8>dstIdSet = it.value();
+
+            QSet<quint8>::iterator itSet = dstIdSet.find(dataPkt->msgDst);
+            if( itSet != dstIdSet.end() ){
+                QStringList urlList = strUrl.split(":");
+                if( 2 == urlList.size() ){
+                    QHostAddress dstAddr(urlList.at(0));
+                    m_pUdpCommon->writeDatagram(dataAry,dstAddr,urlList.at(1).toInt());
+                }
             }
         }
     }
@@ -161,8 +150,7 @@ void CUdp::Disconnected()
 
 void CUdp::DisplayError(QAbstractSocket::SocketError err)
 {
-    switch(err)
-    {
+    switch(err){
         case QAbstractSocket::RemoteHostClosedError:
             break;
         default :
@@ -174,7 +162,7 @@ void CUdp::ReadPendingDatagrams()
 {
     while (m_pUdpCommon->hasPendingDatagrams()) {
         QByteArray rcvAry = m_pUdpCommon->receiveDatagram().data();
-
+        parseDatagram(rcvAry);
     }
 }
 

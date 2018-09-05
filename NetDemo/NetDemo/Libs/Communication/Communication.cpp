@@ -42,7 +42,7 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
     case UDP:
         if( Q_NULLPTR == m_pUDP ){
             m_pUDP = new CUdp(this);
-            connect(this,SIGNAL(writeData(CDataPacket*)),m_pTC,SLOT(writeData(CDataPacket*)));
+            connect(this,SIGNAL(writeData(CDataPacket*)),m_pUDP,SLOT(dispatchData(CDataPacket*)));
             connect(m_pUDP,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
         bRet = m_pUDP->startUdp(pCommCfg);

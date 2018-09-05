@@ -1,16 +1,13 @@
 #ifndef CUDP_H
 #define CUDP_H
 
+#include <QMap>
+#include <QSet>
 #include <QTimer>
 #include <QObject>
 #include <QtNetwork/QUdpSocket>
 #include <QtNetwork/QHostAddress>
 #include "DataStruct.h"
-
-struct DstUdp{
-    QHostAddress dstAddr;
-    quint16      dstPort;
-};
 
 class CDataPacket;
 class CommunicationCfg;
@@ -26,30 +23,23 @@ private:
     /**
      * @brief setDestinationIDs--设置客户订阅的信宿
      * @param strDstsList--信宿列表字符串
+     * @return --信宿地址集合
      */
-    void setDestinationIDs(QString strDstsList);
+    QSet<quint8> setDestinationIDs(QString strDstsList);
 
+    /**
+     * @brief hexStringToChar--16进制字符串转无符号类型
+     * @param hexStr--16进制字符串
+     * @return --无符号类型数据
+     */
     quint8 hexStringToChar(QString hexStr);
 
+    /**
+     * @brief bind--绑定本地端口与IP
+     * @param strUrl--链接地址，格式: IP:PORT
+     * @return
+     */
     bool bind(QString strUrl);
-    /************************************************************************
-    *函数名:	Bind
-    *概述:绑定IP和端口
-    *参数：localHost--要绑定的本地IP
-    *     nLocalPort--要绑定的本地端口
-    *返回值：如果绑定成功，则返回true，否则返回false.
-    ************************************************************************/
-    bool Bind(QHostAddress localHost,quint16 nLocalPort);
-
-    /************************************************************************
-    *函数名:	SendData
-    *概述:发送报文
-    *参数：desHost--目的IP
-    *     nDesPort--目的端口
-    *     sendBu--要发送的报文
-    *返回值：如果发送成功，则返回true，否则返回false.
-    ************************************************************************/
-    bool SendData(QHostAddress desHost,quint16 nDesPort,unsigned char* sendBuf,int nSendLen);
 
     //TEST
     /************************************************************************
@@ -64,18 +54,19 @@ private:
     void parseDatagram(QByteArray rcvAry);
 
  private:
-    QByteArray  mCacheAry;      //报文缓存
-    QUdpSocket* m_pUdpCommon;//通用的UDP对象
-    QSet<quint8>mDstIdSet;
-    QList<DstUdp>mDstUdpList;
+    QByteArray    mCacheAry;    //报文缓存
+    QUdpSocket*   m_pUdpCommon; //通用的UDP对象
+    QMap<QString,QSet<quint8>>mDstMap;
+
     //TEST
-    bool m_bFeedback;       //是否发送应答报文(测试用）
     QTimer* m_pTimer;       //发送测试报文定时器(测试用)
 
 signals:
     void sendDataToQueue(CDataPacket* dataPkt);
+
 public slots:
     void dispatchData( CDataPacket* dataPkt );
+
 private slots:
     /************************************************************************
     *函数名:	Connected
