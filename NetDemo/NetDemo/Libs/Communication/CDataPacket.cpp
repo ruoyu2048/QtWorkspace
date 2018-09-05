@@ -35,6 +35,23 @@ QByteArray CDataPacket::packetToBytes(){
     return dataAry;
 }
 
+void CDataPacket::encodeBytesToPacket(QByteArray encodeAry)
+{
+
+}
+
+QByteArray CDataPacket::encodePacketToBytes(){
+
+}
+
+void CDataPacket::decodeBytesToPacket(QByteArray realAry){
+
+}
+
+QByteArray CDataPacket::decodePacketToBytes(){
+
+}
+
 void CDataPacket::encodeData(){
     unsigned char DataBeforeTrans[COMMAXLEN] = {'\0'};
     unsigned char DataAfterTrans[COMMAXLEN] = {'\0'};

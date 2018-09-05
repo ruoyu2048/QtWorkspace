@@ -8,7 +8,7 @@ class CDataPacket
 public:
     CDataPacket();
     /**
-     * @brief bytesToPacket--将字节序转换成数据报文对象
+     * @brief bytesToPacket--将字加后>的节序转换成数据报文对象
      * @param rcvAry--接受到的字节序
      */
     void bytesToPacket(QByteArray rcvAry);
@@ -18,6 +18,22 @@ public:
      * @return
      */
     QByteArray packetToBytes();
+
+    /**
+     * @brief encodeBytesToPacket--执行转码后的完整报文字节序转成CDataPacket对象
+     * @param encodeAry--转码后的完整报文字节序
+     */
+    void encodeBytesToPacket(QByteArray encodeAry);
+
+    /**
+     * @brief encodePacketToBytes--执行转码后的CDataPacket对象转成完整报文字节序
+     * @return --转码后的完整报文字节序
+     */
+    QByteArray encodePacketToBytes();
+
+    void decodeBytesToPacket(QByteArray realAry);
+
+    QByteArray decodePacketToBytes();
 
     /**
      * @brief encodeData--对数据进行转码
