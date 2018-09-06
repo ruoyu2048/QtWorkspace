@@ -2,6 +2,8 @@
 #include <QHostAddress>
 #include "CDataPacket.h"
 #include "CommunicationCfg.h"
+#include <QCoreApplication>
+#include <QFile>
 
 CTcpClient::CTcpClient(QObject *parent) : QObject(parent)
 {
@@ -15,7 +17,11 @@ CTcpClient::CTcpClient(QObject *parent) : QObject(parent)
 bool CTcpClient::startTcpClient(CommunicationCfg* pCommCfg){
     //设置客户端注册信息
     setDestinationIDs(pCommCfg->strCommOther);
-    return connectToHost(pCommCfg->strCommPara);
+    if( connectToHost(pCommCfg->strCommPara) ){
+        startSimmulator(pCommCfg->bSimmulator);
+        return true;
+    }
+    return false;
 }
 
 void CTcpClient::setDestinationIDs(QString strDstsList){
@@ -42,7 +48,6 @@ bool CTcpClient::connectToHost(QString strUrl)
             if(m_pTSClient->waitForConnected(600000)){
                 //log:连接成功
                 qDebug()<<"连接成功";
-                //StartTest();
                 return true;
             }
             else{
@@ -109,13 +114,6 @@ quint8 CTcpClient::hexStringToChar(QString hexStr){
         }
     }
     return nChar;
-}
-
-void CTcpClient::StartTest()
-{
-    m_pTimer = new QTimer(this);
-    connect(m_pTimer,SIGNAL(timeout()),this,SLOT(SendDataTest()));
-    m_pTimer->start(3000);
 }
 
 void CTcpClient::writeData(CDataPacket* dataPkt){
@@ -201,7 +199,34 @@ void CTcpClient::DisplayError(QAbstractSocket::SocketError socketError)
     }
 }
 
-void CTcpClient::SendDataTest()
-{
+void CTcpClient::startSimmulator( bool bStart ){
+    if( bStart ){
+        mIndex = 0;
+        mSendLen = 256;
+        m_pTimer = new QTimer(this);
+        connect(m_pTimer,SIGNAL(timeout()),this,SLOT(sendSimmData()));
+        mSimAry = getSimDataArray();
+        m_pTimer->start(100);
+    }
+}
 
+QByteArray CTcpClient::getSimDataArray(){
+    QString strFilePath = QCoreApplication::applicationDirPath().append("/simData.dat");
+    QFile simFile(strFilePath);
+    if( simFile.open(QIODevice::ReadOnly|QIODevice::Text) )
+        mSimAry = simFile.readAll();
+    simFile.close();
+    return mSimAry;
+}
+
+void CTcpClient::sendSimmData(){
+    QByteArray leftAry = mSimAry.mid(mIndex);
+    if( leftAry.length()/mSendLen >0 ){
+        m_pTSClient->write( leftAry.mid(0,mSendLen) );
+        mIndex += mSendLen;
+    }
+    else{
+        m_pTSClient->write(leftAry);
+        mIndex = 0;
+    }
 }

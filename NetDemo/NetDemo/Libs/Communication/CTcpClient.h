@@ -25,7 +25,6 @@ private:
      */
     void setDestinationIDs(QString strDstsList);
 
-
     /**
      * @brief connectToHost--连接到服务端
      * @param strUrl--服务端b绑定链接(格式=IP:Port)
@@ -56,14 +55,6 @@ private:
      */
     quint8 hexStringToChar(QString hexStr);
     /************************************************************************
-    *函数名:	StartTest
-    *概述:定时发送报文测试
-    *参数：无
-    *返回值：无
-    ************************************************************************/
-    void StartTest();
-
-    /************************************************************************
     *函数名:	parseDatagram
     *概述:解析接收到的数据报文
     *参数：rcvAry--接收到的数据报文
@@ -79,13 +70,10 @@ private:
     *返回值：无
     ************************************************************************/
     void switchDatagram(unsigned char* cRcvBuf,int nTotalLen);
+
 private:
     QByteArray  mCacheAry;      //报文缓存
     QTcpSocket* m_pTSClient;    //客户端TcpSocket
-
-    //TEST
-    QTimer* m_pTimer;           //发送报文定时器
-
     //目的地址集合
     QSet<quint8> mDstIdSet;
 
@@ -142,14 +130,18 @@ private slots:
     ************************************************************************/
     void DisplayError(QAbstractSocket::SocketError socketError);
 
-    //TEST
-    /************************************************************************
-    *函数名:	SendDataTest
-    *概述:定时发送报文测试函数。
-    *参数：无
-    *返回值：无
-    ************************************************************************/
-    void SendDataTest();
+private:
+    void startSimmulator( bool bStart=false );
+    QByteArray getSimDataArray();
+
+private:
+    QTimer*    m_pTimer;    //发送报文定时器
+    QByteArray mSimAry;     //模拟数据
+    quint32    mIndex;      //发送报文的起点位置
+    quint32    mSendLen;    //每次发送报文长度
+
+private slots:
+    void sendSimmData();
 };
 
 #endif // CTCPCLIENT_H

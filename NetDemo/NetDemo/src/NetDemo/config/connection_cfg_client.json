@@ -1,7 +1,7 @@
 {
 	"connnection_config":[
 		{
-            "simm_data":"false",
+            "simulator":"false",
             "comm_type":"TcpClient",
             "comm_para":"127.0.0.1:9999",
             "comm_other":"0x30,0x40"

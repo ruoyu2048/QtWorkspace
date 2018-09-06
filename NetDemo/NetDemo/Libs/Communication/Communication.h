@@ -1,6 +1,8 @@
 #ifndef COMMUNICATION_H
 #define COMMUNICATION_H
 
+#include <QFile>
+#include <QTimer>
 #include <QObject>
 #include "DataStruct.h"
 
@@ -42,6 +44,13 @@ signals:
 
 public slots:
     void readDataFromMsgQueue(CDataPacket* dataPkt);
+
+private:
+    QFile mRecordFile;
+
+    void openFile();
+    void recordData(CDataPacket* dataPkt);
+    void closeFile();
 };
 
 #endif // COMMUNICATION_H

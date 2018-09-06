@@ -8,34 +8,6 @@ CDataPacket::CDataPacket(){
 
 }
 
-//void CDataPacket::bytesToPacket(QByteArray rcvAry){
-//    msgHead = rcvAry[0];
-//    msgDst  = rcvAry[1];
-//    msgSrc  = rcvAry[2];
-//    msgType = rcvAry[3];
-//    /*信息区长度字节序：前低后高*/
-//    msgLen = (uchar)rcvAry[4]+((uchar)rcvAry[5]<<8);
-//    msgData = rcvAry.mid(6,msgLen);
-//    msgCheck = rcvAry[rcvAry.length()-2];
-//    msgEnd = rcvAry[rcvAry.length()-1];
-//}
-
-//QByteArray CDataPacket::packetToBytes(){
-//    QByteArray dataAry;
-//    dataAry.append(msgHead);
-//    dataAry.append(msgDst);
-//    dataAry.append(msgSrc);
-//    dataAry.append(msgType);
-//    //信息区长度字节序：低位在前，高位在后
-//    dataAry.append(getLowByte(msgLen));
-//    dataAry.append(getHighByte(msgLen));
-//    dataAry.append(msgData);
-//    dataAry.append(msgCheck);
-//    dataAry.append(msgEnd);
-
-//    return dataAry;
-//}
-
 void CDataPacket::encodeBytesToPacket(QByteArray encodeAry)
 {
     msgHead  = encodeAry[0];
@@ -82,8 +54,8 @@ QByteArray CDataPacket::decodePacketToBytes(){
     realAry.append(msgSrc);
     realAry.append(msgType);
     //信息区长度字节序：低位在前，高位在后
-    realAry.append(getLowByte(msgLen));
     realAry.append(getHighByte(msgLen));
+    realAry.append(getLowByte(msgLen));
     realAry.append(msgData);
     realAry.append(msgCheck);
     realAry.append(msgEnd);
@@ -107,12 +79,8 @@ void CDataPacket::encodeData(){
 
     //转码<后>信息区长度
     int nMsgAfterLen = nTotalAfterLen - sizeof(quint16);
-    //低字节在前，高字节在后
-    //DataBeforeTrans[0] = getLowByte(nMsgAfterLen);
-    //DataBeforeTrans[1] = getHighByte(nMsgAfterLen);
     DataBeforeTrans[0] = getHighByte(nMsgAfterLen);
     DataBeforeTrans[1] = getLowByte(nMsgAfterLen);
-
     memmove(DataBeforeTrans+2,(unsigned char*)msgData.data(),nMsgBeforeLen);
 
     // 数据长度-信息区：数据转换，得到附加字
@@ -248,8 +216,7 @@ QByteArray CDataPacket::makeRegisterPacket( QList<quint8> dstIdList ){
     msgCheck = 0xA4;
     msgEnd   = 0xA5;
 
-    //return decodePacketToBytes();
-    encodeData();
+    this->encodeData();
     return encodePacketToBytes();
 }
 
@@ -377,7 +344,7 @@ bool CDataPacket::checkBitTest( QByteArray encodeAry ){
     if( nCheck == (quint8)encodeAry.at(nTotalLen-2) )
         return true;
 
-    qDebug()<<"校验位错误";
+    qDebug()<<"校验位错误:[计算值："<<(uchar)nCheck<<"报文值："<<(uchar)encodeAry.at(nTotalLen-2)<<"]";
     return false;
 }
 

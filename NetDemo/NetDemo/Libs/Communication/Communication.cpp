@@ -5,6 +5,8 @@
 #include "CSerialPort.h"
 #include "CDataPacket.h"
 #include "CommunicationCfg.h"
+#include <QCoreApplication>
+
 
 Communication::Communication(QObject *parent) :
     QObject(parent),m_pTS(NULL),m_pTC(NULL),m_pUDP(NULL),m_pSP(NULL){
@@ -13,6 +15,7 @@ Communication::Communication(QObject *parent) :
 }
 
 Communication::~Communication(){
+    closeFile();
 }
 
 bool Communication::startCommunication(CommunicationCfg* pCommCfg){
@@ -30,6 +33,8 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
             connect(m_pTS,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
         bRet = m_pTS->startTcpServer(pCommCfg);
+        //打开记录文件
+        openFile();
         break;
     case TcpClient:
         if( Q_NULLPTR == m_pTC ){
@@ -84,6 +89,9 @@ void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
         case TcpServer:
             qDebug()<<"【TCP_SERVER_总控转发中心】收到报文，报文类型："<<dataPkt->msgType;
             emit writeData(dataPkt);
+            if( dataPkt->decodeData() ){
+                recordData( dataPkt );
+            }
             break;
         case TcpClient:
             qDebug()<<"【TCP_CLIENT_总控转发中心】收到报文，报文类型："<<dataPkt->msgType;
@@ -96,4 +104,22 @@ void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
             break;
         }
     }
+}
+
+void Communication::openFile(){
+    QString strFile = QCoreApplication::applicationDirPath().append("/simData.dat");
+    mRecordFile.setFileName(strFile);
+    if( !mRecordFile.open(QIODevice::WriteOnly|QIODevice::Append|QIODevice::Text) )
+        qDebug()<<"Open file failed,the file path:"<<strFile;
+}
+
+void Communication::recordData(CDataPacket* dataPkt){
+    if( NULL != dataPkt ){
+        mRecordFile.write(dataPkt->encodePacketToBytes());
+        mRecordFile.flush();
+    }
+}
+
+void Communication::closeFile(){
+    mRecordFile.close();
 }

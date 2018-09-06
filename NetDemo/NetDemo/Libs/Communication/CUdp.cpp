@@ -4,7 +4,8 @@
 #include <QtNetwork/QNetworkDatagram>
 #include "CommunicationCfg.h"
 #include "CDataPacket.h"
-
+#include <QCoreApplication>
+#include <QFile>
 
 CUdp::CUdp(QObject *parent) : QObject(parent)
 {
@@ -112,13 +113,6 @@ void CUdp::parseDatagram(QByteArray rcvAry){
     }
 }
 
-void CUdp::StartTest()
-{
-    m_pTimer = new QTimer();
-    connect(m_pTimer,SIGNAL(timeout()),this,SLOT(SendDataTest()));
-    m_pTimer->start(1000);
-}
-
 void CUdp::dispatchData( CDataPacket* dataPkt ){
     if( NULL != dataPkt ){
         //QByteArray dataAry = dataPkt->packetToBytes();
@@ -168,7 +162,48 @@ void CUdp::ReadPendingDatagrams()
     }
 }
 
-void CUdp::SendDataTest()
-{
 
+
+void CUdp::startSimmulator( bool bStart ){
+    if( bStart ){
+        mIndex = 0;
+        mSendLen = 256;
+        m_pTimer = new QTimer(this);
+        connect(m_pTimer,SIGNAL(timeout()),this,SLOT(sendSimmData()));
+        mSimAry = getSimDataArray();
+        m_pTimer->start(100);
+    }
+}
+
+QByteArray CUdp::getSimDataArray(){
+    QString strFilePath = QCoreApplication::applicationDirPath().append("/simData.dat");
+    QFile simFile(strFilePath);
+    if( simFile.open(QIODevice::ReadOnly|QIODevice::Text) )
+        mSimAry = simFile.readAll();
+    simFile.close();
+    return mSimAry;
+}
+
+void CUdp::sendSimmData(){
+    QByteArray sendAry;
+    QByteArray leftAry = mSimAry.mid(mIndex);
+    if( leftAry.length()/mSendLen >0 ){
+        sendAry = leftAry.mid(0,mSendLen);
+        mIndex += mSendLen;
+    }
+    else{
+        sendAry = leftAry;
+        mIndex = 0;
+    }
+    if( sendAry.length() >0 ){
+        QMap<QString,QSet<quint8>>::iterator it = mDstMap.begin();
+        for( ; it!=mDstMap.end(); it++ ) {
+            QString strUrl = it.key();
+            QStringList urlList = strUrl.split(":");
+            if( 2 == urlList.size() ){
+                QHostAddress dstAddr(urlList.at(0));
+                m_pUdpCommon->writeDatagram(sendAry,dstAddr,urlList.at(1).toInt());
+            }
+        }
+    }
 }

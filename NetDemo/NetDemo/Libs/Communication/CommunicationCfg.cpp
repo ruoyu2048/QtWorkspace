@@ -34,10 +34,18 @@ void CommunicationCfg::parseCommCfgFile(QString strCfgPath)
     QJsonArray commAry = cfgObj["connnection_config"].toArray();
     if( commAry.size() == 1 ){
         QJsonObject commObj = commAry.at(0).toObject();
-        strCommType = commObj["comm_type"].toString();
-        strCommPara = commObj["comm_para"].toString();
-        strCommOther = commObj["comm_other"].toString();
+        strSimmulator = commObj["simulator"].toString();
+        strCommType   = commObj["comm_type"].toString();
+        strCommPara   = commObj["comm_para"].toString();
+        strCommOther  = commObj["comm_other"].toString();
     }
+    if( "true" == strSimmulator )
+        bSimmulator = true;
+    else if( "false" == strSimmulator )
+        bSimmulator = false;
+    else
+        qDebug()<<strSimmulator<<"is invalid simmulator parameter,pls set true of false !";
+
     if( "TcpServer" == strCommType )
         commType = CommType::TcpServer;
     if( "TcpClient" == strCommType )

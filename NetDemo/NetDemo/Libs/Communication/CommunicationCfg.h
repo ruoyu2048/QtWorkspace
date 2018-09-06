@@ -48,12 +48,13 @@ public:
     void parseCommCfgFile(QString strCfgPath);
 
 public:
-    CommType commType;
-    QString strCommType;
-    QString strCommPara;
-    QString strCommOther;
+    bool     bSimmulator;   //是否为模拟器
+    CommType commType;      //通信类型
+    QString  strCommPara;   //启动参数，如IP,Port等
+    QString  strCommOther;  //附加参数，如订阅目的地址等
 private:
-    bool    mSimmData;//是否为模拟器
+    QString  strSimmulator;
+    QString  strCommType;
 };
 
 #endif // CCOMMCFG_H

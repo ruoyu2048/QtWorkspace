@@ -41,15 +41,6 @@ private:
      */
     bool bind(QString strUrl);
 
-    //TEST
-    /************************************************************************
-    *函数名:	StartTest
-    *概述:启动定时发送报文定时器(测试用)
-    *参数：无
-    *返回值：无
-    ************************************************************************/
-    void StartTest();
-
 private:
     void parseDatagram(QByteArray rcvAry);
 
@@ -57,9 +48,6 @@ private:
     QByteArray    mCacheAry;    //报文缓存
     QUdpSocket*   m_pUdpCommon; //通用的UDP对象
     QMap<QString,QSet<quint8>>mDstMap;
-
-    //TEST
-    QTimer* m_pTimer;       //发送测试报文定时器(测试用)
 
 signals:
     void sendDataToQueue(CDataPacket* dataPkt);
@@ -100,14 +88,18 @@ private slots:
     ************************************************************************/
     void ReadPendingDatagrams();
 
-    //TEST
-    /************************************************************************
-    *函数名:	SendDataTest
-    *概述:发送测试报文
-    *参数：无
-    *返回值：无
-    ************************************************************************/
-    void SendDataTest();
+private:
+    void startSimmulator( bool bStart=false );
+    QByteArray getSimDataArray();
+
+private:
+    QTimer*    m_pTimer;    //发送报文定时器
+    QByteArray mSimAry;     //模拟数据
+    quint32    mIndex;      //发送报文的起点位置
+    quint32    mSendLen;    //每次发送报文长度
+
+private slots:
+    void sendSimmData();
 };
 
 #endif // CUDP_H
