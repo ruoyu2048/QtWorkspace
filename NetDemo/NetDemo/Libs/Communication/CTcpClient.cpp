@@ -206,7 +206,7 @@ void CTcpClient::startSimmulator( bool bStart ){
         m_pTimer = new QTimer(this);
         connect(m_pTimer,SIGNAL(timeout()),this,SLOT(sendSimmData()));
         mSimAry = getSimDataArray();
-        m_pTimer->start(100);
+        m_pTimer->start(2000);
     }
 }
 
@@ -222,7 +222,8 @@ QByteArray CTcpClient::getSimDataArray(){
 void CTcpClient::sendSimmData(){
     QByteArray leftAry = mSimAry.mid(mIndex);
     if( leftAry.length()/mSendLen >0 ){
-        m_pTSClient->write( leftAry.mid(0,mSendLen) );
+        QByteArray sendAry = leftAry.mid(0,mSendLen);
+        m_pTSClient->write( sendAry );
         mIndex += mSendLen;
     }
     else{

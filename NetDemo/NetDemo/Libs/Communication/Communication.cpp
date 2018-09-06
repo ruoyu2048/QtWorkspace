@@ -15,7 +15,7 @@ Communication::Communication(QObject *parent) :
 }
 
 Communication::~Communication(){
-    closeFile();
+    //closeFile();
 }
 
 bool Communication::startCommunication(CommunicationCfg* pCommCfg){
@@ -34,7 +34,7 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
         }
         bRet = m_pTS->startTcpServer(pCommCfg);
         //打开记录文件
-        openFile();
+        //openFile();
         break;
     case TcpClient:
         if( Q_NULLPTR == m_pTC ){
@@ -90,7 +90,7 @@ void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
             qDebug()<<"【TCP_SERVER_总控转发中心】收到报文，报文类型："<<dataPkt->msgType;
             emit writeData(dataPkt);
             if( dataPkt->decodeData() ){
-                recordData( dataPkt );
+                //recordData( dataPkt );
             }
             break;
         case TcpClient:

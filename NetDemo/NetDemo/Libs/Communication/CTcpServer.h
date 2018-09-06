@@ -134,15 +134,6 @@ private:
     *返回值：无
     **/
     void parseDatagram(QByteArray rcvAry);
-
-    /*@
-    *函数名:	switchDatagram
-    *概述:分别处理不同类型的报文
-    *参数：cRcvBuf--接收到的数据报文
-    *     nTotalLen--解码之前的报文总长度(报头+信息区+报尾)
-    *返回值：无
-    **/
-    void switchDatagram(unsigned char* cRcvBuf,int nTotalLen);
 };
 
 #endif // CTCPSERVER_H
