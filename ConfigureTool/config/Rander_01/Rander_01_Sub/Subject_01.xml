@@ -1,16 +1,19 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Subject name="Subject_01" displayName="分机_01">
-    <subjectInfo name="control" displayName="控制" type="control">
-        <entity name="CtrlChannel" displayName="可控制通道">
-            <attribute displayType="select" name="diffCode1" displayName="通道1差分编码" dataType="byte" paramType="1:允许;2:禁止"/>
-            <attribute displayType="text" name="TDMAFrameNum1" displayName="通道1TDMA帧数" dataType="byte" value="100" validator="[0-9]+$" tips="请输入数字"/>
-        </entity>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Subject name="Subject_01" displayName="中频源">
+    <subjectInfo name="control" displayName="控制" type="control">  
+        <entity name="CtrlChannel" displayName="控制通道">     
+            <attribute displayType="select" name="workMode" displayName="工作模式" dataType="byte" paramType="单频;锯齿波变周期(10MHz);锯齿波单周期1(10MHz);锯齿波单周期2(10MHz);锯齿波单周期3(10MHz)"/>
+            <attribute displayType="select" name="CPINum" displayName="变周期时每周期CPI个数" dataType="byte" paramType="124;246;496"/>  
+	</entity>      
     </subjectInfo>
-    <subjectInfo name="monitor" displayName="监视" type="monitor">
-        <entity name="channel" displayName="监视通道">
-            <attribute name="Attr1" displayName="属性1" dataType="byte" value="01"/>
-            <attribute name="Attr2" displayName="属性2" dataType="byte" value="02"/>
-        </entity>
+    <subjectInfo name="monitor" displayName="监视" type="monitor">  
+	<entity name="channel" displayName="监视通道">      
+            <attribute name="Attr1" displayName="工作模式" dataType="byte" value="单频"/>
+            <attribute name="Attr2" displayName="脉冲输入" dataType="byte" value="无脉冲输入"/>
+            <attribute name="Attr3" displayName="数据率" dataType="byte" value="0~3s"/>
+            <attribute name="Attr4" displayName="输出幅度" dataType="byte" value="0~30db"/>
+            <attribute name="Attr2" displayName="设备工作状态" dataType="byte" value="正常"/>
+     	</entity>
     </subjectInfo>
 </Subject>
 
