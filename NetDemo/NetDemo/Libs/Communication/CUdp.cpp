@@ -162,8 +162,6 @@ void CUdp::ReadPendingDatagrams()
     }
 }
 
-
-
 void CUdp::startSimmulator( bool bStart ){
     if( bStart ){
         mIndex = 0;
@@ -171,15 +169,19 @@ void CUdp::startSimmulator( bool bStart ){
         m_pTimer = new QTimer(this);
         connect(m_pTimer,SIGNAL(timeout()),this,SLOT(sendSimmData()));
         mSimAry = getSimDataArray();
-        m_pTimer->start(100);
+        m_pTimer->start(2000);
     }
 }
 
 QByteArray CUdp::getSimDataArray(){
     QString strFilePath = QCoreApplication::applicationDirPath().append("/simData.dat");
     QFile simFile(strFilePath);
-    if( simFile.open(QIODevice::ReadOnly|QIODevice::Text) )
-        mSimAry = simFile.readAll();
+    if( simFile.open(QIODevice::ReadOnly|QIODevice::Text) ){
+        //先将从文本中读取的16进制的ByteArray转换成QString
+        QString strHexFile(simFile.readAll());
+        //再还原成原始的字节序
+        mSimAry = hexToByteArray(strHexFile);
+    }
     simFile.close();
     return mSimAry;
 }
@@ -207,3 +209,34 @@ void CUdp::sendSimmData(){
         }
     }
 }
+
+QByteArray CUdp::hexToByteArray(QString strHex)
+{
+    QByteArray hexAry;
+    strHex = strHex.trimmed();
+    strHex = strHex.simplified();
+    QStringList strHexList = strHex.split(" ");
+
+    foreach (QString str, strHexList) {
+        if( !str.isEmpty() ){
+            bool ok = true;
+            char cHex = str.toInt(&ok,16)&0xFF;
+            if(ok){
+                hexAry.append(cHex);
+            }else{
+                qDebug()<<"非法的16进制字符："<<str;
+            }
+        }
+    }
+    return hexAry;
+}
+
+QString CUdp::byteArrayToHex(QByteArray byteAry){
+    QString strHex(byteAry.toHex().toUpper());
+    int aryLen = strHex.length()/2;
+    for( int i=1; i<aryLen; i++ ){
+        strHex.insert(2*i+i-1," ");
+    }
+    return strHex;
+}
+

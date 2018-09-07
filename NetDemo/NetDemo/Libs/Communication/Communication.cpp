@@ -9,13 +9,13 @@
 
 
 Communication::Communication(QObject *parent) :
-    QObject(parent),m_pTS(NULL),m_pTC(NULL),m_pUDP(NULL),m_pSP(NULL){
+    QObject(parent),m_pTS(NULL),m_pTC(NULL),m_pUDP(NULL),m_pSP(NULL),mIsRecorder(false){
     qRegisterMetaType<qintptr>("qintptr");
     qRegisterMetaType<QSet<quint8>>("QSet<quint8>");
 }
 
 Communication::~Communication(){
-    //closeFile();
+    closeRecordFile();
 }
 
 bool Communication::startCommunication(CommunicationCfg* pCommCfg){
@@ -34,7 +34,7 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
         }
         bRet = m_pTS->startTcpServer(pCommCfg);
         //打开记录文件
-        //openFile();
+        openRecordFile();
         break;
     case TcpClient:
         if( Q_NULLPTR == m_pTC ){
@@ -83,14 +83,19 @@ void Communication::sendData(CDataPacket* dataPkt){
     }
 }
 
+void Communication::needToRecord(bool bNeed){
+    mIsRecorder = bNeed;
+}
+
 void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
     if( NULL != dataPkt ){
         switch (m_commType) {
         case TcpServer:
             qDebug()<<"【TCP_SERVER_总控转发中心】收到报文，报文类型："<<dataPkt->msgType;
             emit writeData(dataPkt);
+            recordData( dataPkt );
             if( dataPkt->decodeData() ){
-                //recordData( dataPkt );
+
             }
             break;
         case TcpClient:
@@ -106,20 +111,57 @@ void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
     }
 }
 
-void Communication::openFile(){
-    QString strFile = QCoreApplication::applicationDirPath().append("/simData.dat");
-    mRecordFile.setFileName(strFile);
-    if( !mRecordFile.open(QIODevice::WriteOnly|QIODevice::Append|QIODevice::Text) )
-        qDebug()<<"Open file failed,the file path:"<<strFile;
+void Communication::openRecordFile(){
+    if( mIsRecorder ){
+        QString strFile = QCoreApplication::applicationDirPath().append("/simData.dat");
+        mRecordFile.setFileName(strFile);
+        if( !mRecordFile.open(QIODevice::WriteOnly|QIODevice::Append|QIODevice::Text) )
+            qDebug()<<"Open file failed,the file path:"<<strFile;
+    }
 }
 
 void Communication::recordData(CDataPacket* dataPkt){
-    if( NULL != dataPkt ){
-        mRecordFile.write(dataPkt->encodePacketToBytes());
+    if( NULL != dataPkt && mIsRecorder ){
+        QString strHex = byteArrayToHex(dataPkt->encodePacketToBytes());
+        mRecordFile.write( strHex.toLatin1() );
+        QString strSpace(" ");
+        mRecordFile.write( strSpace.toLatin1() );
         mRecordFile.flush();
     }
 }
 
-void Communication::closeFile(){
-    mRecordFile.close();
+void Communication::closeRecordFile(){
+    if( mIsRecorder ){
+        mRecordFile.close();
+    }
+}
+
+QByteArray Communication::hexToByteArray(QString strHex)
+{
+    QByteArray hexAry;
+    strHex = strHex.trimmed();
+    strHex = strHex.simplified();
+    QStringList strHexList = strHex.split(" ");
+
+    foreach (QString str, strHexList) {
+        if( !str.isEmpty() ){
+            bool ok = true;
+            char cHex = str.toInt(&ok,16)&0xFF;
+            if(ok){
+                hexAry.append(cHex);
+            }else{
+                qDebug()<<"非法的16进制字符："<<str;
+            }
+        }
+    }
+    return hexAry;
+}
+
+QString Communication::byteArrayToHex(QByteArray byteAry){
+    QString strHex(byteAry.toHex().toUpper());
+    int aryLen = strHex.length()/2;
+    for( int i=1; i<aryLen; i++ ){
+        strHex.insert(2*i+i-1," ");
+    }
+    return strHex;
 }

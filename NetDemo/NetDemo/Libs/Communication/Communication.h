@@ -32,6 +32,7 @@ public:
      */
 	void sendData(CDataPacket* dataPkt);
 
+    void needToRecord( bool bNeed = false);
 private:
     CommType    m_commType;
     CTcpServer* m_pTS;
@@ -46,11 +47,14 @@ public slots:
     void readDataFromMsgQueue(CDataPacket* dataPkt);
 
 private:
+    bool  mIsRecorder;
     QFile mRecordFile;
 
-    void openFile();
+    void openRecordFile();
     void recordData(CDataPacket* dataPkt);
-    void closeFile();
+    void closeRecordFile();
+    QByteArray hexToByteArray(QString strHex);
+    QString byteArrayToHex(QByteArray byteAry);
 };
 
 #endif // COMMUNICATION_H

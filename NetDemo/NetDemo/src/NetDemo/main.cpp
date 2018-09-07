@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     CommunicationCfg cfgTS;
     cfgTS.parseCommCfgFile(":/config/connection_cfg _server.json");
     Communication* pCommTS = new Communication();
+    //pCommTS->needToRecord(true);
     pCommTS->startCommunication(&cfgTS);
 
     CommunicationCfg cfgTC;

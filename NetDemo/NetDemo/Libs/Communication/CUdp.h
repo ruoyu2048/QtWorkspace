@@ -91,7 +91,8 @@ private slots:
 private:
     void startSimmulator( bool bStart=false );
     QByteArray getSimDataArray();
-
+    QByteArray hexToByteArray(QString strHex);
+    QString byteArrayToHex(QByteArray byteAry);
 private:
     QTimer*    m_pTimer;    //发送报文定时器
     QByteArray mSimAry;     //模拟数据

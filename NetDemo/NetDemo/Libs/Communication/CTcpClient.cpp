@@ -213,8 +213,13 @@ void CTcpClient::startSimmulator( bool bStart ){
 QByteArray CTcpClient::getSimDataArray(){
     QString strFilePath = QCoreApplication::applicationDirPath().append("/simData.dat");
     QFile simFile(strFilePath);
-    if( simFile.open(QIODevice::ReadOnly|QIODevice::Text) )
-        mSimAry = simFile.readAll();
+    if( simFile.open(QIODevice::ReadOnly|QIODevice::Text) ){
+        //先将从文本中读取的16进制的ByteArray转换成QString
+        QString strHexFile(simFile.readAll());
+        //再还原成原始的字节序
+        QByteArray bateAry = hexToByteArray(strHexFile);
+        mSimAry =  hexToByteArray(strHexFile);
+    }
     simFile.close();
     return mSimAry;
 }
@@ -231,3 +236,34 @@ void CTcpClient::sendSimmData(){
         mIndex = 0;
     }
 }
+
+QByteArray CTcpClient::hexToByteArray(QString strHex)
+{
+    QByteArray hexAry;
+    strHex = strHex.trimmed();
+    strHex = strHex.simplified();
+    QStringList strHexList = strHex.split(" ");
+
+    foreach (QString str, strHexList) {
+        if( !str.isEmpty() ){
+            bool ok = true;
+            char cHex = str.toInt(&ok,16)&0xFF;
+            if(ok){
+                hexAry.append(cHex);
+            }else{
+                qDebug()<<"非法的16进制字符："<<str;
+            }
+        }
+    }
+    return hexAry;
+}
+
+QString CTcpClient::byteArrayToHex(QByteArray byteAry){
+    QString strHex(byteAry.toHex().toUpper());
+    int aryLen = strHex.length()/2;
+    for( int i=1; i<aryLen; i++ ){
+        strHex.insert(2*i+i-1," ");
+    }
+    return strHex;
+}
+
