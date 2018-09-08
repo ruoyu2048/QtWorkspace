@@ -78,7 +78,7 @@ private:
     QSet<quint8> mDstIdSet;
 
 signals:
-    void sendDataToQueue(CDataPacket* dataPkt);
+    void receivedDataPacket(CDataPacket* dataPkt);
     /************************************************************************
     *函数名:	UpdateConnectState
     *概述:发送客户端连接状态信息。

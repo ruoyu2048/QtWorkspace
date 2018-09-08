@@ -125,7 +125,7 @@ void CSerialPort::parseDatagram(QByteArray rcvAry){
                     CDataPacket* dataPkt = new CDataPacket();
                     if( dataPkt->checkBitTest() ){
                         dataPkt->encoddeBytesToPacket();
-                        emit sendDataToQueue(dataPkt);
+                        emit receivedDataPacket(dataPkt);
                     }
 
                     //移除已解析的报文

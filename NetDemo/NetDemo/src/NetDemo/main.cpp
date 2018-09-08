@@ -10,18 +10,22 @@ int main(int argc, char *argv[])
     CommunicationCfg cfgTS;
     cfgTS.parseCommCfgFile(":/config/connection_cfg _server.json");
     Communication* pCommTS = new Communication();
-    //pCommTS->needToRecord(true);
+    pCommTS->startRecoder(false);
     pCommTS->startCommunication(&cfgTS);
 
-    CommunicationCfg cfgTC;
-    cfgTC.parseCommCfgFile(":/config/connection_cfg_client.json");
-    Communication* pCommTC = new Communication();
-    pCommTC->startCommunication(&cfgTC);
+    CommunicationCfg cfgTCSim;
+    cfgTCSim.parseCommCfgFile(":/config/connection_cfg_client.json");
+    Communication* pCommTCSim = new Communication();
+    pCommTCSim->startCommunication(&cfgTCSim);
 
-//    CommunicationCfg cfgUdp;
-//    cfgUdp.parseCommCfgFile(":/config/connection_cfg_udp.json");
-//    Communication* pCommUdp = new Communication();
-//    pCommUdp->startCommunication(&cfgUdp);
+    CommunicationCfg cfgTCTest;
+    cfgTCTest.bSimmulator = false;
+    cfgTCTest.commType = TcpClient;
+    cfgTCTest.strCommPara = "127.0.0.1:9999";
+    cfgTCTest.strCommOther = "0x40";
+    //cfgTCSim.parseCommCfgFile(":/config/connection_cfg_client.json");
+    Communication* pCommTCTest = new Communication();
+    pCommTCTest->startCommunication(&cfgTCTest);
 
     return a.exec();
 }

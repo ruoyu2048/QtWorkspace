@@ -9,7 +9,7 @@
 
 
 Communication::Communication(QObject *parent) :
-    QObject(parent),m_pTS(NULL),m_pTC(NULL),m_pUDP(NULL),m_pSP(NULL),mIsRecorder(false){
+    QObject(parent),m_pTS(NULL),m_pTC(NULL),m_pUDP(NULL),m_pSP(NULL),mbStart(false){
     qRegisterMetaType<qintptr>("qintptr");
     qRegisterMetaType<QSet<quint8>>("QSet<quint8>");
 }
@@ -29,26 +29,24 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
     case TcpServer:
         if( Q_NULLPTR == m_pTS ){
             m_pTS = new CTcpServer(this);
-            connect(this,SIGNAL(writeData(CDataPacket*)),m_pTS,SLOT(dispatchData(CDataPacket*)));
-            connect(m_pTS,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
+            connect(this,SIGNAL(sendData(CDataPacket*)),m_pTS,SLOT(dispatchData(CDataPacket*)));
+            connect(m_pTS,SIGNAL(receivedDataPacket(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
         bRet = m_pTS->startTcpServer(pCommCfg);
-        //打开记录文件
-        openRecordFile();
         break;
     case TcpClient:
         if( Q_NULLPTR == m_pTC ){
             m_pTC = new CTcpClient(this);
-            connect(this,SIGNAL(writeData(CDataPacket*)),m_pTC,SLOT(writeData(CDataPacket*)));
-            connect(m_pTC,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
+            connect(this,SIGNAL(sendData(CDataPacket*)),m_pTC,SLOT(writeData(CDataPacket*)));
+            connect(m_pTC,SIGNAL(receivedDataPacket(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
         bRet = m_pTC->startTcpClient(pCommCfg);
         break;
     case UDP:
         if( Q_NULLPTR == m_pUDP ){
             m_pUDP = new CUdp(this);
-            connect(this,SIGNAL(writeData(CDataPacket*)),m_pUDP,SLOT(dispatchData(CDataPacket*)));
-            connect(m_pUDP,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
+            connect(this,SIGNAL(sendData(CDataPacket*)),m_pUDP,SLOT(dispatchData(CDataPacket*)));
+            connect(m_pUDP,SIGNAL(receivedDataPacket(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
         bRet = m_pUDP->startUdp(pCommCfg);
         break;
@@ -56,39 +54,40 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
         if( Q_NULLPTR == m_pSP ){
             m_pSP = new CSerialPort(this);
         }
-        connect(this,SIGNAL(writeData(CDataPacket*)),m_pSP,SLOT(writeData(CDataPacket*)));
-        connect(m_pSP,SIGNAL(sendDataToQueue(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
+        connect(this,SIGNAL(sendData(CDataPacket*)),m_pSP,SLOT(writeData(CDataPacket*)));
+        connect(m_pSP,SIGNAL(receivedDataPacket(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         bRet = m_pSP->startSerialPort(pCommCfg);
         break;
     }
     if( bRet ){
+        openRecordFile();
         startSimmulator(pCommCfg->bSimmulator);
     }
 
     return bRet;
 }
 
-void Communication::sendData(CDataPacket* dataPkt){
+void Communication::sendDataPacket(CDataPacket* dataPkt){
     if( NULL != dataPkt ){
         switch (m_commType) {
         case TcpServer:
-            emit writeData(dataPkt);
+            emit sendData(dataPkt);
             break;
         case TcpClient:
-            emit writeData(dataPkt);
+            emit sendData(dataPkt);
             break;
         case UDP:
-            emit writeData(dataPkt);
+            emit sendData(dataPkt);
             break;
         case Serial:
-            emit writeData(dataPkt);
+            emit sendData(dataPkt);
             break;
         }
     }
 }
 
-void Communication::needToRecord(bool bNeed){
-    mIsRecorder = bNeed;
+void Communication::startRecoder( bool start ){
+    mbStart = start;
 }
 
 void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
@@ -96,7 +95,7 @@ void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
         switch (m_commType) {
         case TcpServer:
             qDebug()<<"【TCP_SERVER_总控转发中心】收到报文，报文类型："<<dataPkt->msgType;
-            emit writeData(dataPkt);
+            emit sendDataPacket(dataPkt);
             recordData( dataPkt );
             break;
         case TcpClient:
@@ -113,7 +112,7 @@ void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
 }
 
 void Communication::openRecordFile(){
-    if( mIsRecorder ){
+    if( mbStart ){
         QString strFile = QCoreApplication::applicationDirPath().append("/simData.dat");
         mRecordFile.setFileName(strFile);
         if( !mRecordFile.open(QIODevice::WriteOnly|QIODevice::Append|QIODevice::Text) )
@@ -122,7 +121,7 @@ void Communication::openRecordFile(){
 }
 
 void Communication::recordData(CDataPacket* dataPkt){
-    if( NULL != dataPkt && mIsRecorder ){
+    if( NULL != dataPkt && mbStart ){
         //QString strHex = byteArrayToHex(dataPkt->encodePacketToBytes());
         QString strHex = byteArrayToHex(dataPkt->encodedPacketBytes);
         mRecordFile.write( strHex.toLatin1() );
@@ -133,7 +132,7 @@ void Communication::recordData(CDataPacket* dataPkt){
 }
 
 void Communication::closeRecordFile(){
-    if( mIsRecorder ){
+    if( mbStart ){
         mRecordFile.close();
     }
 }

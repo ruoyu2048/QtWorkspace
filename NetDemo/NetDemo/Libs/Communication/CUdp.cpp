@@ -93,7 +93,7 @@ void CUdp::parseDatagram(QByteArray rcvAry){
                     dataPkt->setEncodedPacketBytes(dataAry);
                     if( dataPkt->checkBitTest() ){
                         dataPkt->encoddeBytesToPacket();
-                        emit sendDataToQueue(dataPkt);
+                        emit receivedDataPacket(dataPkt);
                     }
                     //移除已解析的报文
                     mCacheAry.remove( 0, nTailPos+1 );

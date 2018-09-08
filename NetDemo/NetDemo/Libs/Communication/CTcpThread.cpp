@@ -17,7 +17,7 @@ void CTcpThread::run(){
 
     connect(this,SIGNAL(writeData(CDataPacket*)),m_pTcpSocket,SLOT(writeData(CDataPacket*)));
     connect(m_pTcpSocket,SIGNAL(registerDstId(QSet<quint8>,qintptr)),this,SIGNAL(registerDstId(QSet<quint8>,qintptr)));
-    connect(m_pTcpSocket,SIGNAL(sendDataToQueue(CDataPacket*)),this,SIGNAL(sendDataToQueue(CDataPacket*)));
+    connect(m_pTcpSocket,SIGNAL(receivedDataPacket(CDataPacket*)),this,SIGNAL(receivedDataPacket(CDataPacket*)));
 
     connect(m_pTcpSocket,SIGNAL(disconnected(qintptr)),this,SIGNAL(disconnected(qintptr)));
     connect(m_pTcpSocket,SIGNAL(disconnected()),this,SLOT(quit()));

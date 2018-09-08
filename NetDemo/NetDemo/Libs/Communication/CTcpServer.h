@@ -45,7 +45,7 @@ protected:
 
 signals:
     void writeData(CDataPacket* dataPkt);
-    void sendDataToQueue(CDataPacket* dataPkt);
+    void receivedDataPacket(CDataPacket* dataPkt);
 
 public slots:
     void registerDstId(QSet<quint8>dstIDs,qintptr socketDesc );
@@ -97,7 +97,7 @@ private:
     QSet<quint8> mDstIdSet;
 signals:
     void registerDstId(QSet<quint8>dstIDs,qintptr socketDesc );
-    void sendDataToQueue(CDataPacket* dataPkt);
+    void receivedDataPacket(CDataPacket* dataPkt);
 
     /*@
     *函数名:	disconnected

@@ -22,7 +22,7 @@ public:
 signals:
     void registerDstId(QSet<quint8>dstIDs,qintptr socketDesc );
     void writeData(CDataPacket* dataPkt);
-    void sendDataToQueue(CDataPacket* dataPkt);
+    void receivedDataPacket(CDataPacket* dataPkt);
 
     /*概述:将Socket的断开连接信号转发给TcpServer对象*/
     void disconnected(qintptr socketDesc);

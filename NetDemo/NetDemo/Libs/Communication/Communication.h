@@ -30,9 +30,9 @@ public:
      * @brief sendData--发送包报文
      * @param dataPkt--报文对象
      */
-	void sendData(CDataPacket* dataPkt);
+    void sendDataPacket(CDataPacket* dataPkt);
 
-    void needToRecord( bool bNeed = false);
+    void startRecoder( bool start = false );
 private:
     CommType    m_commType;
     CTcpServer* m_pTS;
@@ -41,7 +41,7 @@ private:
     CSerialPort*m_pSP;
 
 signals:
-    void writeData(CDataPacket* dataPkt);
+    void sendData(CDataPacket* dataPkt);
 
 public slots:
     void readDataFromMsgQueue(CDataPacket* dataPkt);
@@ -52,7 +52,7 @@ private:
     void recordData(CDataPacket* dataPkt);
     void closeRecordFile();
 
-    bool  mIsRecorder;
+    bool  mbStart;
     QFile mRecordFile;
 //发送模拟报文
     void startSimmulator( bool bStart=false );

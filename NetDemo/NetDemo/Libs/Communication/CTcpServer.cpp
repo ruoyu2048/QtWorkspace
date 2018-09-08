@@ -45,7 +45,7 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor){
     CTcpThread* pThread = new CTcpThread(socketDescriptor, 0);
     //将客户端报文发送到上层消息队列
     connect(pThread,SIGNAL(registerDstId(QSet<quint8>,qintptr)),this,SLOT(registerDstId(QSet<quint8>,qintptr)));
-    connect(pThread,SIGNAL(sendDataToQueue(CDataPacket*)),this,SIGNAL(sendDataToQueue(CDataPacket*)));
+    connect(pThread,SIGNAL(receivedDataPacket(CDataPacket*)),this,SIGNAL(receivedDataPacket(CDataPacket*)));
 
     connect(pThread,SIGNAL(disconnected(qintptr)),this,SLOT(slotDisconnected(qintptr)));
     connect(pThread, SIGNAL(finished()), pThread, SLOT(deleteLater()));
@@ -141,7 +141,7 @@ void CTcpSocket::parseDatagram(QByteArray rcvAry){
                     if( dataPkt->checkBitTest() ){
                         dataPkt->encoddeBytesToPacket();
                         if( registClientInfo(dataPkt) ){
-                            emit sendDataToQueue(dataPkt);
+                            emit receivedDataPacket(dataPkt);
                         }
                     }
                     //移除已解析的报文

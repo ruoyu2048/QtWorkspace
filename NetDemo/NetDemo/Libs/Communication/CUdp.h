@@ -50,7 +50,7 @@ private:
     QMap<QString,QSet<quint8>>mDstMap;
 
 signals:
-    void sendDataToQueue(CDataPacket* dataPkt);
+    void receivedDataPacket(CDataPacket* dataPkt);
 
 public slots:
     void dispatchData( CDataPacket* dataPkt );

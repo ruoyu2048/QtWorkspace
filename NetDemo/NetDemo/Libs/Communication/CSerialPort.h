@@ -35,7 +35,7 @@ private:
     QSet<QString>m_validSPSet; //有效串口集合
 
 signals:
-    void sendDataToQueue(CDataPacket* dataPkt);
+    void receivedDataPacket(CDataPacket* dataPkt);
 
 public slots:
     void writeData(CDataPacket* dataPkt);
