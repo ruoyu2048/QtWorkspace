@@ -61,6 +61,10 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
         bRet = m_pSP->startSerialPort(pCommCfg);
         break;
     }
+    if( bRet ){
+        startSimmulator(pCommCfg->bSimmulator);
+    }
+
     return bRet;
 }
 
@@ -94,9 +98,6 @@ void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
             qDebug()<<"【TCP_SERVER_总控转发中心】收到报文，报文类型："<<dataPkt->msgType;
             emit writeData(dataPkt);
             recordData( dataPkt );
-            if( dataPkt->decodeData() ){
-
-            }
             break;
         case TcpClient:
             qDebug()<<"【TCP_CLIENT_总控转发中心】收到报文，报文类型："<<dataPkt->msgType;
@@ -122,7 +123,8 @@ void Communication::openRecordFile(){
 
 void Communication::recordData(CDataPacket* dataPkt){
     if( NULL != dataPkt && mIsRecorder ){
-        QString strHex = byteArrayToHex(dataPkt->encodePacketToBytes());
+        //QString strHex = byteArrayToHex(dataPkt->encodePacketToBytes());
+        QString strHex = byteArrayToHex(dataPkt->encodedPacketBytes);
         mRecordFile.write( strHex.toLatin1() );
         QString strSpace(" ");
         mRecordFile.write( strSpace.toLatin1() );
@@ -133,6 +135,51 @@ void Communication::recordData(CDataPacket* dataPkt){
 void Communication::closeRecordFile(){
     if( mIsRecorder ){
         mRecordFile.close();
+    }
+}
+
+void Communication::startSimmulator( bool bStart ){
+    if( bStart ){
+        mIndex = 0;
+        m_pTimer = new QTimer(this);
+        connect(m_pTimer,SIGNAL(timeout()),this,SLOT(sendSimmData()));
+        mSimBytes = getSimDataArray();
+        m_pTimer->start(1000);
+    }
+}
+
+QByteArray Communication::getSimDataArray(){
+    QString strFilePath = QCoreApplication::applicationDirPath().append("/simData.dat");
+    QFile simFile(strFilePath);
+    if( simFile.open(QIODevice::ReadOnly|QIODevice::Text) ){
+        //先将从文本中读取的16进制的ByteArray转换成QString
+        QString strHexFile(simFile.readAll());
+        //再还原成原始的字节序
+        QByteArray bateAry = hexToByteArray(strHexFile);
+        mSimBytes =  hexToByteArray(strHexFile);
+    }
+    simFile.close();
+    return mSimBytes;
+}
+
+void Communication::sendSimmData(){
+    mIndex = mSimBytes.indexOf(0xAA,mIndex);
+    if( mIndex >=0 ){
+        //必须保证报尾在报头后面
+        int nTailPos = mSimBytes.indexOf(0xA5,mIndex);
+        if( -1 == nTailPos ){
+            mIndex = 0;
+        }
+        else{
+            CDataPacket dataPkt;
+            dataPkt.setEncodedPacketBytes(mSimBytes.mid(mIndex,nTailPos-mIndex+1));
+            dataPkt.encoddeBytesToPacket();
+            sendData(&dataPkt);
+            mIndex = nTailPos + 1;
+
+            if( mIndex >= mSimBytes.length() )
+                mIndex = 0;
+        }
     }
 }
 

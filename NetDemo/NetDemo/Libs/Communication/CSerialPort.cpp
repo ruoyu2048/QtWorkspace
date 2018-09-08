@@ -101,8 +101,8 @@ void CSerialPort::writeData(CDataPacket* dataPkt){
         //判断当前消息是否为当前对象订阅的目的地址
         QSet<quint8>::iterator it = mDstIdSet.find(dataPkt->msgDst);
         if( it != mDstIdSet.end() ){
-            //m_pSP->write(dataPkt->packetToBytes());
-            m_pSP->write(dataPkt->encodePacketToBytes());
+            //m_pSP->write(dataPkt->encodePacketToBytes());
+            m_pSP->write(dataPkt->encodedPacketBytes);
         }
     }
 }
@@ -123,9 +123,10 @@ void CSerialPort::parseDatagram(QByteArray rcvAry){
                 if( nTailPos >=0 ){//有头有尾
                     QByteArray dataAry = mCacheAry.mid(nHeadPos,nTailPos-nHeadPos+1);
                     CDataPacket* dataPkt = new CDataPacket();
-                    //dataPkt->bytesToPacket( dataAry );
-                    dataPkt->encodeBytesToPacket(dataAry);
-                    emit sendDataToQueue(dataPkt);
+                    if( dataPkt->checkBitTest() ){
+                        dataPkt->encoddeBytesToPacket();
+                        emit sendDataToQueue(dataPkt);
+                    }
 
                     //移除已解析的报文
                     mCacheAry.remove( 0, nTailPos+1 );

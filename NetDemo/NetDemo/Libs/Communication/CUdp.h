@@ -87,20 +87,6 @@ private slots:
     *返回值：无
     ************************************************************************/
     void ReadPendingDatagrams();
-
-private:
-    void startSimmulator( bool bStart=false );
-    QByteArray getSimDataArray();
-    QByteArray hexToByteArray(QString strHex);
-    QString byteArrayToHex(QByteArray byteAry);
-private:
-    QTimer*    m_pTimer;    //发送报文定时器
-    QByteArray mSimAry;     //模拟数据
-    quint32    mIndex;      //发送报文的起点位置
-    quint32    mSendLen;    //每次发送报文长度
-
-private slots:
-    void sendSimmData();
 };
 
 #endif // CUDP_H

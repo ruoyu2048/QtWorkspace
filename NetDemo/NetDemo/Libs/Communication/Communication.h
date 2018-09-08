@@ -47,14 +47,25 @@ public slots:
     void readDataFromMsgQueue(CDataPacket* dataPkt);
 
 private:
-    bool  mIsRecorder;
-    QFile mRecordFile;
-
+    //记录报文数据
     void openRecordFile();
     void recordData(CDataPacket* dataPkt);
     void closeRecordFile();
+
+    bool  mIsRecorder;
+    QFile mRecordFile;
+//发送模拟报文
+    void startSimmulator( bool bStart=false );
+    QByteArray getSimDataArray();
     QByteArray hexToByteArray(QString strHex);
     QString byteArrayToHex(QByteArray byteAry);
+
+    QTimer*    m_pTimer;    //发送报文定时器
+    QByteArray mSimBytes;   //模拟数据
+    qint32     mIndex;      //发送报文的起点位置
+
+private slots:
+    void sendSimmData();
 };
 
 #endif // COMMUNICATION_H

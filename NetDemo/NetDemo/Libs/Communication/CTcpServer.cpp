@@ -121,28 +121,28 @@ void CTcpSocket::slotDisconnected(){
 
 void CTcpSocket::writeData(CDataPacket* dataPkt){
     if( NULL != dataPkt ){
-        //this->write(dataPkt->packetToBytes());
-        this->write(dataPkt->encodePacketToBytes());
+        //this->write(dataPkt->encodePacketToBytes());
+        this->write(dataPkt->encodedPacketBytes);
     }
 }
 
 void CTcpSocket::parseDatagram(QByteArray rcvAry){
     //将获取到的报文添加到缓存中
     mCacheAry.append(rcvAry);
-    while( mCacheAry.length() >= 8 ){
+    while( mCacheAry.length() >= 4 ){
         int nHeadPos = mCacheAry.indexOf(0xAA);
         if( nHeadPos >=0 ){
                 //必须保证报尾在报头后面
                 int nTailPos = mCacheAry.indexOf(0xA5,nHeadPos);
                 if( nTailPos >=0 ){//有头有尾
-                    //quint16 nDataLen = ((uchar)mCacheAry[4]<<8) + (uchar)mCacheAry[5];
-                    //QByteArray dataAry = mCacheAry.mid(nHeadPos,4+2+nDataLen+2);
                     QByteArray dataAry = mCacheAry.mid(nHeadPos,nTailPos-nHeadPos+1);
                     CDataPacket* dataPkt = new CDataPacket();
-                    //dataPkt->bytesToPacket( dataAry );
-                    dataPkt->encodeBytesToPacket(dataAry);
-                    if( registClientInfo(dataPkt) ){
-                        emit sendDataToQueue(dataPkt);
+                    dataPkt->setEncodedPacketBytes(dataAry);
+                    if( dataPkt->checkBitTest() ){
+                        dataPkt->encoddeBytesToPacket();
+                        if( registClientInfo(dataPkt) ){
+                            emit sendDataToQueue(dataPkt);
+                        }
                     }
                     //移除已解析的报文
                     mCacheAry.remove( 0, nTailPos+1 );

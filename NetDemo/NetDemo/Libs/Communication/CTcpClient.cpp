@@ -18,7 +18,6 @@ bool CTcpClient::startTcpClient(CommunicationCfg* pCommCfg){
     //设置客户端注册信息
     setDestinationIDs(pCommCfg->strCommOther);
     if( connectToHost(pCommCfg->strCommPara) ){
-        startSimmulator(pCommCfg->bSimmulator);
         return true;
     }
     return false;
@@ -118,8 +117,8 @@ quint8 CTcpClient::hexStringToChar(QString hexStr){
 
 void CTcpClient::writeData(CDataPacket* dataPkt){
     if( NULL != dataPkt ){
-        //m_pTSClient->write(dataPkt->packetToBytes());
-        m_pTSClient->write(dataPkt->encodePacketToBytes());
+        //m_pTSClient->write(dataPkt->encodePacketToBytes());
+        m_pTSClient->write(dataPkt->encodedPacketBytes);
     }
 }
 
@@ -147,9 +146,11 @@ void CTcpClient::parseDatagram(QByteArray rcvAry)
                     //QByteArray dataAry = mCacheAry.mid(nHeadPos,4+2+nDataLen+2);
                     QByteArray dataAry = mCacheAry.mid(nHeadPos,nTailPos-nHeadPos+1);
                     CDataPacket* dataPkt = new CDataPacket();
-                    //dataPkt->bytesToPacket( dataAry );
-                    dataPkt->encodeBytesToPacket(dataAry);
-                    emit sendDataToQueue(dataPkt);
+                    dataPkt->setEncodedPacketBytes(dataAry);
+                    if( dataPkt->checkBitTest() ){
+                        dataPkt->encoddeBytesToPacket();
+                        emit sendDataToQueue(dataPkt);
+                    }
                     //移除已解析的报文
                     mCacheAry.remove( 0, nTailPos+1 );
                     qDebug()<<"【客户端接收到消息信宿类型:"<<dataPkt->msgType;
@@ -198,72 +199,3 @@ void CTcpClient::DisplayError(QAbstractSocket::SocketError socketError)
             qDebug() << m_pTSClient->errorString();
     }
 }
-
-void CTcpClient::startSimmulator( bool bStart ){
-    if( bStart ){
-        mIndex = 0;
-        mSendLen = 256;
-        m_pTimer = new QTimer(this);
-        connect(m_pTimer,SIGNAL(timeout()),this,SLOT(sendSimmData()));
-        mSimAry = getSimDataArray();
-        m_pTimer->start(2000);
-    }
-}
-
-QByteArray CTcpClient::getSimDataArray(){
-    QString strFilePath = QCoreApplication::applicationDirPath().append("/simData.dat");
-    QFile simFile(strFilePath);
-    if( simFile.open(QIODevice::ReadOnly|QIODevice::Text) ){
-        //先将从文本中读取的16进制的ByteArray转换成QString
-        QString strHexFile(simFile.readAll());
-        //再还原成原始的字节序
-        QByteArray bateAry = hexToByteArray(strHexFile);
-        mSimAry =  hexToByteArray(strHexFile);
-    }
-    simFile.close();
-    return mSimAry;
-}
-
-void CTcpClient::sendSimmData(){
-    QByteArray leftAry = mSimAry.mid(mIndex);
-    if( leftAry.length()/mSendLen >0 ){
-        QByteArray sendAry = leftAry.mid(0,mSendLen);
-        m_pTSClient->write( sendAry );
-        mIndex += mSendLen;
-    }
-    else{
-        m_pTSClient->write(leftAry);
-        mIndex = 0;
-    }
-}
-
-QByteArray CTcpClient::hexToByteArray(QString strHex)
-{
-    QByteArray hexAry;
-    strHex = strHex.trimmed();
-    strHex = strHex.simplified();
-    QStringList strHexList = strHex.split(" ");
-
-    foreach (QString str, strHexList) {
-        if( !str.isEmpty() ){
-            bool ok = true;
-            char cHex = str.toInt(&ok,16)&0xFF;
-            if(ok){
-                hexAry.append(cHex);
-            }else{
-                qDebug()<<"非法的16进制字符："<<str;
-            }
-        }
-    }
-    return hexAry;
-}
-
-QString CTcpClient::byteArrayToHex(QByteArray byteAry){
-    QString strHex(byteAry.toHex().toUpper());
-    int aryLen = strHex.length()/2;
-    for( int i=1; i<aryLen; i++ ){
-        strHex.insert(2*i+i-1," ");
-    }
-    return strHex;
-}
-

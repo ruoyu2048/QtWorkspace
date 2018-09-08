@@ -90,10 +90,11 @@ void CUdp::parseDatagram(QByteArray rcvAry){
                 if( nTailPos >=0 ){//有头有尾
                     QByteArray dataAry = mCacheAry.mid(nHeadPos,nTailPos-nHeadPos+1);
                     CDataPacket* dataPkt = new CDataPacket();
-                    //dataPkt->bytesToPacket( dataAry );
-                    dataPkt->encodeBytesToPacket(dataAry);
-                    emit sendDataToQueue(dataPkt);
-
+                    dataPkt->setEncodedPacketBytes(dataAry);
+                    if( dataPkt->checkBitTest() ){
+                        dataPkt->encoddeBytesToPacket();
+                        emit sendDataToQueue(dataPkt);
+                    }
                     //移除已解析的报文
                     mCacheAry.remove( 0, nTailPos+1 );
                 }
@@ -115,8 +116,6 @@ void CUdp::parseDatagram(QByteArray rcvAry){
 
 void CUdp::dispatchData( CDataPacket* dataPkt ){
     if( NULL != dataPkt ){
-        //QByteArray dataAry = dataPkt->packetToBytes();
-        QByteArray dataAry = dataPkt->encodePacketToBytes();
         QMap<QString,QSet<quint8>>::iterator it = mDstMap.begin();
         for( ; it!=mDstMap.end(); it++ ) {
             QString strUrl = it.key();
@@ -127,7 +126,7 @@ void CUdp::dispatchData( CDataPacket* dataPkt ){
                 QStringList urlList = strUrl.split(":");
                 if( 2 == urlList.size() ){
                     QHostAddress dstAddr(urlList.at(0));
-                    m_pUdpCommon->writeDatagram(dataAry,dstAddr,urlList.at(1).toInt());
+                    m_pUdpCommon->writeDatagram(dataPkt->encodedPacketBytes,dstAddr,urlList.at(1).toInt());
                 }
             }
         }
@@ -161,82 +160,3 @@ void CUdp::ReadPendingDatagrams()
         parseDatagram(rcvAry);
     }
 }
-
-void CUdp::startSimmulator( bool bStart ){
-    if( bStart ){
-        mIndex = 0;
-        mSendLen = 256;
-        m_pTimer = new QTimer(this);
-        connect(m_pTimer,SIGNAL(timeout()),this,SLOT(sendSimmData()));
-        mSimAry = getSimDataArray();
-        m_pTimer->start(2000);
-    }
-}
-
-QByteArray CUdp::getSimDataArray(){
-    QString strFilePath = QCoreApplication::applicationDirPath().append("/simData.dat");
-    QFile simFile(strFilePath);
-    if( simFile.open(QIODevice::ReadOnly|QIODevice::Text) ){
-        //先将从文本中读取的16进制的ByteArray转换成QString
-        QString strHexFile(simFile.readAll());
-        //再还原成原始的字节序
-        mSimAry = hexToByteArray(strHexFile);
-    }
-    simFile.close();
-    return mSimAry;
-}
-
-void CUdp::sendSimmData(){
-    QByteArray sendAry;
-    QByteArray leftAry = mSimAry.mid(mIndex);
-    if( leftAry.length()/mSendLen >0 ){
-        sendAry = leftAry.mid(0,mSendLen);
-        mIndex += mSendLen;
-    }
-    else{
-        sendAry = leftAry;
-        mIndex = 0;
-    }
-    if( sendAry.length() >0 ){
-        QMap<QString,QSet<quint8>>::iterator it = mDstMap.begin();
-        for( ; it!=mDstMap.end(); it++ ) {
-            QString strUrl = it.key();
-            QStringList urlList = strUrl.split(":");
-            if( 2 == urlList.size() ){
-                QHostAddress dstAddr(urlList.at(0));
-                m_pUdpCommon->writeDatagram(sendAry,dstAddr,urlList.at(1).toInt());
-            }
-        }
-    }
-}
-
-QByteArray CUdp::hexToByteArray(QString strHex)
-{
-    QByteArray hexAry;
-    strHex = strHex.trimmed();
-    strHex = strHex.simplified();
-    QStringList strHexList = strHex.split(" ");
-
-    foreach (QString str, strHexList) {
-        if( !str.isEmpty() ){
-            bool ok = true;
-            char cHex = str.toInt(&ok,16)&0xFF;
-            if(ok){
-                hexAry.append(cHex);
-            }else{
-                qDebug()<<"非法的16进制字符："<<str;
-            }
-        }
-    }
-    return hexAry;
-}
-
-QString CUdp::byteArrayToHex(QByteArray byteAry){
-    QString strHex(byteAry.toHex().toUpper());
-    int aryLen = strHex.length()/2;
-    for( int i=1; i<aryLen; i++ ){
-        strHex.insert(2*i+i-1," ");
-    }
-    return strHex;
-}
-
