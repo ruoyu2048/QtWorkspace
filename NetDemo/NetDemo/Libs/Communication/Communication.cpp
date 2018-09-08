@@ -29,7 +29,6 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
     case TcpServer:
         if( Q_NULLPTR == m_pTS ){
             m_pTS = new CTcpServer(this);
-            connect(this,SIGNAL(sendData(CDataPacket*)),m_pTS,SLOT(dispatchData(CDataPacket*)));
             connect(m_pTS,SIGNAL(receivedDataPacket(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
         bRet = m_pTS->startTcpServer(pCommCfg);
@@ -37,7 +36,6 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
     case TcpClient:
         if( Q_NULLPTR == m_pTC ){
             m_pTC = new CTcpClient(this);
-            connect(this,SIGNAL(sendData(CDataPacket*)),m_pTC,SLOT(writeData(CDataPacket*)));
             connect(m_pTC,SIGNAL(receivedDataPacket(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
         bRet = m_pTC->startTcpClient(pCommCfg);
@@ -45,7 +43,6 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
     case UDP:
         if( Q_NULLPTR == m_pUDP ){
             m_pUDP = new CUdp(this);
-            connect(this,SIGNAL(sendData(CDataPacket*)),m_pUDP,SLOT(dispatchData(CDataPacket*)));
             connect(m_pUDP,SIGNAL(receivedDataPacket(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
         bRet = m_pUDP->startUdp(pCommCfg);
@@ -53,9 +50,8 @@ bool Communication::startCommunication(CommunicationCfg* pCommCfg){
     case Serial:
         if( Q_NULLPTR == m_pSP ){
             m_pSP = new CSerialPort(this);
+            connect(m_pSP,SIGNAL(receivedDataPacket(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         }
-        connect(this,SIGNAL(sendData(CDataPacket*)),m_pSP,SLOT(writeData(CDataPacket*)));
-        connect(m_pSP,SIGNAL(receivedDataPacket(CDataPacket*)),this,SLOT(readDataFromMsgQueue(CDataPacket*)));
         bRet = m_pSP->startSerialPort(pCommCfg);
         break;
     }
@@ -71,16 +67,16 @@ void Communication::sendDataPacket(CDataPacket* dataPkt){
     if( NULL != dataPkt ){
         switch (m_commType) {
         case TcpServer:
-            emit sendData(dataPkt);
+            m_pTS->dispatchData(dataPkt);
             break;
         case TcpClient:
-            emit sendData(dataPkt);
+            m_pTC->writeData(dataPkt);
             break;
         case UDP:
-            emit sendData(dataPkt);
+            m_pUDP->dispatchData(dataPkt);
             break;
         case Serial:
-            emit sendData(dataPkt);
+            m_pSP->writeData(dataPkt);
             break;
         }
     }
@@ -95,7 +91,7 @@ void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
         switch (m_commType) {
         case TcpServer:
             qDebug()<<"【TCP_SERVER_总控转发中心】收到报文，报文类型："<<dataPkt->msgType;
-            emit sendDataPacket(dataPkt);
+            m_pTS->dispatchData(dataPkt);
             recordData( dataPkt );
             break;
         case TcpClient:
@@ -108,6 +104,7 @@ void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
             qDebug()<<"【Serial_总控】收到报文，报文类型："<<dataPkt->msgType;
             break;
         }
+        emit receivedDataPacket(dataPkt);
     }
 }
 
@@ -173,7 +170,7 @@ void Communication::sendSimmData(){
             CDataPacket dataPkt;
             dataPkt.setEncodedPacketBytes(mSimBytes.mid(mIndex,nTailPos-mIndex+1));
             dataPkt.encoddeBytesToPacket();
-            sendData(&dataPkt);
+            sendDataPacket(&dataPkt);
             mIndex = nTailPos + 1;
 
             if( mIndex >= mSimBytes.length() )

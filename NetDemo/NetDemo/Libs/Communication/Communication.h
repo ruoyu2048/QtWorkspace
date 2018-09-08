@@ -42,8 +42,9 @@ private:
 
 signals:
     void sendData(CDataPacket* dataPkt);
+    void receivedDataPacket(CDataPacket* dataPkt);
 
-public slots:
+private slots:
     void readDataFromMsgQueue(CDataPacket* dataPkt);
 
 private:
