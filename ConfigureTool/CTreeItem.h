@@ -4,14 +4,17 @@
 #include <QList>
 
 struct Attr{
-    QString name;
-    QString displayName;
-    QString displayType;
-    QString dataType;
-    QString value;
-    QString paramType;
-    QString validator;
-    QString tips;
+    bool    show;           //是否显示
+    bool    addBtn;         //是否需要添加设置按钮
+    QString dataType;       //数据类型
+    quint32 dataLen;        //数据长度
+    QString displayType;    //显示类型，hide、select、text
+    QString name;           //名称
+    QString displayName;    //显示名称
+    QString paramType;      //参数类型
+    QString defValue;       //默认值
+    QString validator;      //编辑框的正则表达式
+    QString tips;           //编辑框的错误提示
 };
 
 struct Entity{

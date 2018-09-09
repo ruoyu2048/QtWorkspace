@@ -230,15 +230,26 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
                                 QDomElement attrElem = attrNode.toElement();
                                 if(!attrElem.isNull()  && "attribute" == attrElem.tagName()) {
                                     Attr attr;
+                                    if( "true" == attrElem.attribute("show"))
+                                        attr.show = true;
+                                    if( "false" == attrElem.attribute("show"))
+                                        attr.show = false;
+
+                                    if( "true" == attrElem.attribute("addBtn"))
+                                        attr.addBtn = true;
+                                    if( "false" == attrElem.attribute("addBtn"))
+                                        attr.addBtn = false;
+
+                                    attr.dataType = attrElem.attribute("dataType");
+                                    attr.dataLen = attrElem.attribute("dataLen").toInt();
+                                    attr.displayType = attrElem.attribute("displayType");
                                     attr.name = attrElem.attribute("name");
                                     attr.displayName = attrElem.attribute("displayName");
-                                    attr.displayType = attrElem.attribute("displayType");
-                                    attr.dataType = attrElem.attribute("dataType");
-                                    attr.value = attrElem.attribute("value");
                                     attr.paramType = attrElem.attribute("paramType");
+                                    attr.defValue = attrElem.attribute("default");
                                     attr.validator = attrElem.attribute("validator");
                                     attr.tips = attrElem.attribute("tips");
-                                    //qDebug()<<attrElem.attribute("name")<<attrElem.attribute("displayName");
+                                    qDebug()<<attr.displayName;
                                     entity.attrs.push_back(attr);
                                 }
                                 attrNode = attrNode.nextSibling();

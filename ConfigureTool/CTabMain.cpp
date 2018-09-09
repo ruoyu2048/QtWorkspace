@@ -21,31 +21,31 @@ void CTabMain::InitTabMain(){
             //Tab Tag
             Rader_Total raderTotal = *it;
             //qDebug()<<"A\t"<<raderTotal.displayName<<raderTotal.subjects.size();
-            QTreeWidget* pCurTree = new QTreeWidget(this);
-            pCurTree->setHeaderHidden(true);
-            pCurTree->setColumnCount(3);
-            pCurTree->setColumnWidth(0,300);
-            this->addTab(pCurTree,raderTotal.displayName);
-            //保存到队列中
-            m_treeWidgetList.push_back(pCurTree);
-            m_pCurTree = pCurTree;
 
             //Subject
             QList<Subject> subjects = raderTotal.subjects;
             QList<Subject>::iterator itSubject = subjects.begin();
-            for( ;itSubject!=subjects.end();itSubject++ ){
+            for( ;itSubject!=subjects.end();itSubject++ ){                
                 Subject subject = *itSubject;
-                //qDebug()<<"B\t\t"<<subject.displayName;
-                QTreeWidgetItem* pSubject = new QTreeWidgetItem(pCurTree);
-                pSubject->setText(0,subject.displayName);
+
+                QTreeWidget* pCurTree = new QTreeWidget(this);
+                pCurTree->setHeaderHidden(true);
+                pCurTree->setColumnCount(3);
+                pCurTree->setColumnWidth(0,300);
+                pCurTree->setColumnWidth(1,200);
+                pCurTree->setColumnWidth(2,100);
+
+                m_pCurTree = pCurTree;
+                //保存到队列中
+                m_treeWidgetList.push_back(pCurTree);
+                this->addTab(pCurTree,subject.displayName);
 
                 //SubjectInfo
                 QList<SubjectInfo> subjectInfos = subject.subjectInfos;
                 QList<SubjectInfo>::iterator itSubInfo = subjectInfos.begin();
                 for( ;itSubInfo != subjectInfos.end(); itSubInfo++){
                     SubjectInfo subjectInfo = *itSubInfo;
-                    //qDebug()<<"C\t\t\t"<<subjectInfo.displayName<<subjectInfo.ents.size();
-                    QTreeWidgetItem* pSubInfo = new QTreeWidgetItem(pSubject);
+                    QTreeWidgetItem* pSubInfo = new QTreeWidgetItem(pCurTree);
                     pSubInfo->setText(0,subjectInfo.displayName);
 
                     //Entity
@@ -62,54 +62,56 @@ void CTabMain::InitTabMain(){
                         QList<Attr>::iterator itAttr = attrs.begin();
                         for( ;itAttr!=attrs.end(); ){
                             Attr attr = *itAttr;
-                            //qDebug()<<"E\t\t\t\t\t"<<attr.displayName;
-                            QTreeWidgetItem* pAttr = new QTreeWidgetItem(pEnt);
+                            if( attr.show ){
+                                //qDebug()<<"E\t\t\t\t\t"<<attr.displayName;
+                                QTreeWidgetItem* pAttr = new QTreeWidgetItem(pEnt);
 
-                            QLabel* pLable = new QLabel(attr.displayName);
-                            pLable->setObjectName("Lable");
-                            pCurTree->setItemWidget(pAttr,0,pLable);
-                            if( "control" == subjectInfo.type ){
-                                if( "text" == attr.displayType ){
-                                    QLineEdit* pLineEdit = new QLineEdit();
-                                    pLineEdit->setObjectName("LineEdit");
-                                    pLineEdit->setFrame(true);
-                                    pLineEdit->setMaximumWidth(100);
-                                    pLineEdit->setText(attr.value);
-                                    pCurTree->setItemWidget(pAttr,1,pLineEdit);
-                                    connect(pLineEdit,SIGNAL(textEdited(QString)),this,SLOT(lineTextEdited(QString)));
-                                    QStringList strValidTips;
-                                    strValidTips<<attr.validator<<attr.tips;
-                                    m_lineEditTips.insert(pLineEdit,strValidTips);
+                                QLabel* pLable = new QLabel(attr.displayName);
+                                pLable->setObjectName("Lable");
+                                pCurTree->setItemWidget(pAttr,0,pLable);
+                                if( "control" == subjectInfo.type ){
+                                    if( "text" == attr.displayType ){
+                                        QLineEdit* pLineEdit = new QLineEdit();
+                                        pLineEdit->setObjectName("LineEdit");
+                                        pLineEdit->setFrame(true);
+                                        pLineEdit->setMaximumWidth(500);
+                                        pLineEdit->setText(attr.defValue);
+                                        pCurTree->setItemWidget(pAttr,1,pLineEdit);
+                                        connect(pLineEdit,SIGNAL(textEdited(QString)),this,SLOT(lineTextEdited(QString)));
+                                        QStringList strValidTips;
+                                        strValidTips<<attr.validator<<attr.tips;
+                                        m_lineEditTips.insert(pLineEdit,strValidTips);
+                                    }
+                                    else if("select"==attr.displayType){
+                                        QComboBox* pCombo = new QComboBox();
+                                        pCombo->setObjectName("ComboBox");
+                                        pCombo->setFrame(true);
+                                        pCombo->setMaximumWidth(500);
+                                        //pCombo->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+                                        QStringList paramTypes = attr.paramType.split(";");
+                                        pCombo->addItems(paramTypes);
+                                        pCurTree->setItemWidget(pAttr,1,pCombo);
+                                    }
+                                    if( attr.addBtn ){
+                                        QPushButton* pBtn = new QPushButton("设置",this);
+                                        pBtn->setMaximumWidth(100);
+                                        pBtn->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+                                        connect(pBtn,SIGNAL(clicked(bool)),this,SLOT(btnSetClicked()));
+                                        pCurTree->setItemWidget(pAttr,2,pBtn);
+                                        //将设置按钮与父Item关联
+                                        m_btnMap.insert(pBtn,pEnt);
+                                    }
                                 }
-                                else if("select"==attr.displayType){
-                                    QComboBox* pCombo = new QComboBox();
-                                    pCombo->setObjectName("ComboBox");
-                                    pCombo->setFrame(true);
-                                    pCombo->setMaximumWidth(100);
-                                    pCombo->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-                                    QStringList paramTypes = attr.paramType.split(";");
-                                    pCombo->addItems(paramTypes);
-                                    pCurTree->setItemWidget(pAttr,1,pCombo);
-                                }
-                                itAttr++;
-                                if( itAttr==attrs.end() ){
-                                    QPushButton* pBtn = new QPushButton("设置",this);
-                                    pBtn->setMaximumWidth(100);
-                                    connect(pBtn,SIGNAL(clicked(bool)),this,SLOT(btnSetClicked()));
-                                    pCurTree->setItemWidget(pAttr,2,pBtn);
-                                    //将设置按钮与父Item关联
-                                    m_btnMap.insert(pBtn,pEnt);
+                                if( "monitor" == subjectInfo.type ){
+                                    pAttr->setText(1,attr.defValue);
                                 }
                             }
-                            if( "monitor" == subjectInfo.type ){
-                                pAttr->setText(1,attr.value);
-                                itAttr++;
-                            }
+                            itAttr++;
                         }
                     }
                 }
+                pCurTree->expandAll();
             }
-            pCurTree->expandAll();
         }
     }
     connect(this,SIGNAL(currentChanged(int)),this,SLOT(currentTabChanged(int)));
