@@ -24,6 +24,70 @@ enum ConnType{
     Disconnected
 };
 
+//<1>航迹点
+
+//(1)目标坐标
+struct Tar_Coordinate{
+    float fDistance;        //目标径向距离
+    float fSpeed;           //目标径向速度
+    float fDirection;       //目标方位
+    float fTestDirection;   //目标测站方位
+    float fLongitude;       //经度
+    float fLatitude;        //纬度
+    float fHeigh;           //高度
+    float fXCoord;          //目标X坐标
+    float fYCoord;          //目标Y坐标
+    float fXMercator;       //目标墨卡托坐标X
+    float fYMercator;       //目标墨卡托坐标Y
+    Tar_Coordinate(){
+        memset(&fDirection,'0',sizeof(Tar_Coordinate));
+    }
+};
+
+//(2)目标数组
+struct Tar_Group{
+    double          dTarTime;       //目标时标
+    uchar           cWorkMode;      //搜跟模式
+    uchar           cBeamPos;       //波位号
+    uchar           cBeamNo;        //波束号
+    uchar           cBeamCnt;       //测角波束数
+    float           fCenterRCS;     //质心RCS值
+    float           fMaxRCS;        //最大RCS值
+    ushort          uSNR_1;         //重频信噪比1
+    uchar           cSize_1;        //重频径向尺寸1
+    uchar           cDoppler_1;     //重频多普勒带宽1
+    ushort          uSNR_2;         //重频信噪比2
+    uchar           cSize_2;        //重频径向尺寸2
+    uchar           cDoppler_2;     //重频多普勒带宽2
+    ushort          uSNR_3;         //重频信噪比3
+    uchar           cSize_3;        //重频径向尺寸3
+    uchar           cDoppler_3;     //重频多普勒带宽3
+    ushort          uTarRelated;    //目标关联结果
+    ushort          uFateDetect;    //虚警预判结果
+    ushort          uTarDisinguish; //目标识别结果
+    Tar_Coordinate  tarCoord;       //目标坐标
+    Tar_Group(){
+        memset(&dTarTime,'0',sizeof(Tar_Group));
+    }
+};
+
+
+struct TrackPoint{
+    uchar       cCmdByte;       //命令字
+    uchar       cRaderAddr;     //雷达站址编号
+    ushort      uTarBatchNum;   //目标批号
+    ushort      uTarPointCnt;   //目标点个数
+    float       fTarLineSpeed;  //目标线速度
+    float       fTarHXJ;        //目标航向角
+    ushort      uThreaten;      //威胁度
+    Tar_Group   tarGroup;       //目标点数组
+    uchar       cFirstOut;      //首次输出、更新、消批标志
+    uchar       cTarAttri;      //目标属性
+    TrackPoint(){
+        memset(&cCmdByte,'0',sizeof(TrackPoint));
+    }
+};
+
 struct FrameHead{
     char cHead;             //帧头
     char cDesAdd;           //目的地址

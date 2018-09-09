@@ -87,6 +87,10 @@ bool CDataPacket::decodeData(){
     return true;
 }
 
+void CDataPacket::parseDataToStruct(uchar* infoDataStruct, int nStructSz){
+    memcpy(infoDataStruct,(uchar*)msgData.data(),nStructSz);
+}
+
 QByteArray CDataPacket::packPacketToEncodedBytes(){
     encodeData();
     return encodePacketToBytes();

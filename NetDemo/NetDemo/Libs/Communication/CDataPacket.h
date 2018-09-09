@@ -32,6 +32,13 @@ public:
      */
     bool decodeData();
 
+    /**
+     * @brief parseDataToStruct--将转码后的信息区转换成信息区结构体
+     * @param infoDataStruct--信息去结构体对象
+     * @param nStructSz--信息区结构体大小
+     */
+    void parseDataToStruct(uchar* infoDataStruct,int nStructSz);
+
 
     //转码前的对象---->转码后的字节流
     /**
