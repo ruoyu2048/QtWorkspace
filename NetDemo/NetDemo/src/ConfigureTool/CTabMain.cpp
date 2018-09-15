@@ -141,6 +141,7 @@ void CTabMain::btnSetClicked(){
         QTreeWidgetItem* pEntItem = it.value();
         if( NULL != pEntItem ){
             int nAttrs = pEntItem->childCount();
+            QStringList attrList;
             for( int i=0;i<nAttrs;i++ ){
                 QTreeWidgetItem* pAttrItem = pEntItem->child(i);
                 QWidget* pAttr = m_pCurTree->itemWidget(pAttrItem,0);
@@ -152,12 +153,17 @@ void CTabMain::btnSetClicked(){
                 if( "LineEdit" == pValue->objectName() ){
                     QLineEdit* pLineEdit = (QLineEdit*)pValue;
                     qDebug()<<pLineEdit->text();
+                    attrList.append(pLineEdit->text().trimmed());
                 }
                 else if( "ComboBox" == pValue->objectName() ){
                     QComboBox* pComboBox = (QComboBox*)pValue;
                     qDebug()<<pComboBox->currentText();
+                    QString strComVal = pComboBox->currentText().split(":").at(0);
+                    attrList.append(strComVal.trimmed());
                 }
             }
+            mDataDeal.dataTest(0x20,attrList);
+            qDebug()<<pEntItem->text(0);
         }
     }
 }

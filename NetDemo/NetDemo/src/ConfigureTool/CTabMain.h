@@ -6,6 +6,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include "XML.h"
+#include "CDataDeal.h"
 
 class CTabMain : public QTabWidget
 {
@@ -21,7 +22,10 @@ private:
     QTreeWidget*        m_pCurTree;
     QList<QTreeWidget*> m_treeWidgetList;
     QMap<QLineEdit*,QStringList>m_lineEditTips;
+    //当前设置按钮与控制属性父节点的映射关系
     QMap<QPushButton*,QTreeWidgetItem*>m_btnMap;
+
+    CDataDeal           mDataDeal;
 signals:
 
 private slots:

@@ -20,6 +20,7 @@ struct Attr{
 struct Entity{
         QString name;
         QString displayName;
+        uchar   cmd;
         QList<Attr> attrs;
         };
 
@@ -27,12 +28,14 @@ struct SubjectInfo{
         QString name;
         QString displayName;
         QString type;
+        uchar   cmdType;
         QList<Entity>ents;
         };
 
 struct Subject{
         QString name;           //分机标识
         QString displayName;    //分机名称
+        uchar   cSubId;         //分机编号
         QList<SubjectInfo>subjectInfos;
         };
 

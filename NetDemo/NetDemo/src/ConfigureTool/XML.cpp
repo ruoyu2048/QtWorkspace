@@ -209,6 +209,9 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
                     subjectInfo.name = subInfoElement.attribute("name");
                     subjectInfo.displayName = subInfoElement.attribute("displayName");
                     subjectInfo.type = subInfoElement.attribute("type");
+                    if( !subInfoElement.attribute("cmdType").isEmpty() )
+                        subjectInfo.cmdType = hexToByteArray(subInfoElement.attribute("cmdType"));
+
                     //qDebug()<<subInfoElement.attribute("name")<<subInfoElement.attribute("displayName")<<subjectInfo.type;
                     //subject.subjectInfos.push_back(subjectInfo);
 
@@ -220,9 +223,8 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
                             Entity entity;
                             entity.name = entElem.attribute("name");
                             entity.displayName = entElem.attribute("displayName");
-                            //qDebug()<<entElem.attribute("name")<<entElem.attribute("displayName");
-                            //subjectInfo.ents.push_back(entity);
-
+                            if( !entElem.attribute("cmd").isEmpty() )
+                                entity.cmd = hexToByteArray(entElem.attribute("cmd"));
                             //Attr
                             //subjectInfo
                             QDomNode attrNode = entElem.firstChildElement();
@@ -266,4 +268,25 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
     }
 
     return 0;
+}
+
+uchar XML::hexToByteArray(QString strHex)
+{
+    QByteArray hexAry;
+    strHex = strHex.trimmed();
+    strHex = strHex.simplified();
+    QStringList strHexList = strHex.split(" ");
+
+    foreach (QString str, strHexList) {
+        if( !str.isEmpty() ){
+            bool ok = true;
+            char cHex = str.toInt(&ok,16)&0xFF;
+            if(ok){
+                hexAry.append(cHex);
+            }else{
+                qDebug()<<"非法的16进制字符："<<str;
+            }
+        }
+    }
+    return hexAry.at(0);
 }

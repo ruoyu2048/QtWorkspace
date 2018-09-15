@@ -24,6 +24,18 @@ enum ConnType{
     Disconnected
 };
 
+struct CTTest{
+    char cCmd;
+    char cWorkMode;
+    ushort nShort;
+    float fData;
+    char cRes[5];
+    CTTest(){
+        memset(&cCmd,'\0',sizeof(CTTest));
+        cCmd = 0x20;
+    }
+};
+
 //<1>航迹点
 
 //(1)目标坐标

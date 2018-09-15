@@ -1,20 +1,15 @@
-QT += core widgets xml network serialport
-QT += gui
+QT += core
+QT -= gui
 
 CONFIG += c++11
 
-TARGET = ConfigureTool
+TARGET = Switch
 CONFIG += console
 CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES += main.cpp \
-    MainWindow.cpp \
-    XML.cpp \
-    CTabMain.cpp \
-    CTreeItem.cpp \
-    CDataDeal.cpp
+SOURCES += main.cpp
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings
@@ -26,19 +21,3 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
-HEADERS += \
-    MainWindow.h \
-    XML.h \
-    CTabMain.h \
-    CTreeItem.h \
-    CDataDeal.h
-
-RESOURCES += \
-    source.qrc
-
-include (../Src.pri)
-
-LIBS += $$OUT_PWD/../../Libs/libCommunication.a
-INCLUDEPATH += $$PWD/../../Libs/Communication
-DEPENDPATH += $$PWD/../../Libs/Communication

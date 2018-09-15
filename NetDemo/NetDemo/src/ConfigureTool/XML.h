@@ -64,6 +64,9 @@ private:
     ************************************************************************/
     int readEquipmentInfo(QString strPath,Subject &subject);
 
+private:
+    uchar hexToByteArray(QString strHex);
+
 public:
     QList<Rader_Total> mRaderTotals;//总机列表
 private:
