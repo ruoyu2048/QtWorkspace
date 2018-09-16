@@ -11,7 +11,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     XML.cpp \
-    SubMachine.cpp \
     PluginMoinitorDisplay.cpp
 
 # The following define makes your compiler emit warnings if you use
@@ -27,8 +26,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 HEADERS += \
     XML.h \
-    ItemAttr.h \
-    SubMachine.h \
     PluginMoinitorDisplay.h
 
 RESOURCES += \
