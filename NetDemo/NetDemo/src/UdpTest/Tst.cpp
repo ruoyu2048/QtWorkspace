@@ -14,10 +14,14 @@ Tst::Tst(QObject *parent) : QObject(parent)
 
 void Tst::test(CDataPacket *dataPkt){
     if( NULL != dataPkt ){
-        dataPkt->encoddeBytesToPacket();
-        qDebug()<<dataPkt->msgType;
+        dataPkt->decodeData();
         CTTest datas;
-        memcpy(&datas,dataPkt->msgData.data(),sizeof(CTTest));
-        qDebug()<<datas.cWorkMode<<datas.nShort<<datas.fData;
+        dataPkt->parseDataToStruct((uchar*)&datas,(int)sizeof(CTTest));
+        qDebug()<<sizeof(CTTest)<<datas.cWorkMode<<datas.nShort<<datas.fData;
+
+        CDataPacket dataFB;
+        dataFB.msgHead = 0xAA;
+        dataFB.msgEnd = 0xA5;
+        datas.cWorkMode = 2;
     }
 }

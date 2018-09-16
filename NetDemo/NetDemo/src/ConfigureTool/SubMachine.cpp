@@ -1,4 +1,4 @@
-#include "CTabMain.h"
+#include "SubMachine.h"
 #include <QDebug>
 #include <QLabel>
 #include <QLineEdit>
@@ -7,13 +7,15 @@
 #include <QToolTip>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
+#include "CDataPacket.h"
 
-CTabMain::CTabMain(QWidget *parent) : QTabWidget(parent)
+SubMachine::SubMachine(QWidget *parent) : QTabWidget(parent)
 {
     InitTabMain();
+    startCommu();
 }
 
-void CTabMain::InitTabMain(){
+void SubMachine::InitTabMain(){
     m_pXML = new XML();
     if(m_pXML->getConfigureInfo(":/config")){
         QList<Rader_Total>::iterator it = m_pXML->mRaderTotals.begin();
@@ -35,8 +37,9 @@ void CTabMain::InitTabMain(){
                 m_pCurTree = pCurTree;
                 //保存到队列中
                 m_treeWidgetList.push_back(pCurTree);
+                //将分机名称放入列表
+                m_subMachines.push_back(subject.name);
                 this->addTab(pCurTree,subject.displayName);
-
                 //SubjectInfo
                 QList<SubjectInfo> subjectInfos = subject.subjectInfos;
                 QList<SubjectInfo>::iterator itSubInfo = subjectInfos.begin();
@@ -44,6 +47,8 @@ void CTabMain::InitTabMain(){
                     SubjectInfo subjectInfo = *itSubInfo;
                     QTreeWidgetItem* pSubInfo = new QTreeWidgetItem(pCurTree);
                     pSubInfo->setText(0,subjectInfo.displayName);
+                    //测试添加
+                    pSubInfo->setText(1,subjectInfo.strCmdType);
 
                     //Entity
                     QList<Entity> ents = subjectInfo.ents;
@@ -52,6 +57,8 @@ void CTabMain::InitTabMain(){
                         Entity ent = *itEnts;
                         QTreeWidgetItem* pEnt = new QTreeWidgetItem(pSubInfo);
                         pEnt->setText(0,ent.displayName);
+                        //测试添加
+                        pEnt->setText(1,ent.strCmd);
 
                         //Attr
                         QList<Attr> attrs = ent.attrs;
@@ -102,6 +109,15 @@ void CTabMain::InitTabMain(){
                             }
                             itAttr++;
                         }
+                        QString strIds=subject.strSubId;
+                        strIds.append("+").append(subjectInfo.strCmdType);
+                        strIds.append("+").append(ent.strCmd);
+                        if( "control" == subjectInfo.type ){
+                            mCtrlMap.insert(pEnt,strIds);
+                        }
+                        if( "monitor" == subjectInfo.type ){
+                            mMonitorMap.insert(strIds,pEnt);
+                        }
                     }
                 }
                 pCurTree->expandAll();
@@ -111,11 +127,92 @@ void CTabMain::InitTabMain(){
     connect(this,SIGNAL(currentChanged(int)),this,SLOT(currentTabChanged(int)));
 }
 
-void CTabMain::currentTabChanged(int index){
+void SubMachine::switchSubMachine(QString strName){
+    for( int i=0; i< m_subMachines.size();i++ ){
+        if( strName == m_subMachines.at(i) ){
+            m_pCurTree = m_treeWidgetList.at(i);
+            this->setCurrentIndex(i);
+        }
+    }
+}
+
+void SubMachine::startCommu(){
+    mCommCfg.bSimmulator = false;
+    mCommCfg.commType = UDP;
+    mCommCfg.strCommPara = "127.0.0.1:9999";
+    mCommCfg.strCommOther = "127.0.0.1:9998+0xA2";
+    mComm.startCommunication(&mCommCfg);
+    connect(&mComm,SIGNAL(receivedDataPacket(CDataPacket*)),this,SLOT(updateTabView(CDataPacket*)));
+}
+
+uchar SubMachine::hexToByteArray(QString strHex)
+{
+    QByteArray hexAry;
+    strHex = strHex.trimmed();
+    strHex = strHex.simplified();
+    QStringList strHexList = strHex.split(" ");
+
+    foreach (QString str, strHexList) {
+        if( !str.isEmpty() ){
+            bool ok = true;
+            char cHex = str.toInt(&ok,16)&0xFF;
+            if(ok){
+                hexAry.append(cHex);
+            }else{
+                qDebug()<<"非法的16进制字符："<<str;
+            }
+        }
+    }
+    return hexAry.at(0);
+}
+
+void SubMachine::packMessage(QString strIds, QStringList attrList){
+    QStringList cmdList = strIds.split("+");
+    if( cmdList.size() >= 3 ){
+        CDataPacket dataPkt;
+        dataPkt.msgHead = 0xAA;
+        dataPkt.msgEnd = 0xA5;
+        uchar cSubId = hexToByteArray(cmdList.at(0));
+        uchar cMsgType = hexToByteArray(cmdList.at(1));
+        uchar cCmd = hexToByteArray(cmdList.at(2));
+        if( 0x11 == cSubId && 0x02 == cMsgType ){
+            switch (cCmd) {
+            case 0x20:{//控制类型
+                dataPkt.msgDst = 0xA2;
+                dataPkt.msgSrc = 0xA3;
+                dataPkt.msgType = 0x11;
+
+                //某分机的某报文
+                CTTest ctTest;
+                ctTest.cCmd = cCmd;
+                ctTest.cWorkMode = attrList.at(0).toInt();
+                ctTest.nShort = attrList.at(1).toShort();
+                ctTest.fData = attrList.at(2).toFloat();
+
+                dataPkt.msgData.append((char*)&ctTest,sizeof(CTTest));
+                dataPkt.packPacketToEncodedBytes();
+                mComm.sendDataPacket(&dataPkt);
+                }
+                break;
+            }
+        }
+    }
+}
+
+void SubMachine::mappingToCmd(QTreeWidgetItem* pEntItem,QStringList strInfos){
+    if( NULL != pEntItem ){
+        auto it = mCtrlMap.find(pEntItem);
+        if( it != mCtrlMap.end() ){
+            packMessage(it.value(),strInfos);
+        }
+    }
+}
+
+void SubMachine::currentTabChanged(int index){
     m_pCurTree = m_treeWidgetList.at(index);
 }
 
-void CTabMain::lineTextEdited(QString strText){
+void SubMachine::lineTextEdited(QString strText){
     QLineEdit* pLineEdit = qobject_cast<QLineEdit*>(sender());
     QMap<QLineEdit*,QStringList>::iterator it = m_lineEditTips.find(pLineEdit);
     if( it != m_lineEditTips.end() ){
@@ -134,7 +231,7 @@ void CTabMain::lineTextEdited(QString strText){
     }
 }
 
-void CTabMain::btnSetClicked(){
+void SubMachine::btnSetClicked(){
     QPushButton* pBtn = qobject_cast<QPushButton*>(sender());
     QMap<QPushButton*,QTreeWidgetItem*>::iterator it = m_btnMap.find(pBtn);
     if( it != m_btnMap.end() ){
@@ -162,8 +259,16 @@ void CTabMain::btnSetClicked(){
                     attrList.append(strComVal.trimmed());
                 }
             }
-            mDataDeal.dataTest(0x20,attrList);
-            qDebug()<<pEntItem->text(0);
+            mappingToCmd(pEntItem,attrList);
         }
     }
+}
+
+void SubMachine::updateTabView(CDataPacket *dataPkt){
+    dataPkt->decodeData();
+    uchar cSubId = dataPkt->msgDst;
+    uchar cMsgType = dataPkt->msgType;
+    uchar cCmd = dataPkt->msgData.at(0);
+
+    qDebug()<<cSubId<<cMsgType<<cCmd;
 }

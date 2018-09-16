@@ -8,20 +8,24 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QList>
-#include "CTabMain.h"
+#include "SubMachine.h"
 
-class MainWindow : public QWidget
+class PluginMoinitorDisplay : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit PluginMoinitorDisplay(QWidget *parent = nullptr);
     void InitMainWindow();
+    void setSubMachine(QString strName);
+
+protected:
+    virtual void closeEvent(QCloseEvent* ev)override;
 
 private:
     QGridLayout*        m_pGLayout;
     QHBoxLayout*        m_pHLayout_Main;
     QHBoxLayout*        m_pHLayout;
-    CTabMain*           m_pTabMain;
+    SubMachine*         m_pSubMachine;
 signals:
 
 public slots:

@@ -2,7 +2,7 @@
 #define XML_H
 
 #include <QObject>
-#include "CTreeItem.h"
+#include "ItemAttr.h"
 
 class XML : public QObject
 {

@@ -44,9 +44,7 @@ bool XML::parseConfigurationFiles()
 {
     //Rander_01 Rander_02 ...
     int nRaderSz = mPathDirs.count();
-    for( int i=0; i<nRaderSz; ++i )
-    {
-
+    for( int i=0; i<nRaderSz; ++i ){
         QString strEquipListFile("");//设备汇总文件名称
         QString strCfgDirPath = mPathDirs.at(i);
         if( false == getEquipmentListFile(strCfgDirPath,strEquipListFile) ){
@@ -198,7 +196,8 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
         if( "Subject" == rootElem.tagName() ){
             subject.name = rootElem.attribute("name");
             subject.displayName = rootElem.attribute("displayName");
-            //qDebug()<<subject.name <<subject.displayName;
+            subject.strSubId = rootElem.attribute("subId");
+            qDebug()<<subject.name <<subject.displayName<<subject.strSubId;
 
             //subjectInfo
             QDomNode secNode = rootElem.firstChildElement();
@@ -209,6 +208,7 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
                     subjectInfo.name = subInfoElement.attribute("name");
                     subjectInfo.displayName = subInfoElement.attribute("displayName");
                     subjectInfo.type = subInfoElement.attribute("type");
+                    subjectInfo.strCmdType = subInfoElement.attribute("cmdType");
                     if( !subInfoElement.attribute("cmdType").isEmpty() )
                         subjectInfo.cmdType = hexToByteArray(subInfoElement.attribute("cmdType"));
 
@@ -223,6 +223,7 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
                             Entity entity;
                             entity.name = entElem.attribute("name");
                             entity.displayName = entElem.attribute("displayName");
+                            entity.strCmd = entElem.attribute("cmd");
                             if( !entElem.attribute("cmd").isEmpty() )
                                 entity.cmd = hexToByteArray(entElem.attribute("cmd"));
                             //Attr

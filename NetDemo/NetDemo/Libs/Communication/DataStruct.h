@@ -9,6 +9,8 @@ using namespace std;
 
 #define COMMAXLEN 1024
 
+#pragma pack(1)
+
 enum CommType{
     TcpServer,
     TcpClient,
@@ -791,4 +793,5 @@ struct CSCI_13_RaderState{
 //点迹数据
 
 //航迹数据
+#pragma pack()
 #endif // DATASTRUCT_H
