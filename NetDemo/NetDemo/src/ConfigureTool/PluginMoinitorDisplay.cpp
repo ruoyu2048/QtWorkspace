@@ -309,5 +309,6 @@ void SubMachine::updateTabView(CDataPacket *dataPkt){
         QTreeWidgetItem* pAttr = mpEnt->child(i);
         pAttr->setText(1,ss.at(i));
     }
+
 }
 
