@@ -298,7 +298,7 @@ void SubMachine::updateTabView(CDataPacket *dataPkt){
     CTTest stats;
     dataPkt->parseDataToStruct((uchar*)&stats,sizeof(stats));
     qDebug()<<stats.nShort<<"|";
-    QString strWM = QString("%1").arg(stats.cWorkMode);
+    QString strWM = QString("%1").arg((int)stats.cWorkMode);
     QString strShort = QString("%1").arg(stats.nShort);
     QString strFloat = QString("%1").arg(stats.fData);
     QStringList ss;
@@ -307,11 +307,7 @@ void SubMachine::updateTabView(CDataPacket *dataPkt){
     int n = mpEnt->childCount();
     for(int i=0;i<n;i++){
         QTreeWidgetItem* pAttr = mpEnt->child(i);
-        QWidget* pValue = m_pCurTree->itemWidget(pAttr,1);
-        if( "LineEdit" == pValue->objectName() ){
-            QLineEdit* pLineEdit = (QLineEdit*)pValue;
-            pLineEdit->setText(ss.at(i));
-        }
+        pAttr->setText(1,ss.at(i));
     }
 }
 
