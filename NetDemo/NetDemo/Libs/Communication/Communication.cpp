@@ -68,15 +68,19 @@ void Communication::sendDataPacket(CDataPacket* dataPkt){
         switch (m_commType) {
         case TcpServer:
             m_pTS->dispatchData(dataPkt);
+            qDebug()<<"【TcpServer】发送报文，报文类型："<<dataPkt->msgType;
             break;
         case TcpClient:
             m_pTC->writeData(dataPkt);
+            qDebug()<<"【TcpClient】发送报文，报文类型："<<dataPkt->msgType;
             break;
         case UDP:
             m_pUDP->dispatchData(dataPkt);
+            qDebug()<<"【UDP】发送报文，报文类型："<<dataPkt->msgType;
             break;
         case Serial:
             m_pSP->writeData(dataPkt);
+            qDebug()<<"【串口】发送报文，报文类型："<<dataPkt->msgType;
             break;
         }
     }
@@ -95,13 +99,13 @@ void Communication::readDataFromMsgQueue(CDataPacket* dataPkt){
             recordData( dataPkt );
             break;
         case TcpClient:
-            qDebug()<<"【TCP_CLIENT_总控转发中心】收到报文，报文类型："<<dataPkt->msgType;
+            qDebug()<<"【TCP_CLIENT】收到报文，报文类型："<<dataPkt->msgType;
             break;
         case UDP:
-            qDebug()<<"【UDP_总控】收到报文，报文类型："<<dataPkt->msgType;
+            qDebug()<<"【UDP】收到报文，报文类型："<<dataPkt->msgType;
             break;
         case Serial:
-            qDebug()<<"【Serial_总控】收到报文，报文类型："<<dataPkt->msgType;
+            qDebug()<<"【Serial】收到报文，报文类型："<<dataPkt->msgType;
             break;
         }
         emit receivedDataPacket(dataPkt);

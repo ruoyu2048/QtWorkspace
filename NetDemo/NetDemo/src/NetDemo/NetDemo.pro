@@ -3,7 +3,7 @@ QT -= gui
 
 CONFIG += c++11
 
-TARGET = NetDemo
+TARGET = TcpClient_Simmulator
 CONFIG += console
 CONFIG -= app_bundle
 

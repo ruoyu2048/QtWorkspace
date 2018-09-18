@@ -2,7 +2,8 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     ConfigureTool \
-    UdpTest
+    UdpTest \
+    NetDemo
 
 
 

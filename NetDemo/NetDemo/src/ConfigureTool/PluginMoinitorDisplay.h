@@ -65,7 +65,7 @@ private:
 
     CommunicationCfg    mCommCfg;
     Communication       mComm;
-    QTreeWidgetItem* mpEnt;
+    QTreeWidgetItem*    mpEnt;
 signals:
 
 private slots:
