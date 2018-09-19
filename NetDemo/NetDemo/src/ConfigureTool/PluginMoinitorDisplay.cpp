@@ -51,12 +51,14 @@ void SubMachine::InitTabMain(){
                 //Tab Tag
                 QTreeWidget* pCurTree = new QTreeWidget(this);
                 pCurTree->setHeaderHidden(true);
-                pCurTree->setColumnCount(3);
+                pCurTree->setColumnCount(4);
                 pCurTree->setColumnWidth(0,300);
                 pCurTree->setColumnWidth(1,200);
                 pCurTree->setColumnWidth(2,100);
+                pCurTree->setColumnWidth(3,100);
 
                 m_pCurTree = pCurTree;
+                m_curSubId = subject.cSubId;
                 //保存到队列中
                 m_treeWidgetList.push_back(pCurTree);
                 //将分机名称放入列表
@@ -70,7 +72,7 @@ void SubMachine::InitTabMain(){
                     QTreeWidgetItem* pSubInfo = new QTreeWidgetItem(pCurTree);
                     pSubInfo->setText(0,subjectInfo.displayName);
                     //测试添加
-                    pSubInfo->setText(1,subjectInfo.strCmdType);
+                    pSubInfo->setText(3,subjectInfo.strCmdType);
 
                     //Entity
                     QList<Entity> ents = subjectInfo.ents;
@@ -79,10 +81,7 @@ void SubMachine::InitTabMain(){
                         Entity ent = *itEnts;
                         QTreeWidgetItem* pEnt = new QTreeWidgetItem(pSubInfo);
                         pEnt->setText(0,ent.displayName);
-                        //测试添加
-                        pEnt->setText(1,ent.strCmd);
-                        if( ent.name=="channel")
-                            mpEnt = pEnt;
+                        pEnt->setText(3,ent.strCmd);
 
                         //Attr
                         QList<Attr> attrs = ent.attrs;
@@ -90,10 +89,10 @@ void SubMachine::InitTabMain(){
                         for( ;itAttr!=attrs.end(); ){
                             Attr attr = *itAttr;
                             if( attr.show ){
-                                QTreeWidgetItem* pAttr = new QTreeWidgetItem(pEnt);
+                                QTreeWidgetItem* pAttrItem = new QTreeWidgetItem(pEnt);
                                 QLabel* pLable = new QLabel(attr.displayName);
                                 pLable->setObjectName("Lable");
-                                pCurTree->setItemWidget(pAttr,0,pLable);
+                                pCurTree->setItemWidget(pAttrItem,0,pLable);
                                 if( "control" == subjectInfo.type ){
                                     if( "text" == attr.displayType ){
                                         QLineEdit* pLineEdit = new QLineEdit();
@@ -101,7 +100,7 @@ void SubMachine::InitTabMain(){
                                         pLineEdit->setFrame(true);
                                         pLineEdit->setMaximumWidth(500);
                                         pLineEdit->setText(attr.defValue);
-                                        pCurTree->setItemWidget(pAttr,1,pLineEdit);
+                                        pCurTree->setItemWidget(pAttrItem,1,pLineEdit);
                                         connect(pLineEdit,SIGNAL(textEdited(QString)),this,SLOT(lineTextEdited(QString)));
                                         QStringList strValidTips;
                                         strValidTips<<attr.validator<<attr.tips;
@@ -115,32 +114,39 @@ void SubMachine::InitTabMain(){
                                         //pCombo->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
                                         QStringList paramTypes = attr.paramType.split(";");
                                         pCombo->addItems(paramTypes);
-                                        pCurTree->setItemWidget(pAttr,1,pCombo);
+                                        pCurTree->setItemWidget(pAttrItem,1,pCombo);
                                     }
                                     if( attr.addBtn ){
                                         QPushButton* pBtn = new QPushButton("设置",this);
                                         pBtn->setMaximumWidth(100);
                                         pBtn->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
                                         connect(pBtn,SIGNAL(clicked(bool)),this,SLOT(btnSetClicked()));
-                                        pCurTree->setItemWidget(pAttr,2,pBtn);
+                                        pCurTree->setItemWidget(pAttrItem,2,pBtn);
                                         //将设置按钮与父Item关联
                                         m_btnMap.insert(pBtn,pEnt);
                                     }
                                 }
                                 if( "monitor" == subjectInfo.type ){
-                                    pAttr->setText(1,attr.defValue);
+                                    pAttrItem->setText(1,attr.defValue);
                                 }
+                                pAttrItem->setText(3,attr.strID);
+                                //记录当前数组对应的位置
+                                RowItem* pRowItem = new RowItem();
+                                pRowItem->strId = attr.strID;
+                                pRowItem->dataLen = attr.dataLen;
+                                pRowItem->dataType = attr.dataType;
+                                pRowItem->pAttrItem = pAttrItem;
+                                mRowItemMap.insert(attr.strID,pRowItem);
+                            }
+                            else{
+                                RowItem* pRowItem = new RowItem();
+                                pRowItem->strId = attr.strID;
+                                pRowItem->dataLen = attr.dataLen;
+                                pRowItem->dataType = attr.dataType;
+                                pRowItem->pAttrItem = NULL;
+                                mRowItemMap.insert(attr.strID,pRowItem);
                             }
                             itAttr++;
-                        }
-                        QString strIds=subject.strSubId;
-                        strIds.append("+").append(subjectInfo.strCmdType);
-                        strIds.append("+").append(ent.strCmd);
-                        if( "control" == subjectInfo.type ){
-                            mCtrlMap.insert(pEnt,strIds);
-                        }
-                        if( "monitor" == subjectInfo.type ){
-                            mMonitorMap.insert(strIds,pEnt);
                         }
                     }
                 }
@@ -165,6 +171,8 @@ void SubMachine::startCommu(){
     mCommCfg.commType = UDP;
     mCommCfg.strCommPara = "127.0.0.1:9999";
     mCommCfg.strCommOther = "127.0.0.1:9998+0xA2";
+//    mCommCfg.strCommPara = "192.168.1.101:9999";
+//    mCommCfg.strCommOther = "192.168.1.100:8080+0x21";
     mComm.startCommunication(&mCommCfg);
     connect(&mComm,SIGNAL(receivedDataPacket(CDataPacket*)),this,SLOT(updateTabView(CDataPacket*)));
 }
@@ -190,47 +198,86 @@ uchar SubMachine::hexToByteArray(QString strHex)
     return hexAry.at(0);
 }
 
-void SubMachine::packMessage(QString strIds, QStringList attrList){
-    QStringList cmdList = strIds.split("+");
-    if( cmdList.size() >= 3 ){
-        CDataPacket dataPkt;
-        dataPkt.msgHead = 0xAA;
-        dataPkt.msgEnd = 0xA5;
-        uchar cSubId = hexToByteArray(cmdList.at(0));
-        uchar cMsgType = hexToByteArray(cmdList.at(1));
-        uchar cCmd = hexToByteArray(cmdList.at(2));
-        if( 0x11 == cSubId && 0x02 == cMsgType ){
-            switch (cCmd) {
-            case 0x20:{//控制类型
-                dataPkt.msgDst = 0xA2;
-                dataPkt.msgSrc = 0xA3;
-                dataPkt.msgType = 0x11;
-
-                //某分机的某报文
-                CTTest ctTest;
-                ctTest.cCmd = cCmd;
-                ctTest.cWorkMode = attrList.at(0).toInt();
-                ctTest.nShort = attrList.at(1).toShort();
-                ctTest.fData = attrList.at(2).toFloat();
-
-                dataPkt.msgData.append((char*)&ctTest,sizeof(CTTest));
-                dataPkt.packPacketToEncodedBytes();
-                mComm.sendDataPacket(&dataPkt);
-                qDebug()<<"发送报文";
-                }
-                break;
-            }
+void SubMachine::packMessage(uchar cmd,QList<RowItem*> attrList){
+    CDataPacket dataPkt;
+    dataPkt.msgHead = 0xAA;
+    dataPkt.msgDst = 0x21;
+    dataPkt.msgSrc = 0x31;
+    dataPkt.msgType = 0x20;
+    CMD_DEV_BOOK cmdDevBook;
+    cmdDevBook.cmd = cmd;
+    int nSz = attrList.size();
+    for(int i=0; i<nSz;i++ ){
+        RowItem* pRowItem = attrList.at(i);
+        if( "00002" == pRowItem->strId ){
+            cmdDevBook.addrCode = pRowItem->displayValue.toInt();
         }
+        if( "00003" == pRowItem->strId ){
+            cmdDevBook.realAngle = pRowItem->displayValue.toShort();
+        }
+        if( "00004" == pRowItem->strId ){
+            cmdDevBook.addrLong = pRowItem->displayValue.toDouble();
+        }
+        if( "00005" == pRowItem->strId ){
+            cmdDevBook.addrLati = pRowItem->displayValue.toDouble();
+        }
+        if( "00006" == pRowItem->strId ){
+            cmdDevBook.addrHeigh = pRowItem->displayValue.toFloat();
+        }
+        if( "00007" == pRowItem->strId ){
+            cmdDevBook.gpsAngle = pRowItem->displayValue.toShort();
+        }
+        if( "00008" == pRowItem->strId ){
+            cmdDevBook.addrInfo = pRowItem->displayValue.toInt();
+        }
+        if( "00010" == pRowItem->strId ){
+            cmdDevBook.distance = pRowItem->displayValue.toShort();
+        }
+        if( "00011" == pRowItem->strId ){
+            cmdDevBook.speed = pRowItem->displayValue.toShort();
+        }
+        if( "00012" == pRowItem->strId ){
+            cmdDevBook.direction = pRowItem->displayValue.toShort();
+        }
+        if( "00013" == pRowItem->strId ){
+            cmdDevBook.pitch = pRowItem->displayValue.toShort();
+        }
+        if( "00015" == pRowItem->strId ){
+            //cmdDevBook.channel = pRowItem->displayValue.toShort();
+            cmdDevBook.channel[0]=1;
+            cmdDevBook.channel[1]=2;
+        }
+        if( "00016" == pRowItem->strId ){
+            //cmdDevBook.ortho;
+            cmdDevBook.ortho[0]=3;
+            cmdDevBook.ortho[1]=4;
+        }
+        if( "00017" == pRowItem->strId ){
+            //cmdDevBook.beam;
+        }
+    }
+    dataPkt.msgData.append((char*)&cmdDevBook,sizeof(CMD_DEV_BOOK));
+    QByteArray ary=dataPkt.packPacketToEncodedBytes();
+    qDebug()<<"SendSz:"<<ary.length();
+    mComm.sendDataPacket(&dataPkt);
+}
+
+void SubMachine::mappingToCmd(uchar cmd,QList<RowItem*> attrList){
+
+    switch (m_curSubId) {
+    case 0x21:{//dsp1
+        packMessage(cmd,attrList);
+        break;
+    }
     }
 }
 
-void SubMachine::mappingToCmd(QTreeWidgetItem* pEntItem,QStringList strInfos){
-    if( NULL != pEntItem ){
-        auto it = mCtrlMap.find(pEntItem);
-        if( it != mCtrlMap.end() ){
-            packMessage(it.value(),strInfos);
-        }
-    }
+RowItem* SubMachine::getRowItem(QString strId){
+    auto it = mRowItemMap.find(strId);
+    if( it != mRowItemMap.end() )
+        return it.value();
+
+    return NULL;
 }
 
 void SubMachine::currentTabChanged(int index){
@@ -241,18 +288,17 @@ void SubMachine::lineTextEdited(QString strText){
     QLineEdit* pLineEdit = qobject_cast<QLineEdit*>(sender());
     QMap<QLineEdit*,QStringList>::iterator it = m_lineEditTips.find(pLineEdit);
     if( it != m_lineEditTips.end() ){
-        //QRegExp regx("[0-9]+$");
         QStringList strValidTips = it.value();
         QString strValid = strValidTips.at(0);
         QString strTips = strValidTips.at(1);
         QRegExp regx(strValid);
-        QValidator *validator = new QRegExpValidator(regx, 0);
-        int nPos = 0;
-        if( QValidator::Acceptable != validator->validate(strText,nPos) ){
-            // 错误提示
-            QToolTip::showText(pLineEdit->mapToGlobal(QPoint(100, 0)),strTips);
-            pLineEdit->clear();
-        }
+//        QValidator *validator = new QRegExpValidator(regx, 0);
+//        int nPos = 0;
+//        if( QValidator::Acceptable != validator->validate(strText,nPos) ){
+//            // 错误提示
+//            QToolTip::showText(pLineEdit->mapToGlobal(QPoint(100, 0)),strTips);
+//            pLineEdit->clear();
+//        }
     }
 }
 
@@ -262,53 +308,41 @@ void SubMachine::btnSetClicked(){
     if( it != m_btnMap.end() ){
         QTreeWidgetItem* pEntItem = it.value();
         if( NULL != pEntItem ){
+            //命令字
+            uchar cmd = hexToByteArray(pEntItem->text(3));
+            QList<RowItem*>rowItems;
             int nAttrs = pEntItem->childCount();
-            QStringList attrList;
             for( int i=0;i<nAttrs;i++ ){
                 QTreeWidgetItem* pAttrItem = pEntItem->child(i);
+                QString strAttrId = pAttrItem->text(3);
+                QString strValue = "";
                 QWidget* pAttr = m_pCurTree->itemWidget(pAttrItem,0);
                 if( "Lable" == pAttr->objectName() ){
                     QLabel* pLabel = (QLabel*)pAttr;
-                    qDebug()<<pLabel->text();
                 }
                 QWidget* pValue = m_pCurTree->itemWidget(pAttrItem,1);
                 if( "LineEdit" == pValue->objectName() ){
                     QLineEdit* pLineEdit = (QLineEdit*)pValue;
-                    qDebug()<<pLineEdit->text();
-                    attrList.append(pLineEdit->text().trimmed());
+                    strValue = pLineEdit->text().trimmed();
                 }
                 else if( "ComboBox" == pValue->objectName() ){
                     QComboBox* pComboBox = (QComboBox*)pValue;
-                    qDebug()<<pComboBox->currentText();
                     QString strComVal = pComboBox->currentText().split(":").at(0);
-                    attrList.append(strComVal.trimmed());
+                    strValue = strComVal.trimmed();
+                }
+
+                RowItem* pRowItem = getRowItem(strAttrId);
+                if( NULL != pRowItem ){
+                    pRowItem->displayValue = strValue;
+                    rowItems.push_back(pRowItem);
                 }
             }
-            mappingToCmd(pEntItem,attrList);
+            mappingToCmd(cmd,rowItems);
         }
     }
 }
 
 void SubMachine::updateTabView(CDataPacket *dataPkt){
-    dataPkt->decodeData();
-    uchar cMsgDst = dataPkt->msgDst;
-    uchar cMsgSrc = dataPkt->msgSrc;
-    uchar cmsgType = dataPkt->msgType;
-
-    CTTest stats;
-    dataPkt->parseDataToStruct((uchar*)&stats,sizeof(stats));
-    qDebug()<<stats.nShort<<"|";
-    QString strWM = QString("%1").arg((int)stats.cWorkMode);
-    QString strShort = QString("%1").arg(stats.nShort);
-    QString strFloat = QString("%1").arg(stats.fData);
-    QStringList ss;
-    ss<<strWM<<strShort<<strFloat;
-
-    int n = mpEnt->childCount();
-    for(int i=0;i<n;i++){
-        QTreeWidgetItem* pAttr = mpEnt->child(i);
-        pAttr->setText(1,ss.at(i));
-    }
 
 }
 

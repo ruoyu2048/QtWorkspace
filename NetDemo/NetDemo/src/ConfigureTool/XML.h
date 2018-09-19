@@ -3,13 +3,15 @@
 
 #include <QObject>
 #include <QList>
+#include <QTreeWidgetItem>
 
 struct Attr{
     bool    show;           //是否显示
     bool    addBtn;         //是否需要添加设置按钮
+    QString strID;          //属性ID
     QString dataType;       //数据类型
     quint32 dataLen;        //数据长度
-    QString displayType;    //显示类型，hide、select、text
+    QString displayType;    //显示类型，select、text
     QString name;           //名称
     QString displayName;    //显示名称
     QString paramType;      //参数类型
@@ -56,7 +58,6 @@ class XML : public QObject
 public:
     explicit XML(QObject *parent = nullptr);
     bool getConfigureInfo(QString strConfigPath);
-
 private:
     /************************************************************************
     *函数名:	getAllRaderConfigDirPath

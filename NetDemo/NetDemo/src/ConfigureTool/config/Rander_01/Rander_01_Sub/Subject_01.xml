@@ -1,14 +1,29 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Subject name="Subject_01" displayName="中频源" subId="0x11">
-    <subjectInfo id="10000" name="control" displayName="控制" type="control" cmdType='0x02'>
-        <entity  id="11000" name="CtrlChannel" displayName="控制通道" cmd="0x20">
-            <attribute  id="00001" show="true"  addBtn="false" dataType="byte"  dataLen="1" displayType="select" name="workMode" displayName="工作模式" paramType="1:单频;2:锯齿波变周期(10MHz)"/>
-            <attribute  id="00002" show="true"  addBtn="false" dataType="short" dataLen="2" displayType="text"   name="EditTest" displayName="编辑数据" default="1314" validator="[0-9]+$" tips="请输入整数数字"/>
-            <attribute  id="00003" show="true"  addBtn="true"  dataType="float" dataLen="4" displayType="text"   name="FloatVal" displayName="浮点数据" default="100.1" validator="" tips="请输入浮点数字"/>
+<Subject name="Subject_01" displayName="DSP1" subId="0x21">
+    <subjectInfo name="control" displayName="控制" type="control" cmdType='0x02'>
+        <entity  name="CtrlChannel" displayName="设备装订指令" cmd="0x02">
+            <attribute id="00001" show="false" addBtn="false" dataType="byte"    dataLen="1" displayType="text" name="addr" displayName="控制命令字" default="0x02" validator="" tips="请输入值!"/>
+            <attribute id="00002" show="true"  addBtn="false" dataType="byte"    dataLen="1" displayType="text" name="addr" displayName="站址编号" default="1" validator="" tips="请输入值!"/>
+            <attribute id="00003" show="true"  addBtn="false" dataType="short"   dataLen="2" displayType="text" name="addr" displayName="真北角" default="10" validator="" tips="请输入值!"/>
+            <attribute id="00004" show="true"  addBtn="false" dataType="douuble" dataLen="8" displayType="text" name="addr" displayName="站址经度" default="1.1" validator="" tips="请输入值!"/>
+            <attribute id="00005" show="true"  addBtn="false" dataType="douuble" dataLen="8" displayType="text" name="addr" displayName="站址纬度" default="2.2" validator="" tips="请输入值!"/>
+            <attribute id="00006" show="true"  addBtn="false" dataType="float"   dataLen="4" displayType="text" name="addr" displayName="站址高度" default="3.3" validator="" tips="请输入值!"/>
+            <attribute id="00007" show="true"  addBtn="false" dataType="short"   dataLen="2" displayType="text" name="addr" displayName="GPS安装角与天线法线夹角" default="180" validator="" tips="请输入值!"/>
+            <attribute id="00008" show="true"  addBtn="false" dataType="byte"    dataLen="1" displayType="select" name="addrSelect" displayName="站址选择信息" paramType="1:实时;2:固定值"/>
+            <attribute id="00009" show="false" addBtn="false" dataType="byte"    dataLen="1" displayType="text" name="addr" displayName="保留" default="" validator="" tips="请输入值!"/>
+            <attribute id="00010" show="true"  addBtn="false" dataType="short"   dataLen="2" displayType="text" name="addr" displayName="距离零值" default="11" validator="" tips="请输入值!"/>
+            <attribute id="00011" show="true"  addBtn="false" dataType="short"   dataLen="2" displayType="text" name="addr" displayName="速度零值" default="22" validator="" tips="请输入值!"/>
+            <attribute id="00012" show="true"  addBtn="false" dataType="short"   dataLen="2" displayType="text" name="addr" displayName="方位零值" default="33" validator="" tips="请输入值!"/>
+            <attribute id="00013" show="true"  addBtn="false" dataType="short"   dataLen="2" displayType="text" name="addr" displayName="俯仰零值" default="44" validator="" tips="请输入值!"/>
+            <attribute id="00014" show="false" addBtn="false" dataType="byte"    dataLen="2" displayType="text" name="addr" displayName="保留" default="" validator="" tips="请输入值!"/>
+            <attribute id="00015" show="true"  addBtn="false" dataType="short"   dataLen="96" displayType="text" name="addr" displayName="通道一致性修正系数" default="" validator="" tips="请输入值!"/>
+            <attribute id="00016" show="true"  addBtn="false" dataType="short"   dataLen="96" displayType="text" name="addr" displayName="正交一致性修正系数" default="" validator="" tips="请输入值!"/>
+            <attribute id="00017" show="true"  addBtn="true"  dataType="short"   dataLen="15360" displayType="text" name="addr" displayName="波束形成系数" default="" validator="" tips="请输入值!"/>
+            <attribute id="00018" show="false" addBtn="true"  dataType="short"   dataLen="32" displayType="text" name="addr" displayName="保留" default="" validator="" tips="请输入值!"/>
         </entity>
     </subjectInfo>
-    <subjectInfo id="20000" name="monitor" displayName="监视" type="monitor" cmdType='0x01'>
-        <entity id="21000" name="channel" displayName="监视通道"  cmd="0x30">>
+    <subjectInfo name="monitor" displayName="监视" type="monitor" cmdType='0x01'>
+        <entity name="channel" displayName="监视通道"  cmd="0x30">>
             <attribute id="20001" show="true"  addBtn="false" dataType="byte"  dataLen="1" displayType="text" name="Attr2" displayName="工作模式" default="0"/>
             <attribute id="20002" show="true"  addBtn="false" dataType="short" dataLen="2" displayType="text" name="Attr3" displayName="编辑数据" default="1413"/>
             <attribute id="20003" show="true"  addBtn="false" dataType="float" dataLen="4" displayType="text" name="Attr4" displayName="浮点数据" default="1.001"/>

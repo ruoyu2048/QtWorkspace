@@ -197,7 +197,8 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
             subject.name = rootElem.attribute("name");
             subject.displayName = rootElem.attribute("displayName");
             subject.strSubId = rootElem.attribute("subId");
-            qDebug()<<subject.name <<subject.displayName<<subject.strSubId;
+            if( !subject.strSubId.isEmpty() )
+                subject.cSubId = hexToByteArray(subject.strSubId);
 
             //subjectInfo
             QDomNode secNode = rootElem.firstChildElement();
@@ -211,9 +212,6 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
                     subjectInfo.strCmdType = subInfoElement.attribute("cmdType");
                     if( !subInfoElement.attribute("cmdType").isEmpty() )
                         subjectInfo.cmdType = hexToByteArray(subInfoElement.attribute("cmdType"));
-
-                    //qDebug()<<subInfoElement.attribute("name")<<subInfoElement.attribute("displayName")<<subjectInfo.type;
-                    //subject.subjectInfos.push_back(subjectInfo);
 
                     //entity
                     QDomNode entNode = secNode.firstChildElement();
@@ -233,6 +231,7 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
                                 QDomElement attrElem = attrNode.toElement();
                                 if(!attrElem.isNull()  && "attribute" == attrElem.tagName()) {
                                     Attr attr;
+                                    attr.strID = attrElem.attribute("id");
                                     if( "true" == attrElem.attribute("show"))
                                         attr.show = true;
                                     if( "false" == attrElem.attribute("show"))
@@ -252,7 +251,7 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
                                     attr.defValue = attrElem.attribute("default");
                                     attr.validator = attrElem.attribute("validator");
                                     attr.tips = attrElem.attribute("tips");
-                                    qDebug()<<attr.displayName;
+                                    //qDebug()<<attr.displayName;
                                     entity.attrs.push_back(attr);
                                 }
                                 attrNode = attrNode.nextSibling();

@@ -39,6 +39,13 @@ signals:
 public slots:
 };
 
+struct RowItem{
+    QString             strId;
+    QString             dataType;
+    qint32              dataLen;
+    QTreeWidgetItem*    pAttrItem;//绑定的位置
+    QString             displayValue;//用于存储界面上的数值
+};
 
 class SubMachine : public QTabWidget
 {
@@ -51,10 +58,12 @@ public:
 private:
     void startCommu();
     uchar hexToByteArray(QString strHex);
-    void packMessage(QString cCmdId, QStringList attrList);
-    void mappingToCmd(QTreeWidgetItem* pEntItem,QStringList strInfos);
+    void packMessage(uchar cmd,QList<RowItem*> attrList);
+    void mappingToCmd(uchar suID,QList<RowItem*> attrList);
+    RowItem* getRowItem(QString strId);
 private:
     XML*                m_pXML;
+    uchar               m_curSubId;//当前分机ID
     QTreeWidget*        m_pCurTree;
     QList<QString>      m_subMachines;//分机名称
     QList<QTreeWidget*> m_treeWidgetList;//分机树列表
@@ -62,6 +71,8 @@ private:
     QMap<QPushButton*,QTreeWidgetItem*>m_btnMap;//当前设置按钮与控制属性父节点的映射关系
     QMap<QTreeWidgetItem*,QString>mCtrlMap;//Entity节点与Ids的映射关系，发送命令时使用
     QMap<QString,QTreeWidgetItem*>mMonitorMap;//Ids与Entity的映射关系，接受命令更新界面使用
+
+    QMap<QString,RowItem*> mRowItemMap;
 
     CommunicationCfg    mCommCfg;
     Communication       mComm;

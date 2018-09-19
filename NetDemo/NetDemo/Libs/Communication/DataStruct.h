@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define COMMAXLEN 1024
+#define COMMAXLEN 65535
 
 #pragma pack(1)
 
@@ -26,205 +26,205 @@ enum ConnType{
     Disconnected
 };
 
-//中频源
-struct MidInfo{
-    uchar workMode;
-    uchar cpiNum;
-    uchar freqVal;
-    uchar input;
-    uchar output;
-    uchar devStatus;
-    uchar reverse[4];
-};
-
-//源及变频组件
-struct FreqElement{
-    uchar freqPoint;	//频点1-21，对应-100MHz~100MHz，步进10MHz
-    uchar lockStatus;	//锁定指示，0x01：锁定，0x00：失锁
-    uchar output;		//输出幅度，0~30db
-    uchar devStatus;	//设备工作状态，0-故障，1-正常
-    uchar reverse[4];	//备用
-};
-
-struct SendElement{
-    uchar onOff;        //开关状态0—关闭，1—打开
-    uchar reduce;       //衰减值0-63
-    uchar move;         //移相值0-63
-    uchar temperature;  //组件温度0-200，表示-50℃-150℃，量纲：1℃
-    uchar state;        //组件电流状态0x01-打开，0x00-关闭
-    uchar power;        //输出功率值
-    uchar devStatus;    //设备工作状态，0-故障，1-正常
-    uchar reverse[4];   //备用
-};
-
-struct DSP1{
-    uchar version[3];       // Char	3	版本号
-    uchar faultState;       // Char	1	故障状态，1-正常，0-故障
-    uchar custFaultCode1;   // Char	1	自定义故障码1，待定
-    uchar custFaultCode2;   // Char	1	自定义故障码2，待定
-    uchar inputCheck;       // Char	1	输入状态检测
-    uchar ip[4];            // Char	4	网络IP地址
-    uchar port1[2];         // Char	2	端口号1
-    uchar port2[2];         // Char	2	端口号2
-    uchar port3[2];         // Char	2	端口号3
-    uchar cpu[2];           // Char	2	CPU主频
-    uchar ddr[2];           // Char	2	DDR速率
-    uchar bates[2];         // Char	2	串口波特率
-    uchar SRIO[2];          //Char	2	SRIO速率等级
-    uchar SRIO_ID[2];       // Char	2	SRIO ID号
-    uchar SRIOCfg;          // Char	1	SRIO配置模式
-    uchar SRIOErr;			// Char	1	SRIO故障
-    uchar res[6];			// Char	6	备用
-    uchar para[64];			// Char	64	参数（应用程序）
-    uchar core0State;		// Char	1	核0状态：心跳
-    uchar res0[7];			// Char	7	备用（核0自定义状态）
-    uchar core1State;		// Char	1	核1状态：心跳
-    uchar res1[7];			// Char	7	备用（核1自定义状态）
-    uchar core2State;		// Char	1	核2状态：心跳
-    uchar res2[7];			// Char	7	备用（核2自定义状态）
-    uchar core3State;		// Char	1	核3状态：心跳
-    uchar res3[7];			// Char	7	备用（核3自定义状态）
-    uchar core4State;		// Char	1	核4状态：心跳
-    uchar res4[7];			// Char	7	备用（核4自定义状态）
-    uchar core5State;		// Char	1	核5状态：心跳
-    uchar res5[7];			// Char	7	备用（核5自定义状态）
-    uchar core6State;		// Char	1	核6状态：心跳
-    uchar res6[7];			// Char	7	备用（核6自定义状态）
-    uchar core7State;		// Char	1	核7状态：心跳
-    uchar res7[7];			// Char	7	备用（核7自定义状态）
-    short fpgaVerision;		// Short	2	FPGA版本号
-    uchar fpgaErr;			// Char	1	FPGA故障状态，1-正常，0-故障
-    uchar NewIp[4];			// Word	4	网络IP地址
-    short netPort1;			// Short	2	网络端口号1
-    short netPort2;			// Short	2	网络端口号2
-    short netPort3;			// Short	2	网络端口号3
-    short fpgaFreq;			// Short	2	FPGA最高主频
-    uchar fpgaDdr;			// Char	1	FPGA DDR速率
-    short fpgaSRAM;			// Short	2	FPGA SRAM速率
-    uchar fpgaBate1;		// Char	1	FPGA串口波特率1
-    uchar fpgaBate2;		// Char	1	FPGA串口波特率2
-    uchar fpgaBate3;		// Char	1	FPGA串口波特率3
-    uchar fpgaBate4;		// Char	1	FPGA串口波特率4
-    short fpgaSpeed1;		// Short	2	FPGA光纤速率1
-    short fpgaSpeed2;		// Short	2	FPGA光纤速率2
-    short fpgaSpeed3;		// Short	2	FPGA光纤速率3
-    short fpgaSpeed4;		// Short	2	FPGA光纤速率4
-    short fpgaCPCI;			// Short	2	FPGA CPCI速率
-    short fpgaPCIE;			// Short	2	FPGA PCIE速率
-    short CAN;				// Short	2	CAN速率
-    short CAN_ID;			// Short	2	CAN ID
-    uchar CAN_STD;			// Char	1	CAN 标准
-    uchar fpgaSRIO;			// Char	1	FPGA SRIO速率等级
-    short fpgaSRIO_ID1;		// Short	2	FPGA SRIO ID号1
-    short fpgaSRIO_ID2;		// Short	2	FPGA SRIO ID号2
-    short fpgaSRIO_ID3;		// Short	2	FPGA SRIO ID号3
-    short fpgaSRIO_ID4;		// Short	2	FPGA SRIO ID号4
-    uchar fpgaSRIOCfg;		// Char	1	FPGA SRIO配置模式
-    uchar fpgaSRIOErr;		// Char	1	FPGA SRIO故障
-    uchar fpgaInputCheck;	// Char	1	FPGA输入信息检测
-    uchar fpgaCustErrCode1;	// Char	1	FPGA自定义故障码1，待定
-    uchar fpgaCustErrCode2;	// Char	1	FPGA自定义故障码2，待定
-    uchar fpgaRes[10];		// Char	10	FPGA备用
-    uchar fpgaPara;			// Char	1	FPGA参数（应用程序）	可见星数
-    uchar direction;		// Char	1		定位定向状态
-    uchar revs[62];			// Char	62		保留
-    uchar fpgaSave[10];		// Char	10	FPGA保留
-};
-
-struct DSP2{
-uchar version;			//Char	1	版本号
-uchar faultState[3];	//Char	3	故障状态，1-正常，0-故障
-uchar custErr1;			//Char	1	自定义故障状态1
-uchar custErr2;			//Char	1	自定义故障状态2
-uchar inputCheck;		//Char	1	输入状态检测
-uchar ips;				//Char	1	网络IP地址
-uchar port1[4];			//Char	4	端口号1
-uchar port2[2];			//Char	2	端口号2
-uchar port3[2];			//Char	2	端口号3
-uchar cpu[2];			//Char	2	CPU主频
-uchar ddr[2];			//Char	2	DDR速率
-uchar bates[2];			//Char	2	串口波特率
-uchar SRIO[2];          //Char	2	SRIO速率等级
-uchar SRIO_ID[2];       // Char	2	SRIO ID号
-uchar SRIOCfg[2];       // Char	1	SRIO配置模式
-uchar SRIOErr;			// Char	1	SRIO故障
-uchar res;				//Char	1	备用
-uchar para[6];			//Char	6	参数（应用程序）
-uchar core0State[64];	//Char	64	核0状态：心跳
-uchar core0Rev;			//Char	1	备用（核0自定义状态）
-uchar core1State[7];	//Char	7	核1状态：心跳
-uchar core1Rev;			//Char	1	备用（核1自定义状态）
-uchar core2State[7];	//Char	7	核2状态：心跳
-uchar core2Rev;			//Char	1	备用（核2自定义状态）
-uchar core3State[7];	//Char	7	核3状态：心跳
-uchar core3Rev;			//Char	1	备用（核3自定义状态）
-uchar core4State[7];	//Char	7	核4状态：心跳
-uchar core4Rev;			//Char	1	备用（核4自定义状态）
-uchar core5State[7];	//Char	7	核5状态：心跳
-uchar core5Rev;			//Char	1	备用（核5自定义状态）
-uchar core6State[7];	//Char	7	核6状态：心跳
-uchar core6Rev;			//Char	1	备用（核6自定义状态）
-uchar core7State[7];	//Char	7	核7状态：心跳
-uchar core7Rev;			//Char	1	备用（核7自定义状态）
-};
-
-//数据处理软件
-struct DataDeal{
-    uchar devStatus;	//Char	1	数据处理软件设备状态 0-故障，1-正常，2-中断
-    uchar tempA;		//Char	1	机箱内A点温度
-    uchar tempB;		//Char	1	机箱内B点温度
-    float V_1_Value;	//Float	4	电源1电压值
-    float A_1_Value;	//Float	4	电源1电流值
-    float V_2_Value;	//Float	4	电源2电压值
-    float A_2_Value;	//Float	4	电源2电流值
-    float V_3_Value;	//Float	4	电源3电压值
-    float A_3_Value;	//Float	4	电源3电流值
-    uchar cpu;			//Char	1	cpu使用率
-    uchar ram;			//Char	1	内存使用率
-    uchar hard;			//Char	1	硬盘占用率
-    uchar workStaus;	//Char	1	工作状态。0-工作，1-空闲
-    uchar radarId[5];	//Char	5	雷达编号(LDXXX)
-    uchar res[4];		//Char	4	备用
-};
-
-//座体
-struct Base{
-    uchar status;		//Char	1	状态0-停止，1-转动
-    char  angle[2];		//Char	2	当前角度，-1750~1750
-    uchar roateSpeed;	//Char	1	转速（待厂家补充）
-    uchar devStatus;	//Char	1	设备工作状态，0-故障，1-正常
-    uchar res[4];		//Char	4	备用
-};
-//雷达状态
-struct RaderStatus{
-    uchar			cmd;
-    MidInfo			midInfo;
-    FreqElement		freqElem;
-    SendElement     sendElem1;
-    SendElement     sendElem2;
-    SendElement     sendElem3;
-    SendElement     sendElem4;
-    SendElement     sendElem5;
-    SendElement     sendElem6;
-    SendElement     sendElem7;
-    SendElement     sendElem8;
-    DSP1            dsp1;
-    DSP2            dsp2;
-    DataDeal        dataDeal;
-    Base            base;
-};
-
-struct CTTest{
-    char cCmd;
-    char cWorkMode;
-    ushort nShort;
-    float fData;
-    char cRes[5];
-    CTTest(){
-        memset(&cCmd,'\0',sizeof(CTTest));
-        cCmd = 0x20;
+//设备装订指令
+struct CMD_DEV_BOOK{
+    uchar cmd;          //	Char	1	0x02-控制命令字
+    uchar addrCode;     //	Char	1	站址编号，下发固定值
+    short realAngle;    //	UShort	2	真北角，下发固定值，单位：0.01°
+    double addrLong;    // 	Double	8	站址经度，下发固定值，单位：°longitude and latitude
+    double addrLati;    //	Double	8	站址纬度，下发固定值，单位：°
+    float addrHeigh;    //	Float	4	站址高度，下发固定值，单位：m
+    short gpsAngle;     //	UShort	2	GPS安装角与天线法线夹角，下发固定值，单位：0.01°
+    char addrInfo;      //	Char	1	站址信息选择，1：实时；2：固定值
+    char reverse1;      //	Char	1	保留
+    quint16 distance;	//UShort	2	距离零值，单位：0.1m
+    quint16 speed;      //UShort	2	速度零值，单位：0.01m/s
+    quint16 direction;	//UShort	2	方位零值，单位：0.01°
+    quint16 pitch;      //UShort	2	俯仰零值，单位：0.01°
+    char reverse2[2];	//Char	2	保留
+    quint16 channel[48];//Short	24*2*2	通道一致性修正系数，24通道，I和Q各2字节
+    quint16 ortho[48];	//Short	24*2*2	正交一致性修正系数，24通道，I和Q各2字节
+    quint16 beam[7680]; //Short	32*5*24*2*2	波束形成系数,32个波位，每波位5波束，24通道，I和Q各2字节
+    quint16 reverse3[16];//Short	32	保留
+    CMD_DEV_BOOK(){
+        memset(&cmd,'\0',sizeof(CMD_DEV_BOOK));
     }
 };
+//中频源
+typedef struct  _ZPY
+{
+    char	bei[10];
+}ZPY;
+//源及变频组件
+typedef struct _BPZJ
+{
+    char	bei[8];
+}BPZJ;
+//
+typedef struct _JZY
+{
+    char	bei[8];
+}JZY;
+//发射组件
+typedef struct _FSZJ
+{
+    char	bei[11];
+}FSZJ;
+
+typedef struct _DSP1
+{
+    char	ver[3];
+    char	alarmState;
+    char	alarmCode1;
+    char	alarmCode2;
+    char	inState;//输入状态检测
+    //DWORD	IP;//IP
+    quint32	IP;//IP
+    short	port1;//端口号1
+    short	port2;//端口号2
+    short	port3;//端口号3
+    short	cpu;//CPU主频
+    short	ddr;//DDR速率
+    short	commRate;//串口波特率
+    short	SRIORate;//SRIO速率等级
+    short	SRIOID;//SRIO ID号
+    char	SRIOMode;//SRIO配置模式
+    char	SRIDAlarm;//SRIO故障
+    char	bei[6];//备用
+    char	bei1[64];//参数（应用程序）
+    char	h0State;//核0状态：心跳
+    char	h0bei[7];//备用（核0自定义状态）
+    char	h1State;//核1状态：心跳
+    char	h1bei[7];//备用（核1自定义状态）
+    char	h2State;//核2状态：心跳
+    char	h2bei[7];//备用（核2自定义状态）
+    char	h3State;//核3状态：心跳
+    char	h3bei[7];//备用（核3自定义状态）
+    char	h4State;//核4状态：心跳
+    char	h4bei[7];//备用（核4自定义状态）
+    char	h5State;//核5状态：心跳
+    char	h5bei[7];//备用（核5自定义状态）
+    char	h6State;//核6状态：心跳
+    char	h6bei[7];//备用（核6自定义状态）
+    char	h7State;//核7状态：心跳
+    char	h7bei[7];//备用（核7自定义状态）
+    short	FPGAVer;//FPGA版本号
+    char	FPGAAlarm;//FPGA故障状态，1-正常，0-故障
+    //DWORD   FPGAip;//网络IP地址
+    quint32 FPGAip;//网络IP地址
+    short   FPGAport1;//网络端口号1
+    short   FPGAport2;//网络端口号2
+    short   FPGAport3;//网络端口号3
+    short   FPGABig;//FPGA最高主频
+    char	FPGADDR;//FPGA DDR速率
+    short	FPGASRAM;//FPGA SRAM速率
+    char	FPGAComm1;//Char	1	FPGA串口波特率1
+    char	FPGAComm2;//Char	1	FPGA串口波特率2
+    char	FPGAComm3;//Char	1	FPGA串口波特率3
+    char	FPGAComm4;//Char	1	FPGA串口波特率4
+    short	FPGAGx1;//Short	2	FPGA光纤速率1
+    short	FPGAGx2;//Short	2	FPGA光纤速率2
+    short	FPGAGx3;//Short	2	FPGA光纤速率3
+    short	FPGAGx4;//Short	2	FPGA光纤速率4
+    short	FPGACPCI;//Short	2	FPGA CPCI速率
+    short	FPGAPCIE;//Short	2	FPGA PCIE速率
+    short	canRate;//Short	2	CAN速率
+    short	CANID;//Short	2	CAN ID
+    char	canBZ;//Char	1	CAN 标准
+    char	FPGA_SRIO;//Char	1	FPGA SRIO速率等级
+    short	FPGA_SRIO_ID1;//Short	2	FPGA SRIO ID号1
+    short	FPGA_SRIO_ID2;//Short	2	FPGA SRIO ID号2
+    short	FPGA_SRIO_ID3;//Short	2	FPGA SRIO ID号3
+    short	FPGA_SRIO_ID4;//Short	2	FPGA SRIO ID号4
+    char	FPGA_SRIO_Mode;//Char	1	FPGA SRIO配置模式
+    char	FPGA_SRIO_ALARM;//Char	1	FPGA SRIO故障
+    char	FPGA_in;//Char	1	FPGA输入信息检测
+    char	FPGA_alarmCode1;//Char	1	FPGA自定义故障码1，待定
+    char	FPGA_alarmCode2;//Char	1	FPGA自定义故障码2，待定
+    char	bei2[10];//Char	10	FPGA备用
+    char	kjxs;//Char	1	FPGA参数（应用程序）	可见星数
+    char	dwdx;//Char	1		定位定向状态
+    char	bei3[62];//Char	62		保留
+    char	fpgabei[10];//Char	10	FPGA保留
+}DSP1;
+
+typedef struct _DSP2
+{
+    char	ver[3];
+    char	alarmState;
+    char	alarmCode1;
+    char	alarmCode2;
+    char	inState;//输入状态检测
+    char	IP[4];//IP
+    short	port1;//端口号1
+    short	port2;//端口号2
+    short	port3;//端口号3
+    short	cpu;//CPU主频
+    short	ddr;//DDR速率
+    short	commRate;//串口波特率
+    short	SRIORate;//SRIO速率等级
+    short	SRIOID;//SRIO ID号
+    char	SRIOMode;//SRIO配置模式
+    char	SRIDAlarm;//SRIO故障
+    char	bei[6];//备用
+    char	bei1[64];//参数（应用程序）
+    char	h0State;//核0状态：心跳
+    char	h0bei[7];//备用（核0自定义状态）
+    char	h1State;//核1状态：心跳
+    char	h1bei[7];//备用（核1自定义状态）
+    char	h2State;//核2状态：心跳
+    char	h2bei[7];//备用（核2自定义状态）
+    char	h3State;//核3状态：心跳
+    char	h3bei[7];//备用（核3自定义状态）
+    char	h4State;//核4状态：心跳
+    char	h4bei[7];//备用（核4自定义状态）
+    char	h5State;//核5状态：心跳
+    char	h5bei[7];//备用（核5自定义状态）
+    char	h6State;//核6状态：心跳
+    char	h6bei[7];//备用（核6自定义状态）
+    char	h7State;//核7状态：心跳
+    char	h7bei[7];//备用（核7自定义状态）
+}DSP2;
+
+typedef struct _JK
+{
+    char	bei[8];
+}JK;
+
+typedef struct _SJCL
+{
+    char	bei[36];
+}SJCL;
+
+typedef struct _SERVO
+{
+    char	bei[9];
+}SERVO;
+
+//雷达状态信息
+typedef struct _LADAR_INFO
+{
+    char	iState;
+    ZPY		zpyState;
+    BPZJ	bpzjState;
+    JZY		jzyState;
+    FSZJ	fszjState1;
+    FSZJ	fszjState2;
+    FSZJ	fszjState3;
+    FSZJ	fszjState4;
+    FSZJ	fszjState5;
+    FSZJ	fszjState6;
+    FSZJ	fszjState7;
+    FSZJ	fszjState8;
+    DSP1	dsp1State;
+    DSP2	dsp2State;
+    JK		jkState;
+    SJCL	sjclState;
+    SERVO	servoState;
+    _LADAR_INFO(){
+        memset(&iState,'\0',sizeof(_LADAR_INFO));
+    }
+}LADAR_INFO;
 
 //<1>航迹点
 
