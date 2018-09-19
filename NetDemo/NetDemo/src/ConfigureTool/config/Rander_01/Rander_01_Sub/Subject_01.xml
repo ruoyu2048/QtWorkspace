@@ -23,10 +23,78 @@
         </entity>
     </subjectInfo>
     <subjectInfo name="monitor" displayName="监视" type="monitor" cmdType='0x01'>
-        <entity name="channel" displayName="监视通道"  cmd="0x30">>
-            <attribute id="20001" show="true"  addBtn="false" dataType="byte"  dataLen="1" displayType="text" name="Attr2" displayName="工作模式" default="0"/>
-            <attribute id="20002" show="true"  addBtn="false" dataType="short" dataLen="2" displayType="text" name="Attr3" displayName="编辑数据" default="1413"/>
-            <attribute id="20003" show="true"  addBtn="false" dataType="float" dataLen="4" displayType="text" name="Attr4" displayName="浮点数据" default="1.001"/>
+        <entity name="DSP1" displayName="DSP1状态"  cmd="0x01">
+            <attribute id="20001" show="true"  addBtn="false" dataType="byte"  dataLen="1"  displayType="text" name="ver[3]"          displayName="版本号" default=""/>
+            <attribute id="20002" show="true"  addBtn="false" dataType="byte"  dataLen="1"  displayType="text" name="alarmState"      displayName="故障状态" default=""/>
+            <attribute id="20003" show="true"  addBtn="false" dataType="byte"  dataLen="1"  displayType="text" name="alarmCode1"      displayName="自定义故障码1" default=""/>
+            <attribute id="20004" show="true"  addBtn="false" dataType="byte"  dataLen="1"  displayType="text" name="alarmCode2"      displayName="自定义故障码2" default=""/>
+            <attribute id="20005" show="true"  addBtn="false" dataType="byte"  dataLen="1"  displayType="text" name="inState"         displayName="输入状态检测" default=""/>
+            <attribute id="20006" show="true"  addBtn="false" dataType="int"   dataLen="4"  displayType="text" name="IP"              displayName="IP" default=""/>
+            <attribute id="20007" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="port1"           displayName="端口号1" default=""/>
+            <attribute id="20008" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="port2"           displayName="端口号2" default=""/>
+            <attribute id="20009" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="port3"           displayName="端口号3" default=""/>
+            <attribute id="20010" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="cpu"             displayName="CPU主频" default=""/>
+            <attribute id="20011" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="ddr"             displayName="DDR速率" default=""/>
+            <attribute id="20012" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="commRate"        displayName="串口波特率" default=""/>
+            <attribute id="20013" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="SRIORate"        displayName="SRIO速率等级" default=""/>
+            <attribute id="20014" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="SRIOID"          displayName="SRIO ID号" default=""/>
+            <attribute id="20015" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="SRIOMode"        displayName="SRIO配置模式" default=""/>
+            <attribute id="20016" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="SRIDAlarm"       displayName="SRIO故障" default=""/>
+            <attribute id="20017" show="false" addBtn="false" dataType="char"  dataLen="6"  displayType="text" name="bei[6]"          displayName="备用" default=""/>
+            <attribute id="20018" show="false" addBtn="false" dataType="char"  dataLen="64" displayType="text" name="bei1[64]"        displayName="参数（应用程序）" default=""/>
+            <attribute id="20019" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="h0State"         displayName="核0状态：心跳" default=""/>
+            <attribute id="20020" show="false" addBtn="false" dataType="char"  dataLen="7"  displayType="text" name="h0bei[7]"        displayName="备用（核0自定义状态）" default=""/>
+            <attribute id="20021" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="h1State"         displayName="核1状态：心跳" default=""/>
+            <attribute id="20022" show="false" addBtn="false" dataType="char"  dataLen="7"  displayType="text" name="h1bei[7]"        displayName="备用（核1自定义状态）" default=""/>
+            <attribute id="20023" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="h2State"         displayName="核2状态：心跳" default=""/>
+            <attribute id="20024" show="false" addBtn="false" dataType="char"  dataLen="7"  displayType="text" name="h2bei[7]"        displayName="备用（核2自定义状态）" default=""/>
+            <attribute id="20025" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="h3State"         displayName="核3状态：心跳" default=""/>
+            <attribute id="20026" show="false" addBtn="false" dataType="char"  dataLen="7"  displayType="text" name="h3bei[7]"        displayName="备用（核3自定义状态）" default=""/>
+            <attribute id="20027" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="h4State"         displayName="核4状态：心跳" default=""/>
+            <attribute id="20028" show="false" addBtn="false" dataType="char"  dataLen="7"  displayType="text" name="h4bei[7]"        displayName="备用（核4自定义状态）" default=""/>
+            <attribute id="20029" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="h5State"         displayName="核5状态：心跳" default=""/>
+            <attribute id="20030" show="false" addBtn="false" dataType="char"  dataLen="7"  displayType="text" name="h5bei[7]"        displayName="备用（核5自定义状态）" default=""/>
+            <attribute id="20031" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="h6State"         displayName="核6状态：心跳" default=""/>
+            <attribute id="20032" show="false" addBtn="false" dataType="char"  dataLen="7"  displayType="text" name="h6bei[7]"        displayName="备用（核6自定义状态）" default=""/>
+            <attribute id="20033" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="h7State"         displayName="核7状态：心跳" default=""/>
+            <attribute id="20034" show="false" addBtn="false" dataType="char"  dataLen="7"  displayType="text" name="h7bei[7]"        displayName="备用（核7自定义状态）" default=""/>
+            <attribute id="20035" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGAVer"         displayName="FPGA版本号" default=""/>
+            <attribute id="20036" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="FPGAAlarm"       displayName="FPGA故障状态" default=""/>
+            <attribute id="20037" show="true"  addBtn="false" dataType="int"   dataLen="4"  displayType="text" name="FPGAip"          displayName="网络IP地址" default=""/>
+            <attribute id="20038" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGAport1"       displayName="网络端口号1" default=""/>
+            <attribute id="20039" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGAport2"       displayName="网络端口号2" default=""/>
+            <attribute id="20040" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGAport3"       displayName="网络端口号3" default=""/>
+            <attribute id="20041" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGABig"         displayName="FPGA最高主频" default=""/>
+            <attribute id="20042" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="FPGADDR"         displayName="FPGA DDR速率" default=""/>
+            <attribute id="20043" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGASRAM"        displayName="FPGA SRAM速率" default=""/>
+            <attribute id="20044" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="FPGAComm1"       displayName="FPGA串口波特率1" default=""/>
+            <attribute id="20045" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="FPGAComm2"       displayName="FPGA串口波特率2" default=""/>
+            <attribute id="20046" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="FPGAComm3"       displayName="FPGA串口波特率3" default=""/>
+            <attribute id="20047" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="FPGAComm4"       displayName="FPGA串口波特率4" default=""/>
+            <attribute id="20048" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGAGx1"         displayName="FPGA光纤速率1" default=""/>
+            <attribute id="20049" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGAGx2"         displayName="FPGA光纤速率2" default=""/>
+            <attribute id="20050" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGAGx3"         displayName="FPGA光纤速率3" default=""/>
+            <attribute id="20051" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGAGx4"         displayName="FPGA光纤速率4" default=""/>
+            <attribute id="20052" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGACPCI"        displayName="FPGA CPCI速率" default=""/>
+            <attribute id="20053" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGAPCIE"        displayName="FPGA PCIE速率" default=""/>
+            <attribute id="20054" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="canRate"         displayName="CAN速率" default=""/>
+            <attribute id="20055" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="CANID"           displayName="CAN ID" default=""/>
+            <attribute id="20056" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="canBZ"           displayName="CAN 标准" default=""/>
+            <attribute id="20057" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="FPGA_SRIO"       displayName="FPGA SRIO速率等级" default=""/>
+            <attribute id="20058" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGA_SRIO_ID1"   displayName="FPGA SRIO ID号1" default=""/>
+            <attribute id="20059" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGA_SRIO_ID2"   displayName="FPGA SRIO ID号2" default=""/>
+            <attribute id="20060" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGA_SRIO_ID3"   displayName="FPGA SRIO ID号3" default=""/>
+            <attribute id="20061" show="true"  addBtn="false" dataType="short" dataLen="2"  displayType="text" name="FPGA_SRIO_ID4"   displayName="FPGA SRIO ID号4" default=""/>
+            <attribute id="20062" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="FPGA_SRIO_Mode"  displayName="FPGA SRIO配置模式" default=""/>
+            <attribute id="20063" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="FPGA_SRIO_ALARM" displayName="FPGA SRIO故障" default=""/>
+            <attribute id="20064" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="FPGA_in"         displayName="FPGA输入信息检测" default=""/>
+            <attribute id="20065" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="FPGA_alarmCode1" displayName="FPGA自定义故障码1" default=""/>
+            <attribute id="20066" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="FPGA_alarmCode2" displayName="FPGA自定义故障码2" default=""/>
+            <attribute id="20067" show="false" addBtn="false" dataType="char"  dataLen="10"  displayType="text" name="bei2[10]"       displayName="FPGA备用" default=""/>
+            <attribute id="20068" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="kjxs"            displayName="FPGA参数（应用程序）" default=""/>
+            <attribute id="20069" show="true"  addBtn="false" dataType="char"  dataLen="1"  displayType="text" name="dwdx"            displayName="定位定向状态" default=""/>
+            <attribute id="20070" show="false" addBtn="false" dataType="char"  dataLen="62" displayType="text" name="bei3[62]"        displayName="保留" default=""/>
+            <attribute id="20071" show="false" addBtn="false" dataType="char"  dataLen="10" displayType="text" name="fpgabei[10]"     displayName="FPGA保留" default=""/>
      	</entity>
     </subjectInfo>
 </Subject>

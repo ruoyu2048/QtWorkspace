@@ -8,6 +8,7 @@
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 #include "CDataPacket.h"
+#include <QHostAddress>
 
 PluginMoinitorDisplay::PluginMoinitorDisplay(QWidget *parent) : QWidget(parent){
     InitMainWindow();
@@ -280,6 +281,12 @@ RowItem* SubMachine::getRowItem(QString strId){
     return NULL;
 }
 
+void SubMachine::updateRowItem(QString strId,QString itemVal){
+    auto it = mRowItemMap.find(strId);
+    if( it != mRowItemMap.end() )
+        it.value()->pAttrItem->setText(1,itemVal);
+}
+
 void SubMachine::currentTabChanged(int index){
     m_pCurTree = m_treeWidgetList.at(index);
 }
@@ -343,6 +350,90 @@ void SubMachine::btnSetClicked(){
 }
 
 void SubMachine::updateTabView(CDataPacket *dataPkt){
+    //解码
+    dataPkt->decodeData();
+    //雷达状态信息
+    if( 0x31 == dataPkt->msgDst && 0x42 == dataPkt->msgSrc && 0x30 == dataPkt->msgType ){
+        LADAR_INFO ladarInfo;
+        dataPkt->parseDataToStruct((uchar*)&ladarInfo,sizeof(LADAR_INFO));
+        //DSP1状态信息
+        updateDSP1State(ladarInfo.dsp1State);
+    }
+}
 
+void SubMachine::updateDSP1State(DSP1 &dsp1){
+    char cBuf[COMMAXLEN] = {'\0'};
+    memmove(cBuf,dsp1.ver,3);
+    updateRowItem("20001",cBuf);
+    updateRowItem("20002",QString("%1").arg((quint8)dsp1.alarmState));
+    updateRowItem("20003",QString("%1").arg((quint8)dsp1.alarmCode1));
+    updateRowItem("20004",QString("%1").arg((quint8)dsp1.alarmCode2));
+    updateRowItem("20005",QString("%1").arg((quint8)dsp1.inState));
+    updateRowItem("20006",QHostAddress(dsp1.IP).toString());
+    updateRowItem("20007",QString("%1").arg(dsp1.port1));
+    updateRowItem("20008",QString("%1").arg(dsp1.port2));
+    updateRowItem("20009",QString("%1").arg(dsp1.port3));
+    updateRowItem("20010",QString("%1").arg(dsp1.cpu));
+    updateRowItem("20011",QString("%1").arg(dsp1.ddr));
+    updateRowItem("20012",QString("%1").arg(dsp1.commRate));
+    updateRowItem("20013",QString("%1").arg(dsp1.SRIORate));
+    updateRowItem("20014",QString("%1").arg(dsp1.SRIOID));
+    updateRowItem("20015",QString("%1").arg((quint8)dsp1.SRIOMode));
+    updateRowItem("20016",QString("%1").arg((quint8)dsp1.SRIDAlarm));
+    //updateRowItem("20017",QString("%1").arg(dsp1.bei));
+    //updateRowItem("20018",QString("%1").arg(dsp1.bei1));
+    updateRowItem("20019",QString("%1").arg((quint8)dsp1.h0State));
+    ///updateRowItem("20020",QString("%1").arg(dsp1.h0bei));
+    updateRowItem("20021",QString("%1").arg((quint8)dsp1.h1State));
+    //updateRowItem("20022",QString("%1").arg(dsp1.h1be));
+    updateRowItem("20023",QString("%1").arg((quint8)dsp1.h2State));
+    //updateRowItem("20024",QString("%1").arg(dsp1.h2bei));
+    updateRowItem("20025",QString("%1").arg((quint8)dsp1.h3State));
+    //updateRowItem("20026",QString("%1").arg(dsp1.h3bei));
+    updateRowItem("20027",QString("%1").arg((quint8)dsp1.h4State));
+    //updateRowItem("20028",QString("%1").arg(dsp1.h4bei));
+    updateRowItem("20029",QString("%1").arg((quint8)dsp1.h5State));
+    //updateRowItem("20030",QString("%1").arg(dsp1.h5bei));
+    updateRowItem("20031",QString("%1").arg((quint8)dsp1.h6State));
+    //updateRowItem("20032",QString("%1").arg(dsp1.h6bei));
+    updateRowItem("20033",QString("%1").arg((quint8)dsp1.h7State));
+    //updateRowItem("20034",QString("%1").arg(dsp1.h7bei));
+    updateRowItem("20035",QString("%1").arg(dsp1.FPGAVer));
+    updateRowItem("20036",QString("%1").arg((quint8)dsp1.FPGAAlarm));
+    updateRowItem("20037",QHostAddress(dsp1.FPGAip).toString());
+    updateRowItem("20038",QString("%1").arg(dsp1.FPGAport1));
+    updateRowItem("20039",QString("%1").arg(dsp1.FPGAport2));
+    updateRowItem("20040",QString("%1").arg(dsp1.FPGAport3));
+    updateRowItem("20041",QString("%1").arg(dsp1.FPGABig));
+    updateRowItem("20042",QString("%1").arg((quint8)dsp1.FPGADDR));
+    updateRowItem("20043",QString("%1").arg(dsp1.FPGASRAM));
+    updateRowItem("20044",QString("%1").arg((quint8)dsp1.FPGAComm1));
+    updateRowItem("20045",QString("%1").arg((quint8)dsp1.FPGAComm2));
+    updateRowItem("20046",QString("%1").arg((quint8)dsp1.FPGAComm3));
+    updateRowItem("20047",QString("%1").arg((quint8)dsp1.FPGAComm4));
+    updateRowItem("20048",QString("%1").arg(dsp1.FPGAGx1));
+    updateRowItem("20049",QString("%1").arg(dsp1.FPGAGx2));
+    updateRowItem("20050",QString("%1").arg(dsp1.FPGAGx3));
+    updateRowItem("20051",QString("%1").arg(dsp1.FPGAGx4));
+    updateRowItem("20052",QString("%1").arg(dsp1.FPGACPCI));
+    updateRowItem("20053",QString("%1").arg(dsp1.FPGAPCIE));
+    updateRowItem("20054",QString("%1").arg(dsp1.canRate));
+    updateRowItem("20055",QString("%1").arg(dsp1.CANID));
+    updateRowItem("20056",QString("%1").arg((quint8)dsp1.canBZ));
+    updateRowItem("20057",QString("%1").arg((quint8)dsp1.FPGA_SRIO));
+    updateRowItem("20058",QString("%1").arg(dsp1.FPGA_SRIO_ID1));
+    updateRowItem("20059",QString("%1").arg(dsp1.FPGA_SRIO_ID2));
+    updateRowItem("20060",QString("%1").arg(dsp1.FPGA_SRIO_ID3));
+    updateRowItem("20061",QString("%1").arg(dsp1.FPGA_SRIO_ID4));
+    updateRowItem("20062",QString("%1").arg((quint8)dsp1.FPGA_SRIO_Mode));
+    updateRowItem("20063",QString("%1").arg((quint8)dsp1.FPGA_SRIO_ALARM));
+    updateRowItem("20064",QString("%1").arg((quint8)dsp1.FPGA_in));
+    updateRowItem("20065",QString("%1").arg((quint8)dsp1.FPGA_alarmCode1));
+    updateRowItem("20066",QString("%1").arg((quint8)dsp1.FPGA_alarmCode2));
+    //updateRowItem("20067",QString("%1").arg((quint8)dsp1.bei2));
+    updateRowItem("20068",QString("%1").arg((quint8)dsp1.kjxs));
+    updateRowItem("20069",QString("%1").arg((quint8)dsp1.dwdx));
+    //updateRowItem("20070",QString("%1").arg(dsp1.bei3));
+    //updateRowItem("20071",QString("%1").arg(dsp1.fpgabei);
 }
 

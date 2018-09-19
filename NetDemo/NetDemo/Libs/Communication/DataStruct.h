@@ -71,81 +71,80 @@ typedef struct _FSZJ
     char	bei[11];
 }FSZJ;
 
-typedef struct _DSP1
-{
-    char	ver[3];
-    char	alarmState;
-    char	alarmCode1;
-    char	alarmCode2;
-    char	inState;//输入状态检测
-    //DWORD	IP;//IP
-    quint32	IP;//IP
-    short	port1;//端口号1
-    short	port2;//端口号2
-    short	port3;//端口号3
-    short	cpu;//CPU主频
-    short	ddr;//DDR速率
-    short	commRate;//串口波特率
-    short	SRIORate;//SRIO速率等级
-    short	SRIOID;//SRIO ID号
-    char	SRIOMode;//SRIO配置模式
-    char	SRIDAlarm;//SRIO故障
-    char	bei[6];//备用
-    char	bei1[64];//参数（应用程序）
-    char	h0State;//核0状态：心跳
-    char	h0bei[7];//备用（核0自定义状态）
-    char	h1State;//核1状态：心跳
-    char	h1bei[7];//备用（核1自定义状态）
-    char	h2State;//核2状态：心跳
-    char	h2bei[7];//备用（核2自定义状态）
-    char	h3State;//核3状态：心跳
-    char	h3bei[7];//备用（核3自定义状态）
-    char	h4State;//核4状态：心跳
-    char	h4bei[7];//备用（核4自定义状态）
-    char	h5State;//核5状态：心跳
-    char	h5bei[7];//备用（核5自定义状态）
-    char	h6State;//核6状态：心跳
-    char	h6bei[7];//备用（核6自定义状态）
-    char	h7State;//核7状态：心跳
-    char	h7bei[7];//备用（核7自定义状态）
-    short	FPGAVer;//FPGA版本号
-    char	FPGAAlarm;//FPGA故障状态，1-正常，0-故障
-    //DWORD   FPGAip;//网络IP地址
-    quint32 FPGAip;//网络IP地址
-    short   FPGAport1;//网络端口号1
-    short   FPGAport2;//网络端口号2
-    short   FPGAport3;//网络端口号3
-    short   FPGABig;//FPGA最高主频
-    char	FPGADDR;//FPGA DDR速率
-    short	FPGASRAM;//FPGA SRAM速率
-    char	FPGAComm1;//Char	1	FPGA串口波特率1
-    char	FPGAComm2;//Char	1	FPGA串口波特率2
-    char	FPGAComm3;//Char	1	FPGA串口波特率3
-    char	FPGAComm4;//Char	1	FPGA串口波特率4
-    short	FPGAGx1;//Short	2	FPGA光纤速率1
-    short	FPGAGx2;//Short	2	FPGA光纤速率2
-    short	FPGAGx3;//Short	2	FPGA光纤速率3
-    short	FPGAGx4;//Short	2	FPGA光纤速率4
-    short	FPGACPCI;//Short	2	FPGA CPCI速率
-    short	FPGAPCIE;//Short	2	FPGA PCIE速率
-    short	canRate;//Short	2	CAN速率
-    short	CANID;//Short	2	CAN ID
-    char	canBZ;//Char	1	CAN 标准
-    char	FPGA_SRIO;//Char	1	FPGA SRIO速率等级
-    short	FPGA_SRIO_ID1;//Short	2	FPGA SRIO ID号1
-    short	FPGA_SRIO_ID2;//Short	2	FPGA SRIO ID号2
-    short	FPGA_SRIO_ID3;//Short	2	FPGA SRIO ID号3
-    short	FPGA_SRIO_ID4;//Short	2	FPGA SRIO ID号4
-    char	FPGA_SRIO_Mode;//Char	1	FPGA SRIO配置模式
-    char	FPGA_SRIO_ALARM;//Char	1	FPGA SRIO故障
-    char	FPGA_in;//Char	1	FPGA输入信息检测
-    char	FPGA_alarmCode1;//Char	1	FPGA自定义故障码1，待定
-    char	FPGA_alarmCode2;//Char	1	FPGA自定义故障码2，待定
-    char	bei2[10];//Char	10	FPGA备用
-    char	kjxs;//Char	1	FPGA参数（应用程序）	可见星数
-    char	dwdx;//Char	1		定位定向状态
-    char	bei3[62];//Char	62		保留
-    char	fpgabei[10];//Char	10	FPGA保留
+typedef struct _DSP1{
+    char	ver[3];             //版本号
+    char	alarmState;         //故障状态，1-正常，0-故障
+    char	alarmCode1;         //自定义故障码1，待定
+    char	alarmCode2;         //自定义故障码2，待定
+    char	inState;            //输入状态检测
+    //DWORD	IP;                 //IP
+    quint32	IP;                 //IP
+    short	port1;              //端口号1
+    short	port2;              //端口号2
+    short	port3;              //端口号3
+    short	cpu;                //CPU主频
+    short	ddr;                //DDR速率
+    short	commRate;           //串口波特率
+    short	SRIORate;           //SRIO速率等级
+    short	SRIOID;             //SRIO ID号
+    char	SRIOMode;           //SRIO配置模式
+    char	SRIDAlarm;          //SRIO故障
+    char	bei[6];             //备用
+    char	bei1[64];           //参数（应用程序）
+    char	h0State;            //核0状态：心跳
+    char	h0bei[7];           //备用（核0自定义状态）
+    char	h1State;            //核1状态：心跳
+    char	h1bei[7];           //备用（核1自定义状态）
+    char	h2State;            //核2状态：心跳
+    char	h2bei[7];           //备用（核2自定义状态）
+    char	h3State;            //核3状态：心跳
+    char	h3bei[7];           //备用（核3自定义状态）
+    char	h4State;            //核4状态：心跳
+    char	h4bei[7];           //备用（核4自定义状态）
+    char	h5State;            //核5状态：心跳
+    char	h5bei[7];           //备用（核5自定义状态）
+    char	h6State;            //核6状态：心跳
+    char	h6bei[7];           //备用（核6自定义状态）
+    char	h7State;            //核7状态：心跳
+    char	h7bei[7];           //备用（核7自定义状态）
+    short	FPGAVer;            //FPGA版本号
+    char	FPGAAlarm;          //FPGA故障状态，1-正常，0-故障
+    //DWORD   FPGAip;           //网络IP地址
+    quint32 FPGAip;             //网络IP地址
+    short   FPGAport1;          //网络端口号1
+    short   FPGAport2;          //网络端口号2
+    short   FPGAport3;          //网络端口号3
+    short   FPGABig;            //FPGA最高主频
+    char	FPGADDR;            //FPGA DDR速率
+    short	FPGASRAM;           //FPGA SRAM速率
+    char	FPGAComm1;          //Char	1	FPGA串口波特率1
+    char	FPGAComm2;          //Char	1	FPGA串口波特率2
+    char	FPGAComm3;          //Char	1	FPGA串口波特率3
+    char	FPGAComm4;          //Char	1	FPGA串口波特率4
+    short	FPGAGx1;            //Short	2	FPGA光纤速率1
+    short	FPGAGx2;            //Short	2	FPGA光纤速率2
+    short	FPGAGx3;            //Short	2	FPGA光纤速率3
+    short	FPGAGx4;            //Short	2	FPGA光纤速率4
+    short	FPGACPCI;           //Short	2	FPGA CPCI速率
+    short	FPGAPCIE;           //Short	2	FPGA PCIE速率
+    short	canRate;            //Short	2	CAN速率
+    short	CANID;              //Short	2	CAN ID
+    char	canBZ;              //Char	1	CAN 标准
+    char	FPGA_SRIO;          //Char	1	FPGA SRIO速率等级
+    short	FPGA_SRIO_ID1;      //Short	2	FPGA SRIO ID号1
+    short	FPGA_SRIO_ID2;      //Short	2	FPGA SRIO ID号2
+    short	FPGA_SRIO_ID3;      //Short	2	FPGA SRIO ID号3
+    short	FPGA_SRIO_ID4;      //Short	2	FPGA SRIO ID号4
+    char	FPGA_SRIO_Mode;     //Char	1	FPGA SRIO配置模式
+    char	FPGA_SRIO_ALARM;    //Char	1	FPGA SRIO故障
+    char	FPGA_in;            //Char	1	FPGA输入信息检测
+    char	FPGA_alarmCode1;    //Char	1	FPGA自定义故障码1，待定
+    char	FPGA_alarmCode2;    //Char	1	FPGA自定义故障码2，待定
+    char	bei2[10];           //Char	10	FPGA备用
+    char	kjxs;               //Char	1	FPGA参数（应用程序）	可见星数
+    char	dwdx;               //Char	1		定位定向状态
+    char	bei3[62];           //Char	62		保留
+    char	fpgabei[10];        //Char	10	FPGA保留
 }DSP1;
 
 typedef struct _DSP2
