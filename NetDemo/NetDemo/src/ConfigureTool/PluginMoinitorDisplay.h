@@ -13,6 +13,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include "XML.h"
+#include "DataProcess.h"
 #include "CDataPacket.h"
 #include "Communication.h"
 #include "CommunicationCfg.h"
@@ -39,14 +40,6 @@ signals:
 public slots:
 };
 
-struct RowItem{
-    QString             strId;
-    QString             dataType;
-    qint32              dataLen;
-    QTreeWidgetItem*    pAttrItem;//绑定的位置
-    QString             displayValue;//用于存储界面上的数值
-};
-
 class SubMachine : public QTabWidget
 {
     Q_OBJECT
@@ -56,35 +49,26 @@ public:
     void switchSubMachine(QString strName);
 
 private:
-    void startCommu();
     uchar hexToByteArray(QString strHex);
-    void packMessage(uchar cmd,QList<RowItem*> attrList);
-    void mappingToCmd(uchar suID,QList<RowItem*> attrList);
-    RowItem* getRowItem(QString strId);
-    void updateRowItem(QString strId,QString itemVal);
+
 private:
     XML*                m_pXML;
-    uchar               m_curSubId;//当前分机ID
-    QTreeWidget*        m_pCurTree;
-    QList<QString>      m_subMachines;//分机名称
-    QList<QTreeWidget*> m_treeWidgetList;//分机树列表
-    QMap<QLineEdit*,QStringList>m_lineEditTips;//编辑框的正则表达式信息
-    QMap<QPushButton*,QTreeWidgetItem*>m_btnMap;//当前设置按钮与控制属性父节点的映射关系
+    quint8              m_curSubId;                 //当前分机ID
+    QTreeWidget*        m_pCurTree;                 //记录当前Tab页
+    QList<quint8>       m_subDevIds;                //分机ID列表
+    QList<QString>      m_subDevNames;              //分机名称
+    QList<QTreeWidget*> m_subDevTabs;               //分机树列表
+    QMap<QLineEdit*,QStringList>m_lineEditTips;     //编辑框的正则表达式信息
+    QMap<QPushButton*,QTreeWidgetItem*>m_btnMap;    //当前设置按钮与控制属性父节点的映射关系
 
-    QMap<QString,RowItem*> mRowItemMap;
+    DataProcess         m_DataProcess;
 
-    CommunicationCfg    mCommCfg;
-    Communication       mComm;
-    QTreeWidgetItem*    mpEnt;
 signals:
 
 private slots:
     void currentTabChanged(int index);
     void lineTextEdited(QString strText);
     void btnSetClicked();
-    void updateTabView(CDataPacket* dataPkt);
-private:
-    void updateDSP1State(DSP1 &dsp1);
 };
 
 #endif // MAINWINDOW_H
