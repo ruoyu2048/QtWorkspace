@@ -11,8 +11,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     XML.cpp \
-    PluginMoinitorDisplay.cpp \
-    DataProcess.cpp
+    PluginMoinitorDisplay.cpp
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings
@@ -27,8 +26,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 HEADERS += \
     XML.h \
-    PluginMoinitorDisplay.h \
-    DataProcess.h
+    PluginMoinitorDisplay.h
 
 RESOURCES += \
     source.qrc

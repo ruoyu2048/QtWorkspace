@@ -5,7 +5,8 @@
 //#include <windows.h>
 
 CDataPacket::CDataPacket(){
-
+    msgHead = 0xAA;
+    msgEnd  = 0xA5;
 }
 
 void CDataPacket::setEncodedPacketBytes(QByteArray encodedBytes){
