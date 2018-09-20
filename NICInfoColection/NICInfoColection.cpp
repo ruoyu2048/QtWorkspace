@@ -101,6 +101,7 @@ void CNICInfoColection::GetServerCfgInfo()
 {
     QString strCfgFilePath=QString("%1/config/config.ini").arg(QApplication::applicationDirPath());
     QSettings* readIni=new QSettings(strCfgFilePath,QSettings::IniFormat);
+    qDebug()<<readIni->allKeys();
     m_strServerIP=readIni->value("/NIC/IP").toString();
     m_iPort=readIni->value("/NIC/PORT").toInt();
 }

@@ -16,6 +16,7 @@ struct Attr{
     QString displayName;    //显示名称
     QString paramType;      //参数类型
     QString defValue;       //默认值
+    QString iniFile;        //当前属性参数的配置数据ini文件，Key=displayName
     QString validator;      //编辑框的正则表达式
     QString tips;           //编辑框的错误提示
 };

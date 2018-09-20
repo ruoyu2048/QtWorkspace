@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Subject name="Subject_01" displayName="DSP1" subId="0x21">
     <subjectInfo name="control" displayName="控制" type="control" cmdType='0x02'>
-        <entity  name="CtrlChannel" displayName="设备装订指令" cmd="0x02">
+        <entity  name="DevBookCmd" displayName="设备装订指令" cmd="0x02">
             <attribute id="00001" show="false" addBtn="false" dataType="byte"    dataLen="1" displayType="text" name="addr" displayName="控制命令字" default="0x02" validator="" tips="请输入值!"/>
             <attribute id="00002" show="true"  addBtn="false" dataType="byte"    dataLen="1" displayType="text" name="addr" displayName="站址编号" default="1" validator="" tips="请输入值!"/>
             <attribute id="00003" show="true"  addBtn="false" dataType="short"   dataLen="2" displayType="text" name="addr" displayName="真北角" default="10" validator="" tips="请输入值!"/>
@@ -16,10 +16,20 @@
             <attribute id="00012" show="true"  addBtn="false" dataType="short"   dataLen="2" displayType="text" name="addr" displayName="方位零值" default="33" validator="" tips="请输入值!"/>
             <attribute id="00013" show="true"  addBtn="false" dataType="short"   dataLen="2" displayType="text" name="addr" displayName="俯仰零值" default="44" validator="" tips="请输入值!"/>
             <attribute id="00014" show="false" addBtn="false" dataType="byte"    dataLen="2" displayType="text" name="addr" displayName="保留" default="" validator="" tips="请输入值!"/>
-            <attribute id="00015" show="true"  addBtn="false" dataType="short"   dataLen="96" displayType="text" name="addr" displayName="通道一致性修正系数" default="" validator="" tips="请输入值!"/>
-            <attribute id="00016" show="true"  addBtn="false" dataType="short"   dataLen="96" displayType="text" name="addr" displayName="正交一致性修正系数" default="" validator="" tips="请输入值!"/>
-            <attribute id="00017" show="true"  addBtn="true"  dataType="short"   dataLen="15360" displayType="text" name="addr" displayName="波束形成系数" default="" validator="" tips="请输入值!"/>
+            <attribute id="00015" show="true"  addBtn="false" dataType="short"   dataLen="96" displayType="text" name="TongDao" displayName="通道一致性修正系数" iniFile="dataSrc.ini" default="" validator="" tips="请输入值!"/>
+            <attribute id="00016" show="true"  addBtn="false" dataType="short"   dataLen="96" displayType="text" name="ZhengJiao" displayName="正交一致性修正系数" iniFile="dataSrc.ini" default="" validator="" tips="请输入值!"/>
+            <attribute id="00017" show="true"  addBtn="true"  dataType="short"   dataLen="15360" displayType="text" name="BoShu" displayName="波束形成系数" iniFile="dataSrc.ini" default="" validator="" tips="请输入值!"/>
             <attribute id="00018" show="false" addBtn="true"  dataType="short"   dataLen="32" displayType="text" name="addr" displayName="保留" default="" validator="" tips="请输入值!"/>
+        </entity>
+        <entity  name="WPUdateCmd" displayName="波位更新指令" cmd="0x04">
+            <attribute id="00101" show="false" addBtn="false" dataType="byte"  dataLen="1" displayType="text"   name="addr" displayName="控制命令字" default="0x04" validator="" tips="请输入值!"/>
+            <attribute id="00102" show="true"  addBtn="false" dataType="byte"  dataLen="1" displayType="text"   name="addr" displayName="波位编号" default="1" validator="" tips="请输入波位编号，编号范围:1~32 !"/>
+            <attribute id="00103" show="false" addBtn="false" dataType="byte"  dataLen="1" displayType="text"   name="addr" displayName="保留" default="" validator="" tips=""/>
+            <attribute id="00104" show="true"  addBtn="false" dataType="short" dataLen="2" displayType="text"   name="addr" displayName="每周期CPI脉冲数" default="0" validator="" tips="请输入控制波控和中频源的CPI个数，数值范围:0~65536 !"/>
+            <attribute id="00105" show="true"  addBtn="true"  dataType="byte"  dataLen="1" displayType="select" name="addr" displayName="波位类型" paramType="1:搜索;2:跟踪;3:凝视(伴随数据传输，用于航迹处理)"/>
+            <attribute id="00106" show="false" addBtn="false" dataType="byte"  dataLen="1" displayType="text"   name="addr" displayName="保留" default="" validator="" tips=""/>
+            <attribute id="00107" show="false" addBtn="false" dataType="byte"  dataLen="1" displayType="text"   name="addr" displayName="保留" default="" validator="" tips=""/>
+            <attribute id="00108" show="false" addBtn="false" dataType="byte"  dataLen="1" displayType="text"   name="addr" displayName="保留" default="" validator="" tips=""/>
         </entity>
     </subjectInfo>
     <subjectInfo name="monitor" displayName="监视" type="monitor" cmdType='0x01'>

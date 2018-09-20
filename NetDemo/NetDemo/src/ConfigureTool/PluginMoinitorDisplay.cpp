@@ -9,6 +9,8 @@
 #include <QTreeWidgetItemIterator>
 #include "CDataPacket.h"
 #include <QHostAddress>
+#include <QApplication>
+#include <QSettings>
 
 PluginMoinitorDisplay::PluginMoinitorDisplay(QWidget *parent) : QWidget(parent){
     InitMainWindow();
@@ -98,7 +100,13 @@ void SubMachine::InitTabMain(){
                                         pLineEdit->setObjectName("LineEdit");
                                         pLineEdit->setFrame(true);
                                         pLineEdit->setMaximumWidth(500);
-                                        pLineEdit->setText(attr.defValue);
+                                        if( attr.iniFile.isEmpty() )
+                                            pLineEdit->setText(attr.defValue);
+                                        else{
+                                            QString strIniValue = getConfigValue(subject.strSubId,attr.name,attr.iniFile);
+                                            pLineEdit->setText(strIniValue);
+                                            qDebug()<<"subjectID:"<<subject.strSubId<<"DisplayName:"<<attr.displayName<<"Value:"<<strIniValue<<"|";
+                                        }
                                         pCurTree->setItemWidget(pAttrItem,1,pLineEdit);
                                         connect(pLineEdit,SIGNAL(textEdited(QString)),this,SLOT(lineTextEdited(QString)));
                                         QStringList strValidTips;
@@ -112,7 +120,12 @@ void SubMachine::InitTabMain(){
                                         pCombo->setMaximumWidth(500);
                                         //pCombo->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
                                         QStringList paramTypes = attr.paramType.split(";");
-                                        pCombo->addItems(paramTypes);
+                                        foreach (QString strPara, paramTypes) {
+                                           QStringList paramPair = strPara.split(":");
+                                           if( 2 == paramPair.size() && !paramPair.at(1).isEmpty()){
+                                               pCombo->addItem(paramPair.at(1));
+                                           }
+                                        }
                                         pCurTree->setItemWidget(pAttrItem,1,pCombo);
                                     }
                                     if( attr.addBtn ){
@@ -180,6 +193,13 @@ uchar SubMachine::hexToByteArray(QString strHex)
         }
     }
     return hexAry.at(0);
+}
+
+QString SubMachine::getConfigValue(QString strSubID,QString strName,QString srtIniFile){
+    QString strCfgFilePath=QString("%1/config/%2").arg(QApplication::applicationDirPath()).arg(srtIniFile);
+    QSettings* readIni=new QSettings(strCfgFilePath,QSettings::IniFormat);
+    QString strkey=QString("%1/%2").arg(strSubID).arg(strName);
+    return readIni->value(strkey).toString();
 }
 
 void SubMachine::currentTabChanged(int index){
@@ -268,6 +288,8 @@ RowItem* DataProcess::getRowItem(QString strId){
         if( itRowItemMap != it.value().end() )
             return itRowItemMap.value();
     }
+
+    return NULL;
 }
 
 void DataProcess::updateRowItem(QString strId,QString itemVal){
@@ -354,68 +376,87 @@ void DataProcess::resetStateDisplay(){
     }
 }
 
-void DataProcess::packMessage(uchar cmd,QList<RowItem*> attrList){
-    CDataPacket dataPkt;
-    dataPkt.msgHead = 0xAA;
-    dataPkt.msgEnd = 0xA5;
-    dataPkt.msgDst = 0x21;
-    dataPkt.msgSrc = 0x31;
-    dataPkt.msgType = 0x20;
-    CMD_DEV_BOOK cmdDevBook;
-    cmdDevBook.cmd = cmd;
-    int nSz = attrList.size();
-    for(int i=0; i<nSz;i++ ){
-        RowItem* pRowItem = attrList.at(i);
-        if( "00002" == pRowItem->strId ){
-            cmdDevBook.addrCode = pRowItem->displayValue.toInt();
+void DataProcess::packDevBookMessage(uchar cmd,QList<RowItem*> attrList){
+    if( 0x02 == cmd ){
+        CDataPacket dataPkt;
+        dataPkt.msgDst = 0x21;
+        dataPkt.msgSrc = 0x31;
+        dataPkt.msgType = 0x20;
+        CMD_DEV_BOOK cmdDevBook;
+        cmdDevBook.cmd = cmd;
+        int nSz = attrList.size();
+        for(int i=0; i<nSz;i++ ){
+            RowItem* pRowItem = attrList.at(i);
+            if( "select" == pRowItem->displayType ){
+                //eg:paramType="1:实时;2:固定值"
+                QStringList strParamType = pRowItem->paramType.split(";");
+                foreach (QString strParamPair, strParamType) {
+                    QStringList strParamMap = strParamPair.split(":");
+                    if( 2 == strParamMap.size() && strParamMap.at(1) == pRowItem->displayValue ){
+                        pRowItem->displayValue = strParamMap.at(0);
+                        break;
+                    }
+                    else {
+                        pRowItem->displayValue.clear();
+                    }
+                }
+            }
+            if( "00002" == pRowItem->strId ){
+                cmdDevBook.addrCode = pRowItem->displayValue.toInt();
+            }
+            if( "00003" == pRowItem->strId ){
+                cmdDevBook.realAngle = pRowItem->displayValue.toShort();
+            }
+            if( "00004" == pRowItem->strId ){
+                cmdDevBook.addrLong = pRowItem->displayValue.toDouble();
+            }
+            if( "00005" == pRowItem->strId ){
+                cmdDevBook.addrLati = pRowItem->displayValue.toDouble();
+            }
+            if( "00006" == pRowItem->strId ){
+                cmdDevBook.addrHeigh = pRowItem->displayValue.toFloat();
+            }
+            if( "00007" == pRowItem->strId ){
+                cmdDevBook.gpsAngle = pRowItem->displayValue.toShort();
+            }
+            if( "00008" == pRowItem->strId ){
+                cmdDevBook.addrInfo = pRowItem->displayValue.toInt();
+            }
+            if( "00010" == pRowItem->strId ){
+                cmdDevBook.distance = pRowItem->displayValue.toShort();
+            }
+            if( "00011" == pRowItem->strId ){
+                cmdDevBook.speed = pRowItem->displayValue.toShort();
+            }
+            if( "00012" == pRowItem->strId ){
+                cmdDevBook.direction = pRowItem->displayValue.toShort();
+            }
+            if( "00013" == pRowItem->strId ){
+                cmdDevBook.pitch = pRowItem->displayValue.toShort();
+            }
+            if( "00015" == pRowItem->strId ){
+                QStringList chanels=pRowItem->displayValue.split("|");
+                foreach (QString strChanel, chanels) {
+                    cmdDevBook.channel[i]=strChanel.toShort();
+                }
+            }
+            if( "00016" == pRowItem->strId ){
+                QStringList chanels=pRowItem->displayValue.split("|");
+                foreach (QString strChanel, chanels) {
+                    cmdDevBook.ortho[i]=strChanel.toShort();
+                }
+            }
+            if( "00017" == pRowItem->strId ){
+                QStringList chanels=pRowItem->displayValue.split("|");
+                foreach (QString strChanel, chanels) {
+                    cmdDevBook.beam[i]=strChanel.toShort();
+                }
+            }
         }
-        if( "00003" == pRowItem->strId ){
-            cmdDevBook.realAngle = pRowItem->displayValue.toShort();
-        }
-        if( "00004" == pRowItem->strId ){
-            cmdDevBook.addrLong = pRowItem->displayValue.toDouble();
-        }
-        if( "00005" == pRowItem->strId ){
-            cmdDevBook.addrLati = pRowItem->displayValue.toDouble();
-        }
-        if( "00006" == pRowItem->strId ){
-            cmdDevBook.addrHeigh = pRowItem->displayValue.toFloat();
-        }
-        if( "00007" == pRowItem->strId ){
-            cmdDevBook.gpsAngle = pRowItem->displayValue.toShort();
-        }
-        if( "00008" == pRowItem->strId ){
-            cmdDevBook.addrInfo = pRowItem->displayValue.toInt();
-        }
-        if( "00010" == pRowItem->strId ){
-            cmdDevBook.distance = pRowItem->displayValue.toShort();
-        }
-        if( "00011" == pRowItem->strId ){
-            cmdDevBook.speed = pRowItem->displayValue.toShort();
-        }
-        if( "00012" == pRowItem->strId ){
-            cmdDevBook.direction = pRowItem->displayValue.toShort();
-        }
-        if( "00013" == pRowItem->strId ){
-            cmdDevBook.pitch = pRowItem->displayValue.toShort();
-        }
-        if( "00015" == pRowItem->strId ){
-            //cmdDevBook.channel = pRowItem->displayValue.toShort();
-            cmdDevBook.channel[0]=1;
-            cmdDevBook.channel[1]=2;
-        }
-        if( "00016" == pRowItem->strId ){
-            //cmdDevBook.ortho;
-            cmdDevBook.ortho[0]=3;
-            cmdDevBook.ortho[1]=4;
-        }
-        if( "00017" == pRowItem->strId ){
-            //cmdDevBook.beam;
-        }
+        dataPkt.msgData.append((char*)&cmdDevBook,sizeof(CMD_DEV_BOOK));
+        dataPkt.packPacketToEncodedBytes();
+        mComm.sendDataPacket(&dataPkt);
     }
-    dataPkt.msgData.append((char*)&cmdDevBook,sizeof(CMD_DEV_BOOK));
-    dataPkt.packPacketToEncodedBytes();
-    mComm.sendDataPacket(&dataPkt);
 }
 
 void DataProcess::mappingToCmd(uchar cmd,QList<RowItem*> attrList){
@@ -423,7 +464,7 @@ void DataProcess::mappingToCmd(uchar cmd,QList<RowItem*> attrList){
     case 0x21://dsp1
         break;
     }
-    packMessage(cmd,attrList);
+    packDevBookMessage(cmd,attrList);
 }
 
 void DataProcess::updateTabView(CDataPacket *dataPkt){

@@ -50,6 +50,21 @@ struct CMD_DEV_BOOK{
         memset(&cmd,'\0',sizeof(CMD_DEV_BOOK));
     }
 };
+//波位更新指令
+typedef struct _CMD_WAVE_POSITION_UPDATE{
+    char  cmd;			//Char	1	0x04-波位表命令字
+    char  waveNo;		//Char	1	波位编号，1~32，控制波位相关信息的选择
+    char  res1;			//Char	1	保留
+    short CPINum;		//Short	2	每周期CPI脉冲数，0~65536，控制波控和中频源的CPI个数
+    char  wavePosType;	//Char	1	波位类型，0x01：搜索；0x02：跟踪；0x03：凝视，伴随数据传输，用于航迹处理
+    char  res2;			//Char	1	保留
+    char  res3;			//Char	1	保留
+    char  res4;			//Char	1	保留
+    _CMD_WAVE_POSITION_UPDATE(){
+        memset(&cmd,'\0',sizeof(_CMD_WAVE_POSITION_UPDATE));
+    }
+}WAVE_POSITION_UPDATE;
+
 //中频源
 typedef struct  _ZPY
 {

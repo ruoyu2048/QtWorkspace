@@ -247,6 +247,7 @@ int XML::readEquipmentInfo(QString strPath,Subject &subject)
                                     attr.displayType = attrElem.attribute("displayType");
                                     attr.name = attrElem.attribute("name");
                                     attr.displayName = attrElem.attribute("displayName");
+                                    attr.iniFile = attrElem.attribute("iniFile");
                                     attr.paramType = attrElem.attribute("paramType");
                                     attr.defValue = attrElem.attribute("default");
                                     attr.validator = attrElem.attribute("validator");

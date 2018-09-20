@@ -53,7 +53,7 @@ public:
 private:
     void startCommu();
     void startResetTimer();
-    void packMessage(uchar cmd,QList<RowItem*> attrList);
+    void packDevBookMessage(uchar cmd,QList<RowItem*> attrList);
     void updateDSP1State(DSP1 &dsp1);
 signals:
 
@@ -94,6 +94,7 @@ private:
 signals:
 
 public slots:
+
 };
 
 class SubMachine : public QTabWidget
@@ -106,7 +107,7 @@ public:
 
 private:
     uchar hexToByteArray(QString strHex);
-
+    QString getConfigValue(QString strSubID,QString strName,QString srtIniFile);
 private:
     XML*                m_pXML;
     quint8              m_curSubId;                 //当前分机ID
