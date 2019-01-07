@@ -1,4 +1,4 @@
-#include "Xbeltree.h"
+﻿#include "XbelTree.h"
 
 #include <QFile>
 #include <QHeaderView>
@@ -24,7 +24,7 @@ XbelTree::XbelTree(QWidget *parent)
 
 bool XbelTree::read(QString filePath)
 {
-    m_strFilePath = filePath;
+    m_strCfgFilePath = filePath;
     QFile file(filePath);
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
         QMessageBox::warning(this, tr("提示"),
@@ -78,7 +78,7 @@ bool XbelTree::write(QString filePath)
     QFile file(filePath);
     if (!file.open(QFile::WriteOnly | QFile::Text)) {
         QMessageBox::warning(this, tr("提示"),
-                             tr("无法加载文件 %1:\n%2.")
+                             QString(tr("无法加载文件 %1:\n%2."))
                              .arg(filePath)
                              .arg(file.errorString()));
         return false;
@@ -91,7 +91,7 @@ bool XbelTree::write(QString filePath)
 }
 
 bool XbelTree::save(){
-    return write(m_strFilePath);
+    return write(m_strCfgFilePath);
 }
 
 void XbelTree::updateDomElement(QTreeWidgetItem *item, int column)
@@ -110,6 +110,45 @@ void XbelTree::updateDomElement(QTreeWidgetItem *item, int column)
             if (element.tagName() == "bookmark")
                 element.setAttribute("href", item->text(1));
         }
+    }
+}
+
+void XbelTree::parseUnitElement(const QDomElement &element, QTreeWidgetItem *parentItem)
+{
+    QTreeWidgetItem *item = createItem(element, parentItem);
+
+    QString title = element.firstChildElement("title").text();
+    if (title.isEmpty())
+        title = QObject::tr("Folder");
+
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
+    item->setIcon(0, folderIcon);
+    item->setText(0, title);
+
+    bool folded = (element.attribute("folded") != "no");
+    setItemExpanded(item, !folded);
+
+    QDomElement child = element.firstChildElement();
+    while (!child.isNull()) {
+        if (child.tagName() == "folder") {
+            parseFolderElement(child, item);
+        } else if (child.tagName() == "bookmark") {
+            QTreeWidgetItem *childItem = createItem(child, item);
+
+            QString title = child.firstChildElement("title").text();
+            if (title.isEmpty())
+                title = QObject::tr("Folder");
+
+            childItem->setFlags(item->flags() | Qt::ItemIsEditable);
+            childItem->setIcon(0, bookmarkIcon);
+            childItem->setText(0, title);
+            childItem->setText(1, child.attribute("href"));
+        } else if (child.tagName() == "separator") {
+            QTreeWidgetItem *childItem = createItem(child, item);
+            childItem->setFlags(item->flags() & ~(Qt::ItemIsSelectable | Qt::ItemIsEditable));
+            childItem->setText(0, QString(30, 0xB7));
+        }
+        child = child.nextSiblingElement();
     }
 }
 

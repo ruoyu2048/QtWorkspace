@@ -1,11 +1,12 @@
-#include "XbelEditor.h"
+﻿#include "XbelEditor.h"
 #include "XbelTree.h"
 
-XbelEditor::XbelEditor(QWidget *parent)
-    : QWidget(parent)
+XbelEditor::XbelEditor(QString strCfgFilePath,QWidget *parent)
+    : QWidget(parent),m_pXbelTree(nullptr)
 {
     this->showMaximized();
-    initMainWindow();
+    m_strCfgFilePath = strCfgFilePath;
+    initMainWindow( m_strCfgFilePath );
 }
 
 XbelEditor::~XbelEditor()
@@ -13,11 +14,11 @@ XbelEditor::~XbelEditor()
 
 }
 
-void XbelEditor::initMainWindow(){
+void XbelEditor::initMainWindow( QString strCfgFilePath ){
     m_pMainLayout = new QGridLayout(this);
 
     m_pXbelTree = new XbelTree(this);
-    m_pXbelTree->read(":/jennifer.xbel");
+    m_pXbelTree->read( strCfgFilePath );
 
     m_pMainLayout->addWidget(m_pXbelTree,0,0,10,7);
 
@@ -28,7 +29,7 @@ void XbelEditor::initMainWindow(){
 }
 
 void XbelEditor::onBtnSave(){
-    if( NULL != m_pXbelTree ){
+    if( nullptr != m_pXbelTree ){
         m_pXbelTree->save();
     }
 }
