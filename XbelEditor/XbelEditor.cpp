@@ -1,8 +1,7 @@
 ﻿#include "XbelEditor.h"
 #include "XbelTree.h"
 
-XbelEditor::XbelEditor(QString strCfgFilePath,QWidget *parent)
-    : QWidget(parent),m_pXbelTree(nullptr)
+XbelEditor::XbelEditor(QString strCfgFilePath,QWidget *parent):IXbelEditor(parent)
 {
     this->showMaximized();
     m_strCfgFilePath = strCfgFilePath;
@@ -17,8 +16,14 @@ XbelEditor::~XbelEditor()
 void XbelEditor::initMainWindow( QString strCfgFilePath ){
     m_pMainLayout = new QGridLayout(this);
 
+    /*--------------------------------------------------------------------*/
+    /*------------------------XML信息显示对象初始化--------------------------*/
     m_pXbelTree = new XbelTree(this);
+    QStringList headerList;
+    headerList<<tr("名称")<<tr("位置");
+    m_pXbelTree->setHeaders(headerList);
     m_pXbelTree->read( strCfgFilePath );
+    /*--------------------------------------------------------------------*/
 
     m_pMainLayout->addWidget(m_pXbelTree,0,0,10,7);
 

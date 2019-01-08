@@ -1,12 +1,12 @@
 ﻿#ifndef XBELEDITOR_H
 #define XBELEDITOR_H
 
-#include <QWidget>
+#include "IXbelEditor.h"
 #include <QPushButton>
 #include <QGridLayout>
 
-class XbelTree;
-class XbelEditor : public QWidget
+//class IXbelTree;
+class XbelEditor : public IXbelEditor
 {
     Q_OBJECT
 
@@ -43,11 +43,6 @@ private:
      * @brief m_pMainLayout 主界面布局指针对象
      */
     QGridLayout* m_pMainLayout;
-
-    /**
-     * @brief m_pXbelTree 主界面参数显示树指针对象
-     */
-    XbelTree* m_pXbelTree;
 
     /**
      * @brief m_pBtnSave 保存界面参数按钮指针对象

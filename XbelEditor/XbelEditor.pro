@@ -26,11 +26,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         XbelEditor.cpp \
-    XbelTree.cpp
+    XbelTree.cpp \
+    IXbelTree.cpp \
+    IXbelEditor.cpp
 
 HEADERS += \
         XbelEditor.h \
-    XbelTree.h
+    XbelTree.h \
+    IXbelTree.h \
+    IXbelEditor.h
 
 RESOURCES += \
     src.qrc
+
