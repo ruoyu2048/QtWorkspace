@@ -1,4 +1,4 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 
 //#include "CTcpClient.h"
 //#include "CTcpServer.h"
@@ -13,11 +13,11 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    CTcpServer* m_pTS = new CTcpServer();
-    m_pTS->StartListen("127.0.0.1",9999);
+//    CTcpServer* m_pTS = new CTcpServer();
+//    m_pTS->StartListen("127.0.0.1",9999);
 
-//    CTcpClient* m_pTC0 = new CTcpClient();
-//    m_pTC0->ConnectToHost("127.0.0.1",9999);
+    CTcpClient* m_pTC0 = new CTcpClient();
+    m_pTC0->ConnectToHost("127.0.0.1",9999);
 
     //CTcpClient* m_pTC1 = new CTcpClient();
     //m_pTC1->ConnectToHost(QHostAddress::LocalHost,10086);

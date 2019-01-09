@@ -1,10 +1,11 @@
-#include "CTcpClient.h"
+﻿#include "CTcpClient.h"
 #include <QHostAddress>
 #include "../PubDef/PubFunc.h"
 //#include "PubFunc.h"
 
 CTcpClient::CTcpClient(QObject *parent) : QObject(parent)
 {
+    mRcvLen = 0;
     mSocketDecriptor = 0;
     m_pTSClient = new QTcpSocket(this);
     connect(m_pTSClient,SIGNAL(readyRead()),this,SLOT(ReadData()));
@@ -27,7 +28,7 @@ bool CTcpClient::ConnectToHost(QString strServerIP,quint16 nServerPort)
         {
             //log:连接成功
             qDebug()<<"连接成功";
-            StartTest();
+            //StartTest();
             return true;
         }
         else
@@ -70,6 +71,9 @@ void CTcpClient::ReadData()
         {
             QByteArray rcvAry = m_pTSClient->readAll();
             parseDatagram(rcvAry);
+
+            mRcvLen += rcvAry.length();
+            qDebug()<<"RecvLength:"<<mRcvLen;
         }
     }
 }

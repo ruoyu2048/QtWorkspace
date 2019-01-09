@@ -1,4 +1,4 @@
-#ifndef CTCPSERVER_H
+﻿#ifndef CTCPSERVER_H
 #define CTCPSERVER_H
 
 #include <QMap>
@@ -120,6 +120,9 @@ private:
     qintptr mSocketDecriptor;
     //接收数据缓存
     QByteArray mCacheAry;
+
+    //
+    quint64 mRcvLen;
 
 signals:
     //Only used in TcpServer

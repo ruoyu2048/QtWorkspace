@@ -15,6 +15,10 @@ public:
 
     virtual ~IXbelTree();
 
+    QDomDocument getDocument();
+
+    QDomElement getDomElementForItem(QTreeWidgetItem* pItem);
+
     /**
      * @brief setHeaders 设置表头名称
      * @param headerList 表头名称列表
@@ -70,19 +74,23 @@ private:
 protected slots:
     /**
      * @brief updateDomElement 更新XML元素信息
-     * @param item 元素关联的节点指针对象
+     * @param pItem 元素关联的节点指针对象
      * @param column 更新元素所在的列
      */
-    virtual void updateDomElement(QTreeWidgetItem *item, int column) = 0;
+    virtual void updateDomElement(QTreeWidgetItem* pItem, int column) = 0;
 
 public:
     QIcon m_folderIcon;
     QIcon m_bookmarkIcon;
-    QDomDocument m_domDocument;
-    QHash<QTreeWidgetItem*, QDomElement> m_domElementForItem;
+
+protected:
+    QString m_strName;  //名称
+    QString m_strId;    //ID
 
 private:
     QString m_strCfgFilePath;
+    QDomDocument m_domDocument;
+    QHash<QTreeWidgetItem*, QDomElement> m_domElementForItem;
 };
 
 #endif // IXBELTREE_H

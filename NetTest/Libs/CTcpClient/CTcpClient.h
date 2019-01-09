@@ -1,4 +1,4 @@
-#ifndef CTCPCLIENT_H
+﻿#ifndef CTCPCLIENT_H
 #define CTCPCLIENT_H
 
 #include <QObject>
@@ -64,6 +64,7 @@ private:
     ************************************************************************/
     void switchDatagram(unsigned char* cRcvBuf,int nTotalLen);
 private:
+    quint64     mRcvLen;
     QByteArray  mCacheAry;      //报文缓存
     QTcpSocket* m_pTSClient;    //客户端TcpSocket
     qintptr mSocketDecriptor;   //客户端TcpSocket描述符(保留)

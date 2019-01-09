@@ -1,4 +1,4 @@
-#include "CTcpServer.h"
+﻿#include "CTcpServer.h"
 #include "../PubDef/PubFunc.h"
 //#include "PubFunc.h"
 
@@ -113,6 +113,7 @@ void CTcpServer::slotDisconnected(qintptr handle)
 
 CTcpSocket::CTcpSocket(QObject *parent) : QTcpSocket(parent)
 {
+    mRcvLen = 0;
     connect(this,SIGNAL(readyRead()),this,SLOT(slotReadData()));
     connect(this,SIGNAL(disconnected()),this,SLOT(slotDisconnected()));
 }
@@ -166,7 +167,9 @@ void CTcpSocket::slotReadData()
     if( this->bytesAvailable() > sizeof(FrameHead) )
     {
         QByteArray rcvAry = this->readAll();
-        parseDatagram(rcvAry);
+        mRcvLen += rcvAry.length();
+        qDebug()<<"RecvLength:"<<mRcvLen;
+        //parseDatagram(rcvAry);
     }
 }
 

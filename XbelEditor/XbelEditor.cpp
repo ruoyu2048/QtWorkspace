@@ -20,7 +20,7 @@ void XbelEditor::initMainWindow( QString strCfgFilePath ){
     /*------------------------XML信息显示对象初始化--------------------------*/
     m_pXbelTree = new XbelTree(this);
     QStringList headerList;
-    headerList<<tr("名称")<<tr("位置");
+    headerList<<tr("参数名称")<<tr("参数值")<<tr("参数名称")<<tr("参数值")<<tr("参数名称")<<tr("参数值");
     m_pXbelTree->setHeaders(headerList);
     m_pXbelTree->read( strCfgFilePath );
     /*--------------------------------------------------------------------*/

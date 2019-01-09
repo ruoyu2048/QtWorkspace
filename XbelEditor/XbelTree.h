@@ -18,7 +18,7 @@ protected:
     virtual void parseUnitElement(const QDomElement &element,QTreeWidgetItem *parentItem = nullptr );
 
 protected slots:
-    void updateDomElement(QTreeWidgetItem *item, int column);
+    void updateDomElement(QTreeWidgetItem* pItem, int column);
 };
 
 #endif

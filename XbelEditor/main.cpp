@@ -4,7 +4,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    XbelEditor w(":/jennifer.xml");
+    XbelEditor w("./config/jennifer.xml");
     w.show();
 
     return a.exec();
