@@ -1,4 +1,4 @@
-#include "helloworld.h" 
+﻿#include "helloworld.h" 
 #include "helloworldwidget.h"
 
 
@@ -10,7 +10,7 @@ QString HelloWorld::name() const
 
 QString HelloWorld::iconPath() const
 {
-return "://HelloWorld.png";
+    return "://HelloWorld.png";
 }
 
 QWidget *HelloWorld::widget() const

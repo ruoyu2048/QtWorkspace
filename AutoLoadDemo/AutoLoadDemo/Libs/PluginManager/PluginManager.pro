@@ -27,7 +27,8 @@ SOURCES += \
 
 HEADERS += \
         PluginManager.h \
-    PluginInterFace.h
+    PluginInterface.h
+
 unix {
     target.path = /usr/lib
     INSTALLS += target

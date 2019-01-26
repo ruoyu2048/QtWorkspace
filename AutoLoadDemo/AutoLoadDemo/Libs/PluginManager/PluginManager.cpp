@@ -1,7 +1,7 @@
-#include <QDir>
+﻿#include <QDir>
 #include <QDebug>
 #include <QPluginLoader>
-#include "pluginmanager.h"
+#include "PluginManager.h"
 
 
 PluginManager::PluginManager(QObject *parent) :

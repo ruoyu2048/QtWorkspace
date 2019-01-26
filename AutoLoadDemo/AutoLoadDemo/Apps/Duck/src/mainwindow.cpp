@@ -25,7 +25,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::iniForm()
 {
-    setMinimumSize(QSize(1024,768));
+    this->showMaximized();
+    //setMinimumSize(QSize(1024,768));
     QObject::connect(ui->mainToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(actionTriggeredSlots(QAction* )));
 }
 
