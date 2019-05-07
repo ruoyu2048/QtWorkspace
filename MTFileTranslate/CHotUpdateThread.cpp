@@ -11,10 +11,10 @@ CHotUpdateThread::CHotUpdateThread(qintptr handle, QObject *parent):
     qRegisterMetaType<qintptr>("qintptr");
 }
 
-
 CHotUpdateThread::~CHotUpdateThread()
 {
-    //qDebug()<<m_handleId<<"stoped";
+    quit();
+    wait();
 }
 
 void CHotUpdateThread::run()
