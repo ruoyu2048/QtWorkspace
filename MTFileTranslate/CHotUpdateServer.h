@@ -10,9 +10,7 @@ class CHotUpdateServer : public QTcpServer
     Q_OBJECT
 public:
     explicit CHotUpdateServer(QObject* parent = nullptr);
-    explicit CHotUpdateServer(QString strIP,quint16 nPort,QObject* parent = nullptr);
-    bool startListen();
-    bool startListen(QString strIP,quint16 nPort);
+    bool startListen(QString strIP, quint16 nPort);
     bool stopListen();
     bool isStarted();
     void setToBeSendFile( QString strFile );

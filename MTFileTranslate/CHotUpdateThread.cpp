@@ -21,11 +21,12 @@ void CHotUpdateThread::run()
 {
     CHotUpdateClient* pClient = new CHotUpdateClient(m_handleId,nullptr);
     pClient->setHandleFlag(pClient->peerAddress().toString(),pClient->peerPort());
-    connect(pClient,SIGNAL(disconnected()),this,SLOT(quit()),Qt::DirectConnection);
-    connect(pClient,SIGNAL(disconnected()),this,SLOT(onDisconnected()),Qt::DirectConnection);
+    connect(pClient,SIGNAL(disconnected()),this,SLOT(quit()));
+    connect(pClient,SIGNAL(disconnected()),this,SLOT(onDisconnected()));
     //服务端发送文件信号
-    connect(this,SIGNAL(setToBeSendFile(QString)),pClient,SLOT(sendFile(QString)),Qt::DirectConnection);
-    connect(this,SIGNAL(toStopConnect()),pClient,SLOT(onStopConnect()),Qt::DirectConnection);
+    connect(this,SIGNAL(setToBeSendFile(QString)),pClient,SLOT(sendFile(QString)));
+    connect(this,SIGNAL(toStopConnect()),pClient,SLOT(onStopConnect()));
+
     exec();
 }
 

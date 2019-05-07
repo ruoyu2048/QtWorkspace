@@ -3,6 +3,23 @@
 #include <QHostAddress>
 #include <QDataStream>
 
+CHotUpdateClient::CHotUpdateClient(QObject *parent):
+    QTcpSocket(parent),
+    m_bIsNormalClient(true),
+    m_pTimer(nullptr),
+    m_bStarted(false),
+    m_nWriteTotalBytes(0),//发送文件总大小
+    m_nWriteBytesWritten(0),//已发送文件大小
+    m_nWriteBytesReady(0),//待发送数据大小
+    m_nReadTotalBytes(0),//接收文件总大小
+    m_nReadBytesRead(0),//接收送文件大小
+    m_nReadBytesReady(0),//待接收数据大小
+    m_nReadFileNameSize(0),
+    m_nPerDataSize(1024*1024)//1024K
+{
+    initHotUpdateClient();
+}
+
 CHotUpdateClient::CHotUpdateClient(qintptr handle, QObject *parent):
     QTcpSocket(parent),
     m_bIsNormalClient(false),
@@ -20,51 +37,10 @@ CHotUpdateClient::CHotUpdateClient(qintptr handle, QObject *parent):
     initHotUpdateClient(handle);
 }
 
-CHotUpdateClient::CHotUpdateClient(QObject *parent):
-    QTcpSocket(parent),
-    m_bIsNormalClient(true),
-    m_pTimer(nullptr),
-    m_bStarted(false),
-    m_nWriteTotalBytes(0),//发送文件总大小
-    m_nWriteBytesWritten(0),//已发送文件大小
-    m_nWriteBytesReady(0),//待发送数据大小
-    m_nReadTotalBytes(0),//接收文件总大小
-    m_nReadBytesRead(0),//接收送文件大小
-    m_nReadBytesReady(0),//待接收数据大小
-    m_nReadFileNameSize(0),
-    m_nPerDataSize(1024*1024)//1024K
-{
-    initHotUpdateClient();
-}
-CHotUpdateClient::CHotUpdateClient(QString strIP, quint16 nPort,QObject *parent):
-    QTcpSocket(parent),
-    m_bIsNormalClient(true),
-    m_pTimer(nullptr),
-    m_strIP(strIP),
-    m_nPort(nPort),
-    m_bStarted(false),
-    m_nWriteTotalBytes(0),//发送文件总大小
-    m_nWriteBytesWritten(0),//已发送文件大小
-    m_nWriteBytesReady(0),//待发送数据大小
-    m_nReadTotalBytes(0),//接收文件总大小
-    m_nReadBytesRead(0),//接收送文件大小
-    m_nReadBytesReady(0),//待接收数据大小
-    m_nReadFileNameSize(0),
-    m_nPerDataSize(1024*1024)//1024K
-{
-    initHotUpdateClient();
-}
-
 void CHotUpdateClient::setHandleFlag(QString strIP, quint16 nPort)
 {
     m_handleFlag.clear();
     m_handleFlag=QString("%1:%2").arg(strIP).arg(nPort);
-}
-
-void CHotUpdateClient::startClient()
-{
-    this->connectToHost(QHostAddress(m_strIP),m_nPort);
-    m_pTimer->start();
 }
 
 void CHotUpdateClient::startClient(QString strIP, quint16 nPort)

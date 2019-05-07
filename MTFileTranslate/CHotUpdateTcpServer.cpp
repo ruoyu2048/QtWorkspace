@@ -2,23 +2,7 @@
 
 CHotUpdateServer::CHotUpdateServer(QObject *parent):QTcpServer(parent)
 {
-
-}
-
-CHotUpdateServer::CHotUpdateServer(QString strIP, quint16 nPort, QObject *parent):
-    QTcpServer(parent),
-    m_strIP(strIP),
-    m_nPort(nPort)
-{
     qRegisterMetaType<qintptr>("qintptr");
-}
-
-bool CHotUpdateServer::startListen()
-{
-    if(!this->isListening() ){
-      return this->listen(QHostAddress(m_strIP),m_nPort);
-    }
-    return true;
 }
 
 bool CHotUpdateServer::startListen(QString strIP, quint16 nPort)

@@ -11,24 +11,16 @@ class CHotUpdateClient : public QTcpSocket
 public:
     ///
     /// \brief CHotUpdateClient
-    /// \param handle 套接字描述符
-    /// \param parent 父对象指针
-    ///
-    explicit CHotUpdateClient( qintptr handle, QObject *parent = nullptr );
-
-    ///
-    /// \brief CHotUpdateClient
     /// \param parent 父对象指针
     ///
     explicit CHotUpdateClient( QObject *parent = nullptr );
 
     ///
     /// \brief CHotUpdateClient
-    /// \param strIP 服务端IP
-    /// \param nPort 服务端口
+    /// \param handle 套接字描述符
     /// \param parent 父对象指针
     ///
-    explicit CHotUpdateClient( QString strIP,quint16 nPort,QObject *parent = nullptr );
+    explicit CHotUpdateClient( qintptr handle, QObject *parent = nullptr );
 
     ///
     /// \brief setHandleFlag
@@ -36,11 +28,6 @@ public:
     /// \param nPort 客户端口
     ///
     void setHandleFlag(QString strIP,quint16 nPort);
-
-    ///
-    /// \brief startClient 启动客户端
-    ///
-    void startClient();
 
     ///
     /// \brief startClient
