@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>config/connection_cfg_client.json</file>
-        <file>config/connection_cfg_serial.json</file>
-        <file>config/connection_cfg_server.json</file>
-        <file>config/connection_cfg_udp.json</file>
-    </qresource>
-</RCC>

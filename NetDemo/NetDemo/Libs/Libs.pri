@@ -1,4 +1,0 @@
-DLLDESTDIR=../
-OBJECTS_DIR=./objects
-DESTDIR=../
-INCLUDEPATH  += ./
