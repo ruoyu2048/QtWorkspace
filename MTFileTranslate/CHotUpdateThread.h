@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QTimer>
+#include "CHotUpdateEnumDef.h"
 
 class CHotUpdateThread : public QThread
 {
@@ -26,7 +27,7 @@ signals:
     void disconnected(qintptr handle);
 
     //供TCP Client对象使用
-    void setToBeSendFile(QString strFile);
+    void setToBeSendFile(QString strFile,SendType sendType);
 
     void stopRunning();
 

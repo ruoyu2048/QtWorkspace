@@ -3,6 +3,7 @@
 CHotUpdateServer::CHotUpdateServer(QObject *parent):QTcpServer(parent)
 {
     qRegisterMetaType<qintptr>("qintptr");
+    qRegisterMetaType<SendType>("SendType");
 }
 
 bool CHotUpdateServer::startListen(QString strIP, quint16 nPort)
@@ -31,9 +32,9 @@ bool CHotUpdateServer::isRunning()
     return false;
 }
 
-void CHotUpdateServer::sendFile(QString strFile)
+void CHotUpdateServer::sendFile(QString strFile, SendType sendType)
 {
-    emit tsSendFile(strFile);
+    emit tsSendFile(strFile,sendType);
 }
 
 void CHotUpdateServer::updateClientMap(qintptr handle)
@@ -43,7 +44,7 @@ void CHotUpdateServer::updateClientMap(qintptr handle)
         CHotUpdateThread* pThread = new CHotUpdateThread(handle,nullptr);
         connect(pThread,SIGNAL(disconnected(qintptr)),this,SLOT(newDisconnected(qintptr)));
         //设置待发送文件
-        connect(this,SIGNAL(tsSendFile(QString)),pThread,SIGNAL(setToBeSendFile(QString)));
+        connect(this,SIGNAL(tsSendFile(QString,SendType)),pThread,SIGNAL(setToBeSendFile(QString,SendType)));
         connect(this,SIGNAL(tsStopListen()),pThread,SIGNAL(stopRunning()));
         m_HotUpdateThreadMap.insert(handle,pThread);
         pThread->start();

@@ -24,7 +24,7 @@ void CHotUpdateThread::run()
     connect(pClient,SIGNAL(disconnected()),this,SLOT(quit()));
     connect(pClient,SIGNAL(disconnected()),this,SLOT(onDisconnected()));
     //服务端发送文件信号
-    connect(this,SIGNAL(setToBeSendFile(QString)),pClient,SLOT(sendFile(QString)));
+    connect(this,SIGNAL(setToBeSendFile(QString,SendType)),pClient,SLOT(sendFile(QString)));
     connect(this,SIGNAL(stopRunning()),pClient,SLOT(onStopConnect()));
 
     exec();

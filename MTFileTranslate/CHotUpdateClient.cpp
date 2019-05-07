@@ -2,6 +2,8 @@
 
 #include <QHostAddress>
 #include <QDataStream>
+#include <QBitArray>
+#include <QCryptographicHash>
 
 CHotUpdateClient::CHotUpdateClient(QObject *parent):
     QTcpSocket(parent),
@@ -104,32 +106,103 @@ void CHotUpdateClient::initHotUpdateClient(qintptr handle)
     connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
 }
 
-bool CHotUpdateClient::sendFile(QString strPath)
+bool CHotUpdateClient::sendOneFile(QString strFile)
 {
-    if( isRunning() ){
-        m_localSendFile.setFileName(strPath);
-        if( m_localSendFile.exists() ){
-            if( !m_localSendFile.open(QFile::ReadOnly) ){
-                return false;
-            }
-            //获取文件大小
-            m_nWriteTotalBytes = m_localSendFile.size();
-            QString strFileName=m_localSendFile.fileName().right(strPath.size()-strPath.lastIndexOf('/')-1);
-            QDataStream sendOut(&m_outBlock,QIODevice::WriteOnly);
-            sendOut.setVersion(QDataStream::Qt_5_9);
-            //保留文件总大小空间、文件名小大小空间、文件名
-            sendOut<<qint64(0)<<qint64(0)<<strFileName;
-            m_nWriteTotalBytes+=m_outBlock.size();
-            sendOut.device()->seek(0);
-            //文件信息大小=文件总大小空间+文件名大小空间
-            qint64 nFileInfoSize=static_cast<qint64>(sizeof(qint64)*2);
-            qint64 nFileNameSize=static_cast<qint64>(m_outBlock.size()-nFileInfoSize);
-            sendOut<<m_nWriteTotalBytes<<nFileNameSize;
-            m_nWriteBytesReady=m_nWriteTotalBytes-this->write(m_outBlock);
-            m_outBlock.resize(0);
+    if( m_localSendFile.isOpen() ){
+        m_localSendFile.close();
+    }
+
+    m_localSendFile.setFileName(strFile);
+    if( m_localSendFile.exists() ){
+        if( !m_localSendFile.open(QFile::ReadOnly) ){
+            return false;
+        }
+        //获取文件大小
+        m_nWriteTotalBytes = m_localSendFile.size();
+        QString strFileName=m_localSendFile.fileName().right(strFile.size()-strFile.lastIndexOf('/')-1);
+        QDataStream sendOut(&m_outBlock,QIODevice::WriteOnly);
+        sendOut.setVersion(QDataStream::Qt_5_9);
+        //保留文件总大小空间、文件名小大小空间、文件名
+        sendOut<<qint64(0)<<qint64(0)<<strFileName;
+        m_nWriteTotalBytes+=m_outBlock.size();
+        sendOut.device()->seek(0);
+        //文件信息大小=文件总大小空间+文件名大小空间
+        qint64 nFileInfoSize=static_cast<qint64>(sizeof(qint64)*2);
+        qint64 nFileNameSize=static_cast<qint64>(m_outBlock.size()-nFileInfoSize);
+        sendOut<<m_nWriteTotalBytes<<nFileNameSize;
+        m_nWriteBytesReady=m_nWriteTotalBytes-this->write(m_outBlock);
+        m_outBlock.resize(0);
+    }
+
+    return true;
+}
+
+bool CHotUpdateClient::sendOneDir(QString strDir)
+{
+
+    return true;
+}
+
+QByteArray CHotUpdateClient::GetFileMD5(QString strFilePath)
+{
+    QFile file(strFilePath);
+    if(!file.exists())
+        return QByteArray();
+    if(!file.open(QIODevice::ReadOnly))
+        return QByteArray();
+
+    quint64 bytesHadWritten = 0;
+    quint64 bytesReadyLoad = 1024*1024;
+    quint64 bytesTotal = file.size();
+    quint64 bytesToWrite = bytesTotal;
+    QCryptographicHash ch(QCryptographicHash::Md5);
+
+    while(1)
+    {
+        if(bytesToWrite > 0)
+        {
+            QByteArray readBuf = file.read(qMin(bytesToWrite,bytesReadyLoad));
+            ch.addData(readBuf);
+            bytesHadWritten += readBuf.length();
+            bytesToWrite -= readBuf.length();
+        }
+        else
+        {
+            break;
         }
 
-        return true;
+        if(bytesHadWritten == bytesTotal)
+            break;
+    }
+    file.close();
+    QByteArray md5 = ch.result();
+
+    return md5;
+}
+
+QByteArray CHotUpdateClient::GetSmallFileMD5(QString strFilePath)
+{
+    QFile file(strFilePath);
+    if(!file.exists())
+        return QByteArray();
+    file.open(QIODevice::ReadOnly);
+    QByteArray ba = QCryptographicHash::hash(file.readAll(),QCryptographicHash::Md5);
+    file.close();
+    return ba;
+}
+
+bool CHotUpdateClient::sendFile(QString strPath,SendType sendType)
+{
+    if( isRunning() ){
+        if( SendType::File==sendType ){
+            return sendOneFile(strPath);
+        }
+        else if( SendType::Dir==sendType ) {
+            return sendOneDir(strPath);
+        }
+        else if( SendType::Configure==sendType ){
+
+        }
     }
     else{
         qDebug()<<"Have not connected to Host!!!";
@@ -176,6 +249,9 @@ void CHotUpdateClient::onReadyRead()
             QString strRcvFileName;
             inFile>>strRcvFileName;
             m_nReadBytesRead += m_nReadFileNameSize;
+            if( m_localRecvFile.isOpen() ){
+                m_localRecvFile.close();
+            }
             m_localRecvFile.setFileName(strRcvFileName);
             if( !m_localRecvFile.open(QFile::WriteOnly) ){
 

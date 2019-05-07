@@ -35,7 +35,8 @@ HEADERS += \
         MTFileTranslate.h \
         CHotUpdateClient.h \
         CHotUpdateServer.h \
-        CHotUpdateThread.h
+        CHotUpdateThread.h \
+        CHotUpdateEnumDef.h
 
 FORMS += \
         MTFileTranslate.ui

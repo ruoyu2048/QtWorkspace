@@ -4,6 +4,17 @@
 #include <QTcpSocket>
 #include <QTimer>
 #include <QFile>
+#include <CHotUpdateEnumDef.h>
+
+struct FileInfo{
+    quint64 nFileSzie;  //文件大小
+    char cFileName[256];//文件名称
+    char cFilePath[256];//文件路径
+    char cMD5[64];      //MD5码
+    FileInfo(){
+        memset(&nFileSzie,0,sizeof (FileInfo));
+    }
+};
 
 class CHotUpdateClient : public QTcpSocket
 {
@@ -53,6 +64,12 @@ private:
     void initHotUpdateClient();
     void initHotUpdateClient( qintptr handle );
 
+    bool sendOneFile(QString strFile);
+    bool sendOneDir(QString strDir);
+
+    QByteArray GetFileMD5(QString strFilePath);
+    QByteArray GetSmallFileMD5(QString strFilePath);
+
 signals:
     //普通客户端使用
     void updateSendProcess(double fSendProcess);
@@ -68,7 +85,7 @@ public slots:
     /// \param strPath 发送文件路径
     /// \return 打开文件成功返回true，否则返回false
     ///
-    bool sendFile(QString strPath);
+    bool sendFile(QString strPath,SendType sendType=SendType::File);
 
     ///
     /// \brief onStopConnect 断开客户端与服务端的连接

@@ -4,6 +4,7 @@
 #include <QTcpServer>
 #include "CHotUpdateThread.h"
 #include "CHotUpdateClient.h"
+#include "CHotUpdateEnumDef.h"
 
 class CHotUpdateServer : public QTcpServer
 {
@@ -33,8 +34,9 @@ public:
     ///
     /// \brief sendFile 发送文件
     /// \param strFile 文件路径
+    /// \param sendType 发送文件类型
     ///
-    void sendFile( QString strFile );
+    void sendFile( QString strFile,SendType sendType=SendType::File);
 
 private:
     void updateClientMap(qintptr handle);
@@ -46,7 +48,7 @@ signals:
     //服务端停止监听信息(ts=Tcp Server)
     void tsStopListen();
     //服务端发送文件
-    void tsSendFile(QString strFile);
+    void tsSendFile(QString strFile,SendType sendType);
 
 public slots:
     void newDisconnected( qintptr handle );
