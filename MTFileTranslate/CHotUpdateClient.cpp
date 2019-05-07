@@ -7,7 +7,7 @@ CHotUpdateClient::CHotUpdateClient(QObject *parent):
     QTcpSocket(parent),
     m_bIsNormalClient(true),
     m_pTimer(nullptr),
-    m_bStarted(false),
+    m_bIsRunning(false),
     m_nWriteTotalBytes(0),//发送文件总大小
     m_nWriteBytesWritten(0),//已发送文件大小
     m_nWriteBytesReady(0),//待发送数据大小
@@ -23,7 +23,7 @@ CHotUpdateClient::CHotUpdateClient(QObject *parent):
 CHotUpdateClient::CHotUpdateClient(qintptr handle, QObject *parent):
     QTcpSocket(parent),
     m_bIsNormalClient(false),
-    m_bStarted(true),
+    m_bIsRunning(true),
     m_nWriteTotalBytes(0),//发送文件总大小
     m_nWriteBytesWritten(0),//已发送文件大小
     m_nWriteBytesReady(0),//待发送数据大小
@@ -54,14 +54,16 @@ void CHotUpdateClient::startClient(QString strIP, quint16 nPort)
 void CHotUpdateClient::stopClient()
 {
     this->disconnectFromHost();
-    if( m_pTimer->isActive() ){
-        m_pTimer->stop();
+    if( m_bIsNormalClient ){
+        if( m_pTimer->isActive() ){
+            m_pTimer->stop();
+        }
     }
 }
 
-bool CHotUpdateClient::isStarted()
+bool CHotUpdateClient::isRunning()
 {
-    return m_bStarted;
+    return m_bIsRunning;
 }
 
 void CHotUpdateClient::resetReadVariables()
@@ -87,8 +89,6 @@ void CHotUpdateClient::initHotUpdateClient()
 
     connect(this,SIGNAL(connected()),this,SLOT(onConnected()));
     connect(this,SIGNAL(disconnected()),this,SLOT(onDisconnected()));
-    connect(this,SIGNAL(connected()),this,SIGNAL(thisStarted()));
-    connect(this,SIGNAL(disconnected()),this,SIGNAL(thisStoped()));
 
     connect(this,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
     connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
@@ -99,8 +99,6 @@ void CHotUpdateClient::initHotUpdateClient(qintptr handle)
     this->setSocketDescriptor(handle);
     connect(this,SIGNAL(connected()),this,SLOT(onConnected()));
     connect(this,SIGNAL(disconnected()),this,SLOT(onDisconnected()));
-    connect(this,SIGNAL(connected()),this,SIGNAL(thisStarted()));
-    connect(this,SIGNAL(disconnected()),this,SIGNAL(thisStoped()));
 
     connect(this,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
     connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
@@ -108,7 +106,7 @@ void CHotUpdateClient::initHotUpdateClient(qintptr handle)
 
 bool CHotUpdateClient::sendFile(QString strPath)
 {
-    if( isStarted() ){
+    if( isRunning() ){
         m_localSendFile.setFileName(strPath);
         if( m_localSendFile.exists() ){
             if( !m_localSendFile.open(QFile::ReadOnly) ){
@@ -142,17 +140,12 @@ bool CHotUpdateClient::sendFile(QString strPath)
 
 void CHotUpdateClient::onStopConnect()
 {
-    this->close();
-}
-
-void CHotUpdateClient::onReadyWrite(QByteArray &sendAry)
-{
-    this->write(sendAry);
+    stopClient();
 }
 
 void CHotUpdateClient::onConnected()
 {
-    m_bStarted=true;
+    m_bIsRunning=true;
     if( m_pTimer->isActive() ){
         m_pTimer->stop();
     }
@@ -160,7 +153,7 @@ void CHotUpdateClient::onConnected()
 
 void CHotUpdateClient::onDisconnected()
 {
-    m_bStarted=false;
+    m_bIsRunning=false;
 }
 
 void CHotUpdateClient::onReconnect()

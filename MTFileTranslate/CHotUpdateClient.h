@@ -42,10 +42,10 @@ public:
     void stopClient();
 
     ///
-    /// \brief isStarted 客户端是否启动
+    /// \brief isRunning 客户端是否启动
     /// \return 启动返回true，投资返回false
     ///
-    bool isStarted();
+    bool isRunning();
 
 private:
     void resetReadVariables();
@@ -54,33 +54,37 @@ private:
     void initHotUpdateClient( qintptr handle );
 
 signals:
-    void thisStarted();
-    void thisStoped();
+    //普通客户端使用
     void updateSendProcess(double fSendProcess);
     void updateReceiveProcess( double fRecvProcess);
 
+    //服务端的客户端对象使用
     void updateSendProcess(QString strHandleFlag,double fSendProcess);
     void updateReceiveProcess(QString strHandleFlag,double fRecvProcess);
 
 public slots:
     ///
-    /// \brief sendFile
-    /// \param strPath
-    /// \return
+    /// \brief sendFile 发送文件槽函数
+    /// \param strPath 发送文件路径
+    /// \return 打开文件成功返回true，否则返回false
     ///
     bool sendFile(QString strPath);
 
+    ///
+    /// \brief onStopConnect 断开客户端与服务端的连接
+    ///
     void onStopConnect();
 
-    void onReadyWrite(QByteArray &sendAry);
-
 private slots:
+    //已连接
     void onConnected();
+    //断开连接
     void onDisconnected();
+    //定时重连
     void onReconnect();
-
+    //读取数据
     void onReadyRead();
-
+    //发送数据
     void onUpdateWritten(qint64 nBytesWritten);
 
 private:
@@ -92,7 +96,7 @@ private:
     QTimer* m_pTimer;
     QString m_strIP;
     quint16 m_nPort;
-    bool    m_bStarted;
+    bool    m_bIsRunning;
 
     QFile   m_localSendFile;
     qint64  m_nWriteTotalBytes;//发送文件总大小

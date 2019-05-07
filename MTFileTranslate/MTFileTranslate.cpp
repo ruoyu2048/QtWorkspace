@@ -10,8 +10,8 @@ MTFileTranslate::MTFileTranslate(QWidget *parent) :
 
     pS = new CHotUpdateServer(this);
     pC = new CHotUpdateClient(this);
-    connect(pC,SIGNAL(thisStarted()),this,SLOT(onClientConnected()));
-    connect(pC,SIGNAL(thisStoped()),this,SLOT(onClientDisconnected()));
+    connect(pC,SIGNAL(connected()),this,SLOT(onClientConnected()));
+    connect(pC,SIGNAL(disconnected()),this,SLOT(onClientDisconnected()));
     connect(pC,SIGNAL(updateSendProcess(double)),this,SLOT(onUpdateSendProcess(double)));
     connect(pC,SIGNAL(updateReceiveProcess(double)),this,SLOT(onUpdateReceiveProcess(double)));
 }
@@ -46,7 +46,7 @@ void MTFileTranslate::onUpdateReceiveProcess(double fRecvProcess)
 
 void MTFileTranslate::on_btnStartServer_clicked()
 {
-    if( !pS->isStarted() ){
+    if( !pS->isRunning() ){
         quint16 nPort=static_cast<quint16>(ui->lePS->text().toInt());
         if(pS->startListen(ui->leIPS->text(),nPort)){
             ui->btnStartServer->setText("关闭服务");
@@ -61,7 +61,7 @@ void MTFileTranslate::on_btnStartServer_clicked()
 
 void MTFileTranslate::on_btnStartClient_clicked()
 {
-    if( !pC->isStarted() ){
+    if( !pC->isRunning() ){
         quint16 nPort=static_cast<quint16>(ui->lePS->text().toInt());
         pC->startClient(ui->leIPS->text(),nPort);
         ui->btnStartClient->setEnabled(false);
@@ -91,6 +91,6 @@ void MTFileTranslate::on_btnSelectS_clicked()
     else{
         QString sss=QFileDialog::getOpenFileName(this,"Open a file","/","files (*)");
         ui->lePathS->setText(sss);
-        pS->setToBeSendFile(sss);
+        pS->sendFile(sss);
     }
 }

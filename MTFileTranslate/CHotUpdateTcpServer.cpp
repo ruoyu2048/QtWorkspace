@@ -8,9 +8,7 @@ CHotUpdateServer::CHotUpdateServer(QObject *parent):QTcpServer(parent)
 bool CHotUpdateServer::startListen(QString strIP, quint16 nPort)
 {
     if(!this->isListening() ){
-      m_strIP=strIP;
-      m_nPort=nPort;
-      return this->listen(QHostAddress(m_strIP),m_nPort);
+      return this->listen(QHostAddress(strIP),nPort);
     }
     return true;
 }
@@ -18,13 +16,13 @@ bool CHotUpdateServer::startListen(QString strIP, quint16 nPort)
 bool CHotUpdateServer::stopListen()
 {
     if( this->isListening() ){
-        emit toStopListen();
+        emit tsStopListen();
         this->close();
     }
     return true;
 }
 
-bool CHotUpdateServer::isStarted()
+bool CHotUpdateServer::isRunning()
 {
     if( this->isListening() ){
         return true;
@@ -33,21 +31,21 @@ bool CHotUpdateServer::isStarted()
     return false;
 }
 
-void CHotUpdateServer::setToBeSendFile(QString strFile)
+void CHotUpdateServer::sendFile(QString strFile)
 {
-    emit toBeSendFile(strFile);
+    emit tsSendFile(strFile);
 }
 
 void CHotUpdateServer::updateClientMap(qintptr handle)
 {
-    auto it=m_HotUpdateMap.find(handle);
-    if( it==m_HotUpdateMap.end() ){
+    auto it=m_HotUpdateThreadMap.find(handle);
+    if( it==m_HotUpdateThreadMap.end() ){
         CHotUpdateThread* pThread = new CHotUpdateThread(handle,nullptr);
         connect(pThread,SIGNAL(disconnected(qintptr)),this,SLOT(newDisconnected(qintptr)));
         //设置待发送文件
-        connect(this,SIGNAL(toBeSendFile(QString)),pThread,SIGNAL(setToBeSendFile(QString)));
-        connect(this,SIGNAL(toStopListen()),pThread,SIGNAL(toStopConnect()));
-        m_HotUpdateMap.insert(handle,pThread);
+        connect(this,SIGNAL(tsSendFile(QString)),pThread,SIGNAL(setToBeSendFile(QString)));
+        connect(this,SIGNAL(tsStopListen()),pThread,SIGNAL(stopRunning()));
+        m_HotUpdateThreadMap.insert(handle,pThread);
         pThread->start();
         if( pThread->isRunning() ){
             qDebug()<<"new incomingConnection"<<handle;
@@ -62,9 +60,9 @@ void CHotUpdateServer::incomingConnection(qintptr handle)
 
 void CHotUpdateServer::newDisconnected( qintptr handle )
 {
-    auto it=m_HotUpdateMap.find(handle);
-    if( it!=m_HotUpdateMap.end() ){
+    auto it=m_HotUpdateThreadMap.find(handle);
+    if( it!=m_HotUpdateThreadMap.end() ){
         qDebug()<<"new Disconnected"<<handle;
-        m_HotUpdateMap.erase(it);
+        m_HotUpdateThreadMap.erase(it);
     }
 }

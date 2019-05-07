@@ -25,12 +25,12 @@ signals:
     //供TCPServer使用
     void disconnected(qintptr handle);
 
+    //供TCP Client对象使用
     void setToBeSendFile(QString strFile);
 
-    void toStopConnect();
+    void stopRunning();
 
 public slots:
-
 
 private slots:
     void onDisconnected();
