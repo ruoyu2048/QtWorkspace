@@ -14,7 +14,7 @@ CHotUpdateThread::CHotUpdateThread(qintptr handle, QObject *parent):
 
 CHotUpdateThread::~CHotUpdateThread()
 {
-
+    //qDebug()<<m_handleId<<"stoped";
 }
 
 void CHotUpdateThread::run()

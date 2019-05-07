@@ -62,7 +62,9 @@ void CHotUpdateServer::newDisconnected( qintptr handle )
 {
     auto it=m_HotUpdateThreadMap.find(handle);
     if( it!=m_HotUpdateThreadMap.end() ){
-        qDebug()<<"new Disconnected"<<handle;
+        delete it.value();
+        it.value()=nullptr;
         m_HotUpdateThreadMap.erase(it);
+        qDebug()<<"new Disconnected"<<handle<<m_HotUpdateThreadMap.size();
     }
 }
