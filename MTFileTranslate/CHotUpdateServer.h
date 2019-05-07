@@ -15,12 +15,17 @@ public:
     bool startListen(QString strIP,quint16 nPort);
     bool stopListen();
     bool isStarted();
+    void setToBeSendFile( QString strFile );
 
 private:
     void updateClientMap(qintptr handle);
 
 protected:
     void incomingConnection(qintptr handle);
+
+signals:
+    void toStopListen();
+    void toBeSendFile(QString strFile);
 
 public slots:
     void newDisconnected( qintptr handle );

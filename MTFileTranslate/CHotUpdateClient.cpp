@@ -14,7 +14,7 @@ CHotUpdateClient::CHotUpdateClient(qintptr handle, QObject *parent):
     m_nReadBytesRead(0),//接收送文件大小
     m_nReadBytesReady(0),//待接收数据大小
     m_nReadFileNameSize(0),
-    m_nPerDataSize(1024*512),//512K
+    m_nPerDataSize(1024*1024),//1024K
     m_handleId(handle)
 {
     initHotUpdateClient(handle);
@@ -32,7 +32,7 @@ CHotUpdateClient::CHotUpdateClient(QObject *parent):
     m_nReadBytesRead(0),//接收送文件大小
     m_nReadBytesReady(0),//待接收数据大小
     m_nReadFileNameSize(0),
-    m_nPerDataSize(1024*512)//512K
+    m_nPerDataSize(1024*1024)//1024K
 {
     initHotUpdateClient();
 }
@@ -50,7 +50,7 @@ CHotUpdateClient::CHotUpdateClient(QString strIP, quint16 nPort,QObject *parent)
     m_nReadBytesRead(0),//接收送文件大小
     m_nReadBytesReady(0),//待接收数据大小
     m_nReadFileNameSize(0),
-    m_nPerDataSize(1024*512)//512K
+    m_nPerDataSize(1024*1024)//1024K
 {
     initHotUpdateClient();
 }
@@ -86,37 +86,6 @@ void CHotUpdateClient::stopClient()
 bool CHotUpdateClient::isStarted()
 {
     return m_bStarted;
-}
-
-bool CHotUpdateClient::sendFile(QString strPath)
-{
-    if( isStarted() ){
-        m_localSendFile.setFileName(strPath);
-        if( m_localSendFile.exists() ){
-            if( !m_localSendFile.open(QFile::ReadOnly) ){
-                return false;
-            }
-            //获取文件大小
-            m_nWriteTotalBytes = m_localSendFile.size();
-            QString strFileName=m_localSendFile.fileName().right(strPath.size()-strPath.lastIndexOf('/')-1);
-            QDataStream sendOut(&m_outBlock,QIODevice::WriteOnly);
-            sendOut.setVersion(QDataStream::Qt_5_9);
-            //保留文件总大小空间、文件名小大小空间、文件名
-            sendOut<<qint64(0)<<qint64(0)<<strFileName;
-            m_nWriteTotalBytes+=m_outBlock.size();
-            sendOut.device()->seek(0);
-            sendOut<<m_nWriteTotalBytes<<qint64( (m_outBlock.size()-(sizeof(qint64)*2)) );
-            m_nWriteBytesReady=m_nWriteTotalBytes-this->write(m_outBlock);
-            m_outBlock.resize(0);
-        }
-
-        return true;
-    }
-    else{
-        qDebug()<<"Have not connected to Host!!!";
-    }
-
-    return false;
 }
 
 void CHotUpdateClient::resetReadVariables()
@@ -161,6 +130,45 @@ void CHotUpdateClient::initHotUpdateClient(qintptr handle)
     connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
 }
 
+bool CHotUpdateClient::sendFile(QString strPath)
+{
+    if( isStarted() ){
+        m_localSendFile.setFileName(strPath);
+        if( m_localSendFile.exists() ){
+            if( !m_localSendFile.open(QFile::ReadOnly) ){
+                return false;
+            }
+            //获取文件大小
+            m_nWriteTotalBytes = m_localSendFile.size();
+            QString strFileName=m_localSendFile.fileName().right(strPath.size()-strPath.lastIndexOf('/')-1);
+            QDataStream sendOut(&m_outBlock,QIODevice::WriteOnly);
+            sendOut.setVersion(QDataStream::Qt_5_9);
+            //保留文件总大小空间、文件名小大小空间、文件名
+            sendOut<<qint64(0)<<qint64(0)<<strFileName;
+            m_nWriteTotalBytes+=m_outBlock.size();
+            sendOut.device()->seek(0);
+            //文件信息大小=文件总大小空间+文件名大小空间
+            qint64 nFileInfoSize=static_cast<qint64>(sizeof(qint64)*2);
+            qint64 nFileNameSize=static_cast<qint64>(m_outBlock.size()-nFileInfoSize);
+            sendOut<<m_nWriteTotalBytes<<nFileNameSize;
+            m_nWriteBytesReady=m_nWriteTotalBytes-this->write(m_outBlock);
+            m_outBlock.resize(0);
+        }
+
+        return true;
+    }
+    else{
+        qDebug()<<"Have not connected to Host!!!";
+    }
+
+    return false;
+}
+
+void CHotUpdateClient::onStopConnect()
+{
+    this->close();
+}
+
 void CHotUpdateClient::onReadyWrite(QByteArray &sendAry)
 {
     this->write(sendAry);
@@ -189,10 +197,11 @@ void CHotUpdateClient::onReadyRead()
     QDataStream inFile(this);
     inFile.setVersion(QDataStream::Qt_5_9);
 
-    if( m_nReadBytesRead <= (qint64)(sizeof(qint64)*2) ){
-        if( this->bytesAvailable()>=(qint64)(sizeof(qint64)*2) && 0==m_nReadFileNameSize ){
+    qint64 nFileInfoSize=static_cast<qint64>(sizeof(qint64)*2);
+    if( m_nReadBytesRead <= nFileInfoSize ){
+        if( this->bytesAvailable()>=nFileInfoSize && 0==m_nReadFileNameSize ){
             inFile>>m_nReadTotalBytes>>m_nReadFileNameSize;
-            m_nReadBytesRead += sizeof(qint64)*2;
+            m_nReadBytesRead += nFileInfoSize;
         }
         if( this->bytesAvailable()>=m_nReadFileNameSize && 0!=m_nReadFileNameSize ){
             QString strRcvFileName;

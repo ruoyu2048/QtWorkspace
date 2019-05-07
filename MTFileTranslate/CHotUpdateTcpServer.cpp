@@ -34,6 +34,7 @@ bool CHotUpdateServer::startListen(QString strIP, quint16 nPort)
 bool CHotUpdateServer::stopListen()
 {
     if( this->isListening() ){
+        emit toStopListen();
         this->close();
     }
     return true;
@@ -48,12 +49,20 @@ bool CHotUpdateServer::isStarted()
     return false;
 }
 
+void CHotUpdateServer::setToBeSendFile(QString strFile)
+{
+    emit toBeSendFile(strFile);
+}
+
 void CHotUpdateServer::updateClientMap(qintptr handle)
 {
     auto it=m_HotUpdateMap.find(handle);
     if( it==m_HotUpdateMap.end() ){
         CHotUpdateThread* pThread = new CHotUpdateThread(handle,nullptr);
         connect(pThread,SIGNAL(disconnected(qintptr)),this,SLOT(newDisconnected(qintptr)));
+        //设置待发送文件
+        connect(this,SIGNAL(toBeSendFile(QString)),pThread,SIGNAL(setToBeSendFile(QString)));
+        connect(this,SIGNAL(toStopListen()),pThread,SIGNAL(toStopConnect()));
         m_HotUpdateMap.insert(handle,pThread);
         pThread->start();
         if( pThread->isRunning() ){

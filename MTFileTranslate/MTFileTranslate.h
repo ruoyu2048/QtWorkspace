@@ -31,6 +31,8 @@ private slots:
 
     void on_btnSelectC_clicked();
 
+    void on_btnSelectS_clicked();
+
 private:
     Ui::MTFileTranslate *ui;
 

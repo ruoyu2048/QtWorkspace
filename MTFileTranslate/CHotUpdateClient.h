@@ -60,13 +60,6 @@ public:
     ///
     bool isStarted();
 
-    ///
-    /// \brief sendFile
-    /// \param strPath
-    /// \return
-    ///
-    bool sendFile(QString strPath);
-
 private:
     void resetReadVariables();
     void resetWriteVariables();
@@ -83,6 +76,15 @@ signals:
     void updateReceiveProcess(QString strHandleFlag,double fRecvProcess);
 
 public slots:
+    ///
+    /// \brief sendFile
+    /// \param strPath
+    /// \return
+    ///
+    bool sendFile(QString strPath);
+
+    void onStopConnect();
+
     void onReadyWrite(QByteArray &sendAry);
 
 private slots:

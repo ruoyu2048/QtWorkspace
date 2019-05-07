@@ -82,3 +82,15 @@ void MTFileTranslate::on_btnSelectC_clicked()
         pC->sendFile(sss);
     }
 }
+
+void MTFileTranslate::on_btnSelectS_clicked()
+{
+    if( ui->cbS->isChecked() ){
+
+    }
+    else{
+        QString sss=QFileDialog::getOpenFileName(this,"Open a file","/","files (*)");
+        ui->lePathS->setText(sss);
+        pS->setToBeSendFile(sss);
+    }
+}

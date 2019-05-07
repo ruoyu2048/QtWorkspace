@@ -25,6 +25,10 @@ signals:
     //供TCPServer使用
     void disconnected(qintptr handle);
 
+    void setToBeSendFile(QString strFile);
+
+    void toStopConnect();
+
 public slots:
 
 
