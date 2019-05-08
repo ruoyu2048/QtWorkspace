@@ -6,13 +6,15 @@
 #include <QFile>
 #include <CHotUpdateEnumDef.h>
 
-struct FileInfo{
-    quint64 nFileSzie;  //文件大小
-    char cFileName[256];//文件名称
-    char cFilePath[256];//文件路径
-    char cMD5[64];      //MD5码
-    FileInfo(){
-        memset(&nFileSzie,0,sizeof (FileInfo));
+struct FileTransferInfo{//文件传输信息
+    TransferState ts;
+    quint64 nFileSzie;      //文件大小
+    char cFileName[128];    //文件名称
+    char cFileSrcPath[256]; //文件路径
+    char cFileDstPath[256]; //文件路径
+    char cMD5[64];          //MD5码
+    FileTransferInfo(){
+        memset(&ts,0,sizeof (FileTransferInfo));
     }
 };
 

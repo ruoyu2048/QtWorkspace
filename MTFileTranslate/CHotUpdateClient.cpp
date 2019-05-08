@@ -4,6 +4,7 @@
 #include <QDataStream>
 #include <QBitArray>
 #include <QCryptographicHash>
+#include <QFileInfo>
 
 CHotUpdateClient::CHotUpdateClient(QObject *parent):
     QTcpSocket(parent),
@@ -193,15 +194,23 @@ QByteArray CHotUpdateClient::GetSmallFileMD5(QString strFilePath)
 
 bool CHotUpdateClient::sendFile(QString strPath,SendType sendType)
 {
+    if( strPath.size()>255 ){
+        qDebug()<<"The maximum length of the file path is 255 bytes. Please reset the file path!";
+        return false;
+    }
     if( isRunning() ){
-        if( SendType::File==sendType ){
-            return sendOneFile(strPath);
-        }
-        else if( SendType::Dir==sendType ) {
-            return sendOneDir(strPath);
-        }
-        else if( SendType::Configure==sendType ){
+        QFileInfo fileInfo(strPath);
+        if( fileInfo.isFile() ){
+            //配置文件
+            if( SendType::Configure==sendType ){
 
+            }
+            else{//普通文件
+                return sendOneFile(strPath);
+            }
+        }
+        else if( fileInfo.isDir() ){
+            return sendOneDir(strPath);
         }
     }
     else{
