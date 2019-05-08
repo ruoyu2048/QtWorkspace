@@ -72,6 +72,7 @@ bool CHotUpdateClient::isRunning()
 
 void CHotUpdateClient::resetReadVariables()
 {
+    m_inBlock.resize(0);
     m_nReadTotalBytes=(0);//接收文件总大小
     m_nReadBytesRead=(0);//接收送文件大小
     //m_nReadBytesReady=(0);//待接收数据大小
@@ -80,6 +81,7 @@ void CHotUpdateClient::resetReadVariables()
 
 void CHotUpdateClient::resetWriteVariables()
 {
+    m_outBlock.resize(0);
     m_nWriteTotalBytes=(0);//发送文件总大小
     m_nWriteBytesWritten=(0);//已发送文件大小
     m_nWriteBytesReady=(0);//待发送数据大小
@@ -164,7 +166,7 @@ bool CHotUpdateClient::sendOneDir(QString strDirPath)
            fti.nFileSzie = nFTISize+fileInfo.size();
            sprintf(fti.cFileName,"%s",fileInfo.fileName().toStdString().c_str());
            sprintf(fti.cFileSrcPath,"%s",fileInfo.filePath().toStdString().c_str());
-           sprintf(fti.cFileDstPath,"./%s",dir.dirName().toStdString().c_str());
+           sprintf(fti.cFileDstPath,"/%s",dir.dirName().toStdString().c_str());
            sprintf(fti.cMD5,"%s",getFileMD5(fileInfo.filePath()).toHex().constData());
 
            m_fileTransferInfoList.push_back(fti);
@@ -275,21 +277,24 @@ void CHotUpdateClient::onStopConnect()
 void CHotUpdateClient::onLoopSend()
 {
     if( m_fileTransferInfoList.size()>0 ){
-        FileTransferInfo fti=m_fileTransferInfoList.first();
+        m_fileTransferInfoSend=m_fileTransferInfoList.first();
         m_fileTransferInfoList.pop_front();
         if( m_localSendFile.isOpen() ){
             m_localSendFile.close();
         }
-        QString strFile(fti.cFileSrcPath);
+        QString strFile(m_fileTransferInfoSend.cFileSrcPath);
         m_localSendFile.setFileName(strFile);
         if( m_localSendFile.exists() ){
             if( !m_localSendFile.open(QFile::ReadOnly) ){
                 qDebug()<<strFile<<"Opened failed!";
                 return;
             }
-            m_nWriteTotalBytes = fti.nFileSzie;//文件信息大小+文件实际大小
+            //连接写入信号槽
+            connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
+            resetWriteVariables();//重置发送端变量
+            m_nWriteTotalBytes = m_fileTransferInfoSend.nFileSzie;//文件信息大小+文件实际大小
             m_outBlock.resize(sizeof(FileTransferInfo));
-            memcpy(m_outBlock.data(),&fti,sizeof(FileTransferInfo));
+            memcpy(m_outBlock.data(),&m_fileTransferInfoSend,sizeof(FileTransferInfo));
             m_nWriteBytesReady=m_nWriteTotalBytes-this->write(m_outBlock);
             m_outBlock.resize(0);
         }
@@ -322,26 +327,43 @@ void CHotUpdateClient::onReadyRead()
         if( m_nReadBytesRead==0 && this->bytesAvailable()>=nFileTransInfoSz ){
             m_inBlock=this->read(nFileTransInfoSz);
             memcpy(&m_fileTransferInfoRecv,m_inBlock.data(),sizeof(FileTransferInfo));
-            m_nReadBytesRead += nFileTransInfoSz;
             m_inBlock.resize(0);
+            //接收端
             if( TransferState::Start==m_fileTransferInfoRecv.transferState ){
+                resetReadVariables();//重置接收端相关变量
+                m_nReadBytesRead += nFileTransInfoSz;
                 m_nReadTotalBytes = m_fileTransferInfoRecv.nFileSzie;
-                //比对MD5值，如果一致，则终止下载
-                QString strFileName(m_fileTransferInfoRecv.cFileName);
-                QString strDstDir(m_fileTransferInfoRecv.cFileDstPath);
-                QDir dstDir(strDstDir);
-                if( !dstDir.exists() ){
-                    dstDir.mkpath(strDstDir);
-                }
-                if( m_localRecvFile.isOpen() ){
-                    m_localRecvFile.close();
-                }
-                m_localRecvFile.setFileName(strDstDir+"/"+strFileName);
-                if( !m_localRecvFile.open(QFile::WriteOnly) ){
 
-                    return;
+                QDir dstDir;
+                QString strDstDir(m_fileTransferInfoRecv.cFileDstPath);
+                QString strAbsDirPath=dstDir.absolutePath()+strDstDir;
+
+                QString strFileName(m_fileTransferInfoRecv.cFileName);
+                QString strAbsFilePath=strAbsDirPath+"/"+strFileName;
+                //比对MD5值，如果一致，则终止下载
+                QByteArray localMD5=getFileMD5(strFileName).toHex();
+                if( localMD5.isEmpty() || 0!=strcmp(m_fileTransferInfoRecv.cMD5,localMD5.constData()) ){
+                    if( !dstDir.exists(strAbsDirPath) ){
+                        dstDir.mkpath(strAbsDirPath);
+                    }
+                    if( m_localRecvFile.isOpen() ){
+                        m_localRecvFile.close();
+                    }
+                    m_localRecvFile.setFileName(strAbsFilePath);
+                    if( !m_localRecvFile.open(QFile::WriteOnly) ){
+
+                        return;
+                    }
+                }
+                else{
+                    m_fileTransferInfoRecv.transferState=TransferState::Stop;
+                    m_inBlock.resize(sizeof(FileTransferInfo));
+                    memcpy(m_inBlock.data(),&m_fileTransferInfoRecv,sizeof(FileTransferInfo));
+                    this->write(m_inBlock);
+                    m_inBlock.resize(0);
                 }
             }
+            //发送端
             else if( TransferState::Stop==m_fileTransferInfoRecv.transferState ){
                 emit loopSend();
             }
@@ -363,11 +385,18 @@ void CHotUpdateClient::onReadyRead()
             emit updateReceiveProcess(m_handleFlag,dRecvProcess);
 
         if( m_nReadBytesRead == m_nReadTotalBytes ){
+            //断开写入信号槽，发送反馈报文时，不需要关联该信号槽
+            disconnect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
             //比对下载文件MD5
-
+            m_fileTransferInfoRecv.transferState=TransferState::Stop;
+            m_inBlock.resize(sizeof(FileTransferInfo));
+            memcpy(m_inBlock.data(),&m_fileTransferInfoRecv,sizeof(FileTransferInfo));
+            this->write(m_inBlock);
+            m_inBlock.resize(0);
             if( m_localRecvFile.isOpen() ){
                 m_localRecvFile.close();
             }
+            //重置读取文件变量
             resetReadVariables();
         }
     }
@@ -399,6 +428,7 @@ void CHotUpdateClient::onUpdateWritten(qint64 nBytesWritten)
         if( m_localSendFile.isOpen() ){
             m_localSendFile.close();
         }
+        //重置发送文件变量
         resetWriteVariables();
     }
 }
