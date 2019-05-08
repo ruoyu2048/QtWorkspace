@@ -7,9 +7,12 @@
 #include <QFileInfo>
 #include <CHotUpdateEnumDef.h>
 
+//#pragma pack(1)
 typedef struct _FileTransferInfo{//文件传输信息
-    SendType sendType;
-    TransferState transferState;
+    SendType sendType;//发送类型
+    TransferState transferState;//文件发送状态
+    qint32 nTotal;          //总文件个数
+    qint32 nIndex;          //当前文件序号
     qint64 nFileSzie;       //文件大小
     char cFileName[128];    //文件名称
     char cFileSrcPath[256]; //文件路径
@@ -19,6 +22,7 @@ typedef struct _FileTransferInfo{//文件传输信息
         memset(&sendType,0,sizeof (_FileTransferInfo));
     }
 }FileTransferInfo;
+//#pragma pack()
 
 class CHotUpdateClient : public QTcpSocket
 {
@@ -131,7 +135,7 @@ private:
     QFile   m_localRecvFile;
     qint64  m_nReadTotalBytes;//接收文件总大小
     qint64  m_nReadBytesRead;//接收送文件大小
-    qint64  m_nReadBytesReady;//待接收数据大小
+    //qint64  m_nReadBytesReady;//待接收数据大小
     qint64  m_nReadFileNameSize;//接收的文件名称大小
     QByteArray m_inBlock;//接收数据缓冲区
 
@@ -142,6 +146,7 @@ private:
     qintptr m_handleId;//当前套接字描述符
     QString m_handleFlag;//当前套接字标志(客户端IP:客户端Port)
 
+    FileTransferInfo m_fileTransferInfoRecv;
     QList<FileTransferInfo>m_fileTransferInfoList;//文件传输信息列表
 };
 
