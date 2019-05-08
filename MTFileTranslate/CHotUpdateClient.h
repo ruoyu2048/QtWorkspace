@@ -4,19 +4,21 @@
 #include <QTcpSocket>
 #include <QTimer>
 #include <QFile>
+#include <QFileInfo>
 #include <CHotUpdateEnumDef.h>
 
-struct FileTransferInfo{//文件传输信息
-    TransferState ts;
-    quint64 nFileSzie;      //文件大小
+typedef struct _FileTransferInfo{//文件传输信息
+    SendType sendType;
+    TransferState transferState;
+    qint64 nFileSzie;       //文件大小
     char cFileName[128];    //文件名称
     char cFileSrcPath[256]; //文件路径
     char cFileDstPath[256]; //文件路径
     char cMD5[64];          //MD5码
-    FileTransferInfo(){
-        memset(&ts,0,sizeof (FileTransferInfo));
+    _FileTransferInfo(){
+        memset(&sendType,0,sizeof (_FileTransferInfo));
     }
-};
+}FileTransferInfo;
 
 class CHotUpdateClient : public QTcpSocket
 {
@@ -67,12 +69,14 @@ private:
     void initHotUpdateClient( qintptr handle );
 
     bool sendOneFile(QString strFile);
-    bool sendOneDir(QString strDir);
+    bool sendOneDir(QString strDirPath);
 
-    QByteArray GetFileMD5(QString strFilePath);
-    QByteArray GetSmallFileMD5(QString strFilePath);
+    QByteArray getFileMD5(QString strFilePath);
+    QByteArray getSmallFileMD5(QString strFilePath);
+    QFileInfoList getFileInfoList(QString strDirPath);
 
 signals:
+    void loopSend();
     //普通客户端使用
     void updateSendProcess(double fSendProcess);
     void updateReceiveProcess( double fRecvProcess);
@@ -95,6 +99,7 @@ public slots:
     void onStopConnect();
 
 private slots:
+    void onLoopSend();
     //已连接
     void onConnected();
     //断开连接
@@ -136,6 +141,8 @@ private:
     /*********************************************/
     qintptr m_handleId;//当前套接字描述符
     QString m_handleFlag;//当前套接字标志(客户端IP:客户端Port)
+
+    QList<FileTransferInfo>m_fileTransferInfoList;//文件传输信息列表
 };
 
 #endif // CHOTUPDATECLIENT_H

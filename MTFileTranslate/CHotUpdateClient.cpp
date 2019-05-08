@@ -5,6 +5,7 @@
 #include <QBitArray>
 #include <QCryptographicHash>
 #include <QFileInfo>
+#include <QDir>
 
 CHotUpdateClient::CHotUpdateClient(QObject *parent):
     QTcpSocket(parent),
@@ -95,6 +96,8 @@ void CHotUpdateClient::initHotUpdateClient()
 
     connect(this,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
     connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
+
+    connect(this,SIGNAL(loopSend()),this,SLOT(onLoopSend()));
 }
 
 void CHotUpdateClient::initHotUpdateClient(qintptr handle)
@@ -105,7 +108,10 @@ void CHotUpdateClient::initHotUpdateClient(qintptr handle)
 
     connect(this,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
     connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
+
+    connect(this,SIGNAL(loopSend()),this,SLOT(onLoopSend()));
 }
+
 
 bool CHotUpdateClient::sendOneFile(QString strFile)
 {
@@ -138,13 +144,34 @@ bool CHotUpdateClient::sendOneFile(QString strFile)
     return true;
 }
 
-bool CHotUpdateClient::sendOneDir(QString strDir)
+bool CHotUpdateClient::sendOneDir(QString strDirPath)
 {
+    QDir dir(strDirPath);
+    if( !dir.isEmpty() ){
+        m_fileTransferInfoList.clear();
+        //遍历当前文件夹中的文件
+        QFileInfoList fileInfoList=getFileInfoList(strDirPath);
+        int nSzie=fileInfoList.size();
+        for( int i=0;i<nSzie;i++ ){
+           QFileInfo fileInfo=fileInfoList.at(i);
+           FileTransferInfo fti;
+           fti.sendType=SendType::Dir;
+           fti.transferState=TransferState::Start;
+           fti.nFileSzie = static_cast<qint64>(sizeof(FileTransferInfo))+fileInfo.size();
+           sprintf(fti.cFileName,"%s",fileInfo.fileName().toStdString().c_str());
+           sprintf(fti.cFileSrcPath,"%s",fileInfo.filePath().toStdString().c_str());
+           sprintf(fti.cFileDstPath,"./%s/%s",dir.dirName().toStdString().c_str(),fileInfo.fileName().toStdString().c_str());
+           sprintf(fti.cMD5,"%s",getFileMD5(fileInfo.filePath()).toHex().constData());
 
-    return true;
+           m_fileTransferInfoList.push_back(fti);
+        }
+        emit loopSend();//触发循环发送信号
+        return true;
+    }
+    return false;
 }
 
-QByteArray CHotUpdateClient::GetFileMD5(QString strFilePath)
+QByteArray CHotUpdateClient::getFileMD5(QString strFilePath)
 {
     QFile file(strFilePath);
     if(!file.exists())
@@ -181,7 +208,7 @@ QByteArray CHotUpdateClient::GetFileMD5(QString strFilePath)
     return md5;
 }
 
-QByteArray CHotUpdateClient::GetSmallFileMD5(QString strFilePath)
+QByteArray CHotUpdateClient::getSmallFileMD5(QString strFilePath)
 {
     QFile file(strFilePath);
     if(!file.exists())
@@ -190,6 +217,22 @@ QByteArray CHotUpdateClient::GetSmallFileMD5(QString strFilePath)
     QByteArray ba = QCryptographicHash::hash(file.readAll(),QCryptographicHash::Md5);
     file.close();
     return ba;
+}
+
+QFileInfoList CHotUpdateClient::getFileInfoList(QString strDirPath)
+{
+    QDir dir(strDirPath);
+    QFileInfoList filesList = dir.entryInfoList(QDir::Files);
+    QFileInfoList foldersList = dir.entryInfoList(QDir::Dirs|QDir::NoDotAndDotDot);
+
+    for(int i = 0; i != foldersList.size(); i++)
+    {
+         QString name = foldersList.at(i).absoluteFilePath();
+         QFileInfoList child_file_list = getFileInfoList(name);
+         filesList.append(child_file_list);
+    }
+
+    return filesList;
 }
 
 bool CHotUpdateClient::sendFile(QString strPath,SendType sendType)
@@ -223,6 +266,37 @@ bool CHotUpdateClient::sendFile(QString strPath,SendType sendType)
 void CHotUpdateClient::onStopConnect()
 {
     stopClient();
+}
+
+void CHotUpdateClient::onLoopSend()
+{
+    if( m_fileTransferInfoList.size()>0 ){
+        FileTransferInfo fti=m_fileTransferInfoList.first();
+        m_fileTransferInfoList.pop_front();
+        if( m_localSendFile.isOpen() ){
+            m_localSendFile.close();
+        }
+        QString strFile(fti.cFileSrcPath);
+        m_localSendFile.setFileName(strFile);
+        if( m_localSendFile.exists() ){
+            if( !m_localSendFile.open(QFile::ReadOnly) ){
+                qDebug()<<strFile<<"Opened failed!";
+                return;
+            }
+            m_nWriteTotalBytes = fti.nFileSzie;//文件信息大小+文件实际大小
+            QDataStream sendOut(&m_outBlock,QIODevice::WriteOnly);
+            sendOut.setVersion(QDataStream::Qt_5_9);
+
+            //保留文件总大小空间、文件名小大小空间、文件名
+            QByteArray fileTransferInfoAry;
+            fileTransferInfoAry.resize(sizeof (FileTransferInfo));
+            memcpy(fileTransferInfoAry.data(),&fti,sizeof(FileTransferInfo));
+
+            sendOut<<fileTransferInfoAry;
+            m_nWriteBytesReady=m_nWriteTotalBytes-this->write(m_outBlock);
+            m_outBlock.resize(0);
+        }
+    }
 }
 
 void CHotUpdateClient::onConnected()

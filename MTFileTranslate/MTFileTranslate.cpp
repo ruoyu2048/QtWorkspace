@@ -74,7 +74,9 @@ void MTFileTranslate::on_btnStartClient_clicked()
 void MTFileTranslate::on_btnSelectC_clicked()
 {
     if( ui->cbC->isChecked() ){
-
+        QString sss=QFileDialog::getExistingDirectory(this,"选择文件夹","./");
+        ui->lePathC->setText(sss);
+        pC->sendFile(sss,SendType::Dir);
     }
     else{
         QString sss=QFileDialog::getOpenFileName(this,"Open a file","/","files (*)");
@@ -86,7 +88,9 @@ void MTFileTranslate::on_btnSelectC_clicked()
 void MTFileTranslate::on_btnSelectS_clicked()
 {
     if( ui->cbS->isChecked() ){
-
+        QString sss=QFileDialog::getExistingDirectory(this,"选择文件夹","./");
+        ui->lePathS->setText(sss);
+        pS->sendFile(sss,SendType::Dir);
     }
     else{
         QString sss=QFileDialog::getOpenFileName(this,"Open a file","/","files (*)");
