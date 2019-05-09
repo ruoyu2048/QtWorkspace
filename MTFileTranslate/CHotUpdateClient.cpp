@@ -124,7 +124,7 @@ bool CHotUpdateClient::sendOneFile(QString strFile)
         fti.sendType=SendType::File;
         fti.transferState=TransferState::Start;
         fti.nTotal=1;
-        fti.nIndex=0;
+        fti.nIndex=1;
         int nFTISize=static_cast<qint64>(sizeof(FileTransferInfo));
         fti.nFileSzie = nFTISize+fileInfo.size();
         sprintf(fti.cFileName,"%s",fileInfo.fileName().toStdString().c_str());
@@ -155,7 +155,7 @@ bool CHotUpdateClient::sendOneDir(QString strDirPath)
            fti.sendType=SendType::Dir;
            fti.transferState=TransferState::Start;
            fti.nTotal=nSzie;
-           fti.nIndex=i;
+           fti.nIndex=i+1;
            int nFTISize=static_cast<qint64>(sizeof(FileTransferInfo));
            fti.nFileSzie = nFTISize+fileInfo.size();
            sprintf(fti.cFileName,"%s",fileInfo.fileName().toStdString().c_str());
@@ -375,6 +375,7 @@ void CHotUpdateClient::onReadyRead()
                 emit bytesWritten(m_nWriteTotalBytes-m_nWriteBytesReady);
             }
             else if( TransferState::Stop==m_fileTransferInfoRecv.transferState ){
+                //qDebug()<<m_fileTransferInfoRecv.nTotal<<m_fileTransferInfoRecv.nIndex<<m_fileTransferInfoRecv.transferResult;
                 m_fileTransferInfoList.pop_front();
                 resetWriteVariables();
                 resetReadVariables();
@@ -422,7 +423,7 @@ void CHotUpdateClient::onReadyRead()
 
 void CHotUpdateClient::onUpdateWritten(qint64 nBytesWritten)
 {
-    if( m_bContinue/* && TransferState::Start==m_fileTransferInfoSend.transferState */){
+    if( m_bContinue ){
         //统计已发送数据大小
         m_nWriteBytesWritten += nBytesWritten;
         //更新发送文件进度
@@ -443,7 +444,7 @@ void CHotUpdateClient::onUpdateWritten(qint64 nBytesWritten)
         else{
             resetWriteVariables();
             if( m_localSendFile.isOpen() ){
-                qDebug()<<"Send:"<<m_localSendFile.fileName();
+                //qDebug()<<"Send:"<<m_localSendFile.fileName();
                 m_localSendFile.close();
             }
         }
