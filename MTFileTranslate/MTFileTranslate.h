@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "CHotUpdateServer.h"
 #include "CHotUpdateClient.h"
+#include "CHotUpdateDataStruct.h"
 
 namespace Ui {
 class MTFileTranslate;
@@ -21,8 +22,8 @@ public:
 public slots:
     void onClientConnected();
     void onClientDisconnected();
-    void onUpdateSendProcess(double fSendProcess);
-    void onUpdateReceiveProcess( double fRecvProcess);
+    void onUpdateSendProcess(FileUpdateInfo fuInfo);
+    void onUpdateReceiveProcess(FileUpdateInfo fuInfo);
 
 private slots:
     void on_btnStartServer_clicked();

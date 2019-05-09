@@ -5,25 +5,7 @@
 #include <QTimer>
 #include <QFile>
 #include <QFileInfo>
-#include <CHotUpdateEnumDef.h>
-
-//#pragma pack(1)
-typedef struct _FileTransferInfo{//文件传输信息
-    SendType sendType;//发送类型
-    TransferState transferState;//文件发送状态
-    TransferResult transferResult;//传输结果
-    qint32 nTotal;          //总文件个数
-    qint32 nIndex;          //当前文件序号
-    qint64 nFileSzie;       //文件大小
-    char cFileName[128];    //文件名称
-    char cFileSrcPath[256]; //文件路径
-    char cFileDstPath[256]; //文件路径
-    char cMD5[64];          //MD5码
-    _FileTransferInfo(){
-        memset(&sendType,0,sizeof (_FileTransferInfo));
-    }
-}FileTransferInfo;
-//#pragma pack()
+#include "CHotUpdateDataStruct.h"
 
 class CHotUpdateClient : public QTcpSocket
 {
@@ -77,6 +59,9 @@ private:
     bool sendOneDir(QString strDirPath);
     void sendFeedback(TransferState transferState=TransferState::Stop);
 
+    void updateSendInfo(double dProcess);
+    void updateReceiveInfo(double dProcess);
+
     QByteArray getFileMD5(QString strFilePath);
     QByteArray getSmallFileMD5(QString strFilePath);
     QFileInfoList getFileInfoList(QString strDirPath);
@@ -84,12 +69,8 @@ private:
 signals:
     void loopSend();
     //普通客户端使用
-    void updateSendProcess(double fSendProcess);
-    void updateReceiveProcess( double fRecvProcess);
-
-    //服务端的客户端对象使用
-    void updateSendProcess(QString strHandleFlag,double fSendProcess);
-    void updateReceiveProcess(QString strHandleFlag,double fRecvProcess);
+    void updateSendProcess(FileUpdateInfo fuInfo);
+    void updateReceiveProcess(FileUpdateInfo fuInfo);
 
 public slots:
     ///
