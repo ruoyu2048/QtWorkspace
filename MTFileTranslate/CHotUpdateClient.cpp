@@ -390,6 +390,7 @@ void CHotUpdateClient::onReadyRead()
             memcpy(m_inBlock.data(),&m_fileTransferInfoRecv,sizeof(FileTransferInfo));
             this->write(m_inBlock);
             m_inBlock.resize(0);
+            qDebug()<<"Recved:"<<m_localRecvFile.fileName();
             if( m_localRecvFile.isOpen() ){
                 m_localRecvFile.close();
             }
@@ -403,6 +404,12 @@ void CHotUpdateClient::onUpdateWritten(qint64 nBytesWritten)
 {
     //统计已发送数据大小
     m_nWriteBytesWritten += nBytesWritten;
+    //更新发送文件进度
+    double dSendProcess=static_cast<double>(m_nWriteBytesWritten/m_nWriteTotalBytes);
+    if( m_bIsNormalClient )
+        emit updateSendProcess(dSendProcess);
+    else
+        emit updateSendProcess(m_handleFlag,dSendProcess);
 
     //如果数据未发送完毕，则继续发送
     if( m_nWriteBytesReady>0 ){
@@ -412,20 +419,11 @@ void CHotUpdateClient::onUpdateWritten(qint64 nBytesWritten)
         //清空缓冲区
         m_outBlock.resize(0);
     }
-
-    //更新发送文件进度
-    double dSendProcess=static_cast<double>(m_nWriteBytesWritten/m_nWriteTotalBytes);
-    if( m_bIsNormalClient )
-        emit updateSendProcess(dSendProcess);
-    else
-        emit updateSendProcess(m_handleFlag,dSendProcess);
-
-    //如果发送完毕，则关闭文件
-    if( m_nWriteBytesWritten == m_nWriteTotalBytes ){
+    else{
+        //qDebug()<<"Send:"<<m_localSendFile.fileName();
         if( m_localSendFile.isOpen() ){
+            qDebug()<<"Send:"<<m_localSendFile.fileName();
             m_localSendFile.close();
         }
-        //重置发送文件变量
-        resetWriteVariables();
     }
 }
