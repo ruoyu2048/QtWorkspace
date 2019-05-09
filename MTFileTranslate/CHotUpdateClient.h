@@ -11,6 +11,7 @@
 typedef struct _FileTransferInfo{//文件传输信息
     SendType sendType;//发送类型
     TransferState transferState;//文件发送状态
+    TransferResult transferResult;//传输结果
     qint32 nTotal;          //总文件个数
     qint32 nIndex;          //当前文件序号
     qint64 nFileSzie;       //文件大小

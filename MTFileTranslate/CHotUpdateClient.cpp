@@ -190,10 +190,10 @@ QByteArray CHotUpdateClient::getFileMD5(QString strFilePath)
     if(!file.open(QIODevice::ReadOnly))
         return QByteArray();
 
-    quint64 bytesHadWritten = 0;
-    quint64 bytesReadyLoad = 1024*1024;
-    quint64 bytesTotal = file.size();
-    quint64 bytesToWrite = bytesTotal;
+    qint64 bytesHadWritten = 0;
+    qint64 bytesReadyLoad = 1024*1024;
+    qint64 bytesTotal = file.size();
+    qint64 bytesToWrite = bytesTotal;
     QCryptographicHash ch(QCryptographicHash::Md5);
 
     while(1)
@@ -295,6 +295,7 @@ void CHotUpdateClient::onLoopSend()
         if( m_localSendFile.exists() ){
             if( !m_localSendFile.open(QFile::ReadOnly) ){
                 qDebug()<<strFile<<"Opened failed!";
+                emit loopSend();//触发剩余文件传输
                 return;
             }
             m_nWriteTotalBytes = m_fileTransferInfoSend.nFileSzie;//文件信息大小+文件实际大小
@@ -302,7 +303,6 @@ void CHotUpdateClient::onLoopSend()
             memcpy(m_outBlock.data(),&m_fileTransferInfoSend,sizeof(FileTransferInfo));
             m_nWriteBytesReady=m_nWriteTotalBytes-this->write(m_outBlock);
             m_outBlock.resize(0);
-            //m_bContinue=true;
         }
     }
 }
@@ -364,6 +364,7 @@ void CHotUpdateClient::onReadyRead()
                     sendFeedback(TransferState::Continue);
                 }
                 else{
+                    m_fileTransferInfoRecv.transferResult=TransferResult::Success;
                     sendFeedback(TransferState::Stop);
                     resetReadVariables();
                 }
@@ -397,17 +398,24 @@ void CHotUpdateClient::onReadyRead()
             emit updateReceiveProcess(m_handleFlag,dRecvProcess);
 
         if( m_nReadBytesRead == m_nReadTotalBytes ){
-            //比对下载文件MD5,检验文件是否传输成功
-
-
-            qDebug()<<"Recved:"<<m_localRecvFile.fileName();
+            //关闭本地文件
+            QString strLocalFile=m_localRecvFile.fileName();
             if( m_localRecvFile.isOpen() ){
                 m_localRecvFile.close();
             }
-            //重置读取文件变量
-            resetReadVariables();
+
+            //比对下载文件MD5,检验文件是否传输成功
+            QByteArray localMD5=getFileMD5(m_localRecvFile.fileName());
+            if( 0==strcmp(m_fileTransferInfoRecv.cMD5,localMD5.constData()) ){
+                m_fileTransferInfoRecv.transferResult=TransferResult::Success;
+            }
+            else{
+                m_fileTransferInfoRecv.transferResult=TransferResult::Fail;
+            }
             //发送回执
             sendFeedback(TransferState::Stop);
+            //重置读取文件变量
+            resetReadVariables();
         }
     }
 }
