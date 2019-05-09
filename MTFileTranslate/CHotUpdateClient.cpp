@@ -97,7 +97,7 @@ void CHotUpdateClient::initHotUpdateClient()
     connect(this,SIGNAL(disconnected()),this,SLOT(onDisconnected()));
 
     connect(this,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
-    connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
+    //connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
 
     connect(this,SIGNAL(loopSend()),this,SLOT(onLoopSend()));
 }
@@ -109,7 +109,7 @@ void CHotUpdateClient::initHotUpdateClient(qintptr handle)
     connect(this,SIGNAL(disconnected()),this,SLOT(onDisconnected()));
 
     connect(this,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
-    connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
+    //connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
 
     connect(this,SIGNAL(loopSend()),this,SLOT(onLoopSend()));
 }
@@ -117,33 +117,27 @@ void CHotUpdateClient::initHotUpdateClient(qintptr handle)
 
 bool CHotUpdateClient::sendOneFile(QString strFile)
 {
-    if( m_localSendFile.isOpen() ){
-        m_localSendFile.close();
+    QFileInfo fileInfo(strFile);
+    if( fileInfo.exists() && fileInfo.isFile() ){
+        m_fileTransferInfoList.clear();
+        FileTransferInfo fti;
+        fti.sendType=SendType::File;
+        fti.transferState=TransferState::Start;
+        fti.nTotal=1;
+        fti.nIndex=0;
+        int nFTISize=static_cast<qint64>(sizeof(FileTransferInfo));
+        fti.nFileSzie = nFTISize+fileInfo.size();
+        sprintf(fti.cFileName,"%s",fileInfo.fileName().toStdString().c_str());
+        sprintf(fti.cFileSrcPath,"%s",fileInfo.filePath().toStdString().c_str());
+        sprintf(fti.cFileDstPath,"/%s","");
+        sprintf(fti.cMD5,"%s",getFileMD5(fileInfo.filePath()).toHex().constData());
+
+        m_fileTransferInfoList.push_back(fti);
+        emit loopSend();//触发循环发送信号
+        return true;
     }
 
-    m_localSendFile.setFileName(strFile);
-    if( m_localSendFile.exists() ){
-        if( !m_localSendFile.open(QFile::ReadOnly) ){
-            return false;
-        }
-        //获取文件大小
-        m_nWriteTotalBytes = m_localSendFile.size();
-        QString strFileName=m_localSendFile.fileName().right(strFile.size()-strFile.lastIndexOf('/')-1);
-        QDataStream sendOut(&m_outBlock,QIODevice::WriteOnly);
-        sendOut.setVersion(QDataStream::Qt_5_9);
-        //保留文件总大小空间、文件名小大小空间、文件名
-        sendOut<<qint64(0)<<qint64(0)<<strFileName;
-        m_nWriteTotalBytes+=m_outBlock.size();
-        sendOut.device()->seek(0);
-        //文件信息大小=文件总大小空间+文件名大小空间
-        qint64 nFileInfoSize=static_cast<qint64>(sizeof(qint64)*2);
-        qint64 nFileNameSize=static_cast<qint64>(m_outBlock.size()-nFileInfoSize);
-        sendOut<<m_nWriteTotalBytes<<nFileNameSize;
-        m_nWriteBytesReady=m_nWriteTotalBytes-this->write(m_outBlock);
-        m_outBlock.resize(0);
-    }
-
-    return true;
+    return false;
 }
 
 bool CHotUpdateClient::sendOneDir(QString strDirPath)
@@ -244,7 +238,11 @@ QFileInfoList CHotUpdateClient::getFileInfoList(QString strDirPath)
 bool CHotUpdateClient::sendFile(QString strPath,SendType sendType)
 {
     if( strPath.size()>255 ){
-        qDebug()<<"The maximum length of the file path is 255 bytes. Please reset the file path!";
+        qDebug()<<"The maximum length of the file path is 255 bytes, please reset the file path!";
+        return false;
+    }
+    if( m_fileTransferInfoList.size()>0 ){
+        qDebug()<<"The last file transfer task has not been completed, please try again later!";
         return false;
     }
     if( isRunning() ){
@@ -278,7 +276,6 @@ void CHotUpdateClient::onLoopSend()
 {
     if( m_fileTransferInfoList.size()>0 ){
         m_fileTransferInfoSend=m_fileTransferInfoList.first();
-        m_fileTransferInfoList.pop_front();
         if( m_localSendFile.isOpen() ){
             m_localSendFile.close();
         }
@@ -289,9 +286,10 @@ void CHotUpdateClient::onLoopSend()
                 qDebug()<<strFile<<"Opened failed!";
                 return;
             }
+            resetWriteVariables();//重置发送端变量
+            qDebug()<<m_nWriteTotalBytes<<strFile;
             //连接写入信号槽
             connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
-            resetWriteVariables();//重置发送端变量
             m_nWriteTotalBytes = m_fileTransferInfoSend.nFileSzie;//文件信息大小+文件实际大小
             m_outBlock.resize(sizeof(FileTransferInfo));
             memcpy(m_outBlock.data(),&m_fileTransferInfoSend,sizeof(FileTransferInfo));
@@ -365,6 +363,7 @@ void CHotUpdateClient::onReadyRead()
             }
             //发送端
             else if( TransferState::Stop==m_fileTransferInfoRecv.transferState ){
+                m_fileTransferInfoList.pop_front();
                 emit loopSend();
             }
         }
@@ -418,6 +417,7 @@ void CHotUpdateClient::onUpdateWritten(qint64 nBytesWritten)
 
     //更新发送文件进度
     double dSendProcess=static_cast<double>(m_nWriteBytesWritten/m_nWriteTotalBytes);
+    qDebug()<<dSendProcess<<m_nWriteBytesWritten<<m_nWriteTotalBytes;
     if( m_bIsNormalClient )
         emit updateSendProcess(dSendProcess);
     else
