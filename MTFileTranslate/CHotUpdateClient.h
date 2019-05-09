@@ -146,6 +146,7 @@ private:
     qintptr m_handleId;//当前套接字描述符
     QString m_handleFlag;//当前套接字标志(客户端IP:客户端Port)
 
+    bool m_bWriting;
     FileTransferInfo m_fileTransferInfoSend;
     FileTransferInfo m_fileTransferInfoRecv;
     QList<FileTransferInfo>m_fileTransferInfoList;//文件传输信息列表
