@@ -9,6 +9,8 @@ MTFileTranslate::MTFileTranslate(QWidget *parent) :
     ui->setupUi(this);
 
     pS = new CHotUpdateServer(this);
+    connect(pS,SIGNAL(tsUpdateSendProcess(FileUpdateInfo)),this,SLOT(onUpdateSendProcess(FileUpdateInfo)));
+    connect(pS,SIGNAL(tsUpdateReceiveProcess(FileUpdateInfo)),this,SLOT(onUpdateReceiveProcess(FileUpdateInfo)));
     pC = new CHotUpdateClient(this);
     connect(pC,SIGNAL(connected()),this,SLOT(onClientConnected()));
     connect(pC,SIGNAL(disconnected()),this,SLOT(onClientDisconnected()));

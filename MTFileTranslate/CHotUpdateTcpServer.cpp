@@ -4,6 +4,7 @@ CHotUpdateServer::CHotUpdateServer(QObject *parent):QTcpServer(parent)
 {
     qRegisterMetaType<qintptr>("qintptr");
     qRegisterMetaType<SendType>("SendType");
+    qRegisterMetaType<FileTransferInfo>("FileTransferInfo");
 }
 
 bool CHotUpdateServer::startListen(QString strIP, quint16 nPort)
@@ -43,6 +44,8 @@ void CHotUpdateServer::updateClientMap(qintptr handle)
     if( it==m_HotUpdateThreadMap.end() ){
         CHotUpdateThread* pThread = new CHotUpdateThread(handle,nullptr);
         connect(pThread,SIGNAL(disconnected(qintptr)),this,SLOT(newDisconnected(qintptr)));
+        connect(pThread,SIGNAL(transferUpdateSendProcess(FileUpdateInfo)),this,SIGNAL(tsUpdateSendProcess(FileUpdateInfo)));
+        connect(pThread,SIGNAL(tranferUpdateReceiveProcess(FileUpdateInfo)),this,SIGNAL(tsUpdateReceiveProcess(FileUpdateInfo)));
         //设置待发送文件
         connect(this,SIGNAL(tsSendFile(QString,SendType)),pThread,SIGNAL(setToBeSendFile(QString,SendType)));
         connect(this,SIGNAL(tsStopListen()),pThread,SIGNAL(stopRunning()));

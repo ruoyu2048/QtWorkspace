@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include <QTimer>
 #include "CHotUpdateEnumDef.h"
+#include "CHotUpdateDataStruct.h"
 
 class CHotUpdateThread : public QThread
 {
@@ -30,6 +31,10 @@ signals:
     void setToBeSendFile(QString strFile,SendType sendType);
 
     void stopRunning();
+
+    void transferUpdateSendProcess( FileUpdateInfo fuInfo );
+
+    void tranferUpdateReceiveProcess( FileUpdateInfo fuInfo );
 
 public slots:
 

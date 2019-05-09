@@ -9,6 +9,7 @@ CHotUpdateThread::CHotUpdateThread(qintptr handle, QObject *parent):
     m_handleId(handle)
 {
     qRegisterMetaType<qintptr>("qintptr");
+    qRegisterMetaType<FileTransferInfo>("FileTransferInfo");
 }
 
 CHotUpdateThread::~CHotUpdateThread()
@@ -23,6 +24,8 @@ void CHotUpdateThread::run()
     pClient->setHandleFlag(pClient->peerAddress().toString(),pClient->peerPort());
     connect(pClient,SIGNAL(disconnected()),this,SLOT(quit()));
     connect(pClient,SIGNAL(disconnected()),this,SLOT(onDisconnected()));
+    connect(pClient,SIGNAL(updateSendProcess(FileUpdateInfo)),this,SIGNAL(transferUpdateSendProcess(FileUpdateInfo)));
+    connect(pClient,SIGNAL(updateReceiveProcess(FileUpdateInfo)),this,SIGNAL(tranferUpdateReceiveProcess(FileUpdateInfo)));
     //服务端发送文件信号
     connect(this,SIGNAL(setToBeSendFile(QString,SendType)),pClient,SLOT(sendFile(QString)));
     connect(this,SIGNAL(stopRunning()),pClient,SLOT(onStopConnect()));

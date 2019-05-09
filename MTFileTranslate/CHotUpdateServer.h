@@ -5,6 +5,7 @@
 #include "CHotUpdateThread.h"
 #include "CHotUpdateClient.h"
 #include "CHotUpdateEnumDef.h"
+#include "CHotUpdateDataStruct.h"
 
 class CHotUpdateServer : public QTcpServer
 {
@@ -49,6 +50,11 @@ signals:
     void tsStopListen();
     //服务端发送文件
     void tsSendFile(QString strFile,SendType sendType);
+
+    //本地客户端发送文件更新信息
+    void tsUpdateSendProcess(FileUpdateInfo fuInfo);
+    //本地客户端接收文件更新信息
+    void tsUpdateReceiveProcess(FileUpdateInfo fuInfo);
 
 public slots:
     void newDisconnected( qintptr handle );
