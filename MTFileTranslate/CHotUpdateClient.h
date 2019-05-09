@@ -135,7 +135,6 @@ private:
     QFile   m_localRecvFile;
     qint64  m_nReadTotalBytes;//接收文件总大小
     qint64  m_nReadBytesRead;//接收送文件大小
-    //qint64  m_nReadBytesReady;//待接收数据大小
     qint64  m_nReadFileNameSize;//接收的文件名称大小
     QByteArray m_inBlock;//接收数据缓冲区
 

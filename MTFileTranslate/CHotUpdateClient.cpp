@@ -17,7 +17,6 @@ CHotUpdateClient::CHotUpdateClient(QObject *parent):
     m_nWriteBytesReady(0),//待发送数据大小
     m_nReadTotalBytes(0),//接收文件总大小
     m_nReadBytesRead(0),//接收送文件大小
-    //m_nReadBytesReady(0),//待接收数据大小
     m_nReadFileNameSize(0),
     m_nPerDataSize(1024*1024)//1024K
 {
@@ -33,7 +32,6 @@ CHotUpdateClient::CHotUpdateClient(qintptr handle, QObject *parent):
     m_nWriteBytesReady(0),//待发送数据大小
     m_nReadTotalBytes(0),//接收文件总大小
     m_nReadBytesRead(0),//接收送文件大小
-    //m_nReadBytesReady(0),//待接收数据大小
     m_nReadFileNameSize(0),
     m_nPerDataSize(1024*1024),//1024K
     m_handleId(handle)
@@ -75,7 +73,6 @@ void CHotUpdateClient::resetReadVariables()
     m_inBlock.resize(0);
     m_nReadTotalBytes=(0);//接收文件总大小
     m_nReadBytesRead=(0);//接收送文件大小
-    //m_nReadBytesReady=(0);//待接收数据大小
     m_nReadFileNameSize=(0);//接收的文件名称大小
 }
 
@@ -417,7 +414,6 @@ void CHotUpdateClient::onUpdateWritten(qint64 nBytesWritten)
 
     //更新发送文件进度
     double dSendProcess=static_cast<double>(m_nWriteBytesWritten/m_nWriteTotalBytes);
-    qDebug()<<dSendProcess<<m_nWriteBytesWritten<<m_nWriteTotalBytes;
     if( m_bIsNormalClient )
         emit updateSendProcess(dSendProcess);
     else
