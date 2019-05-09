@@ -11,6 +11,7 @@ enum SendType{
 //当前文件的传输状态
 enum TransferState{
     Start,
+    Continue,
     Stop
 };
 

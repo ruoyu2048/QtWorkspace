@@ -19,7 +19,7 @@ CHotUpdateClient::CHotUpdateClient(QObject *parent):
     m_nReadBytesRead(0),//接收送文件大小
     m_nReadFileNameSize(0),
     m_nPerDataSize(1024*1024),//1024K
-    m_bWriting(false)
+    m_bContinue(false)
 {
     initHotUpdateClient();
 }
@@ -36,7 +36,7 @@ CHotUpdateClient::CHotUpdateClient(qintptr handle, QObject *parent):
     m_nReadFileNameSize(0),
     m_nPerDataSize(1024*1024),//1024K
     m_handleId(handle),
-    m_bWriting(false)
+    m_bContinue(false)
 {
     initHotUpdateClient(handle);
 }
@@ -84,7 +84,7 @@ void CHotUpdateClient::resetWriteVariables()
     m_nWriteTotalBytes=(0);//发送文件总大小
     m_nWriteBytesWritten=(0);//已发送文件大小
     m_nWriteBytesReady=(0);//待发送数据大小
-    m_bWriting=false;
+    m_bContinue=false;
 }
 
 void CHotUpdateClient::initHotUpdateClient()
@@ -173,9 +173,9 @@ bool CHotUpdateClient::sendOneDir(QString strDirPath)
     return false;
 }
 
-void CHotUpdateClient::sendFeedback()
+void CHotUpdateClient::sendFeedback(TransferState transferState)
 {
-    m_fileTransferInfoRecv.transferState=TransferState::Stop;
+    m_fileTransferInfoRecv.transferState=transferState;
     m_inBlock.resize(sizeof(FileTransferInfo));
     memcpy(m_inBlock.data(),&m_fileTransferInfoRecv,sizeof(FileTransferInfo));
     this->write(m_inBlock);
@@ -302,7 +302,7 @@ void CHotUpdateClient::onLoopSend()
             memcpy(m_outBlock.data(),&m_fileTransferInfoSend,sizeof(FileTransferInfo));
             m_nWriteBytesReady=m_nWriteTotalBytes-this->write(m_outBlock);
             m_outBlock.resize(0);
-            m_bWriting=true;
+            //m_bContinue=true;
         }
     }
 }
@@ -357,15 +357,22 @@ void CHotUpdateClient::onReadyRead()
                     }
                     m_localRecvFile.setFileName(strAbsFilePath);
                     if( !m_localRecvFile.open(QFile::WriteOnly) ){
-
+                        sendFeedback(TransferState::Stop);
+                        resetReadVariables();
                         return;
                     }
+                    sendFeedback(TransferState::Continue);
                 }
                 else{
-                    sendFeedback();
+                    sendFeedback(TransferState::Stop);
+                    resetReadVariables();
                 }
             }
             //发送端
+            else if( TransferState::Continue==m_fileTransferInfoRecv.transferState ){
+                m_bContinue=true;
+                emit bytesWritten(m_nWriteTotalBytes-m_nWriteBytesReady);
+            }
             else if( TransferState::Stop==m_fileTransferInfoRecv.transferState ){
                 m_fileTransferInfoList.pop_front();
                 resetWriteVariables();
@@ -400,14 +407,14 @@ void CHotUpdateClient::onReadyRead()
             //重置读取文件变量
             resetReadVariables();
             //发送回执
-            sendFeedback();
+            sendFeedback(TransferState::Stop);
         }
     }
 }
 
 void CHotUpdateClient::onUpdateWritten(qint64 nBytesWritten)
 {
-    if( m_bWriting && TransferState::Start==m_fileTransferInfoSend.transferState ){
+    if( m_bContinue/* && TransferState::Start==m_fileTransferInfoSend.transferState */){
         //统计已发送数据大小
         m_nWriteBytesWritten += nBytesWritten;
         //更新发送文件进度
