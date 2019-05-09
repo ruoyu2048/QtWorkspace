@@ -157,7 +157,9 @@ bool CHotUpdateClient::sendOneDir(QString strDirPath)
            fti.nFileSzie = nFTISize+fileInfo.size();
            sprintf(fti.cFileName,"%s",fileInfo.fileName().toStdString().c_str());
            sprintf(fti.cFileSrcPath,"%s",fileInfo.filePath().toStdString().c_str());
-           sprintf(fti.cFileDstPath,"/%s",dir.dirName().toStdString().c_str());
+           int nPos=fileInfo.absolutePath().indexOf(dir.dirName());
+           QString strDstDir=fileInfo.absolutePath().mid(nPos);
+           sprintf(fti.cFileDstPath,"/%s",strDstDir.toStdString().c_str());
            sprintf(fti.cMD5,"%s",getFileMD5(fileInfo.filePath()).toHex().constData());
 
            m_fileTransferInfoList.push_back(fti);
@@ -284,7 +286,6 @@ void CHotUpdateClient::onLoopSend()
                 return;
             }
             resetWriteVariables();//重置发送端变量
-            qDebug()<<m_nWriteTotalBytes<<strFile;
             //连接写入信号槽
             connect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
             m_nWriteTotalBytes = m_fileTransferInfoSend.nFileSzie;//文件信息大小+文件实际大小
