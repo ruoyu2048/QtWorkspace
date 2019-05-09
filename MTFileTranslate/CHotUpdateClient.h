@@ -74,6 +74,7 @@ private:
 
     bool sendOneFile(QString strFile);
     bool sendOneDir(QString strDirPath);
+    void sendFeedback();
 
     QByteArray getFileMD5(QString strFilePath);
     QByteArray getSmallFileMD5(QString strFilePath);

@@ -127,7 +127,7 @@ bool CHotUpdateClient::sendOneFile(QString strFile)
         sprintf(fti.cFileName,"%s",fileInfo.fileName().toStdString().c_str());
         sprintf(fti.cFileSrcPath,"%s",fileInfo.filePath().toStdString().c_str());
         sprintf(fti.cFileDstPath,"/%s","");
-        sprintf(fti.cMD5,"%s",getFileMD5(fileInfo.filePath()).toHex().constData());
+        sprintf(fti.cMD5,"%s",getFileMD5(fileInfo.filePath()).constData());
 
         m_fileTransferInfoList.push_back(fti);
         emit loopSend();//触发循环发送信号
@@ -160,7 +160,7 @@ bool CHotUpdateClient::sendOneDir(QString strDirPath)
            int nPos=fileInfo.absolutePath().indexOf(dir.dirName());
            QString strDstDir=fileInfo.absolutePath().mid(nPos);
            sprintf(fti.cFileDstPath,"/%s",strDstDir.toStdString().c_str());
-           sprintf(fti.cMD5,"%s",getFileMD5(fileInfo.filePath()).toHex().constData());
+           sprintf(fti.cMD5,"%s",getFileMD5(fileInfo.filePath()).constData());
 
            m_fileTransferInfoList.push_back(fti);
         }
@@ -168,6 +168,15 @@ bool CHotUpdateClient::sendOneDir(QString strDirPath)
         return true;
     }
     return false;
+}
+
+void CHotUpdateClient::sendFeedback()
+{
+    m_fileTransferInfoRecv.transferState=TransferState::Stop;
+    m_inBlock.resize(sizeof(FileTransferInfo));
+    memcpy(m_inBlock.data(),&m_fileTransferInfoRecv,sizeof(FileTransferInfo));
+    this->write(m_inBlock);
+    m_inBlock.resize(0);
 }
 
 QByteArray CHotUpdateClient::getFileMD5(QString strFilePath)
@@ -202,7 +211,7 @@ QByteArray CHotUpdateClient::getFileMD5(QString strFilePath)
             break;
     }
     file.close();
-    QByteArray md5 = ch.result();
+    QByteArray md5 = ch.result().toHex().toUpper();
 
     return md5;
 }
@@ -213,7 +222,7 @@ QByteArray CHotUpdateClient::getSmallFileMD5(QString strFilePath)
     if(!file.exists())
         return QByteArray();
     file.open(QIODevice::ReadOnly);
-    QByteArray ba = QCryptographicHash::hash(file.readAll(),QCryptographicHash::Md5);
+    QByteArray ba = QCryptographicHash::hash(file.readAll(),QCryptographicHash::Md5).toHex().toUpper();
     file.close();
     return ba;
 }
@@ -337,7 +346,7 @@ void CHotUpdateClient::onReadyRead()
                 QString strFileName(m_fileTransferInfoRecv.cFileName);
                 QString strAbsFilePath=strAbsDirPath+"/"+strFileName;
                 //比对MD5值，如果一致，则终止下载
-                QByteArray localMD5=getFileMD5(strFileName).toHex();
+                QByteArray localMD5=getFileMD5(strAbsFilePath);
                 if( localMD5.isEmpty() || 0!=strcmp(m_fileTransferInfoRecv.cMD5,localMD5.constData()) ){
                     if( !dstDir.exists(strAbsDirPath) ){
                         dstDir.mkpath(strAbsDirPath);
@@ -352,11 +361,7 @@ void CHotUpdateClient::onReadyRead()
                     }
                 }
                 else{
-                    m_fileTransferInfoRecv.transferState=TransferState::Stop;
-                    m_inBlock.resize(sizeof(FileTransferInfo));
-                    memcpy(m_inBlock.data(),&m_fileTransferInfoRecv,sizeof(FileTransferInfo));
-                    this->write(m_inBlock);
-                    m_inBlock.resize(0);
+                    sendFeedback();
                 }
             }
             //发送端
@@ -385,11 +390,7 @@ void CHotUpdateClient::onReadyRead()
             //断开写入信号槽，发送反馈报文时，不需要关联该信号槽
             disconnect(this,SIGNAL(bytesWritten(qint64)),this,SLOT(onUpdateWritten(qint64)));
             //比对下载文件MD5
-            m_fileTransferInfoRecv.transferState=TransferState::Stop;
-            m_inBlock.resize(sizeof(FileTransferInfo));
-            memcpy(m_inBlock.data(),&m_fileTransferInfoRecv,sizeof(FileTransferInfo));
-            this->write(m_inBlock);
-            m_inBlock.resize(0);
+            sendFeedback();
             qDebug()<<"Recved:"<<m_localRecvFile.fileName();
             if( m_localRecvFile.isOpen() ){
                 m_localRecvFile.close();
@@ -420,7 +421,6 @@ void CHotUpdateClient::onUpdateWritten(qint64 nBytesWritten)
         m_outBlock.resize(0);
     }
     else{
-        //qDebug()<<"Send:"<<m_localSendFile.fileName();
         if( m_localSendFile.isOpen() ){
             qDebug()<<"Send:"<<m_localSendFile.fileName();
             m_localSendFile.close();
