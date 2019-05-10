@@ -59,8 +59,8 @@ private:
     bool sendOneDir(QString strDirPath);
     void sendFeedback(TransferState transferState=TransferState::Stop,TransferResult transferResult=TransferResult::Existed);
 
-    void updateSendInfo(double dProcess);
-    void updateReceiveInfo(double dProcess);
+    void updateSendInfo(float fProcess);
+    void updateReceiveInfo(float fProcess);
 
     QByteArray getFileMD5(QString strFilePath);
     QByteArray getSmallFileMD5(QString strFilePath);

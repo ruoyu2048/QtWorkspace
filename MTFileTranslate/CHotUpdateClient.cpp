@@ -123,8 +123,6 @@ bool CHotUpdateClient::sendOneFile(QString strFile)
     if( fileInfo.exists() && fileInfo.isFile() ){
         m_fileTransferInfoList.clear();
         FileTransferInfo fti;
-        fti.sendType=SendType::File;
-        fti.transferState=TransferState::Start;
         fti.nTotal=1;
         fti.nIndex=1;
         int nFTISize=static_cast<qint64>(sizeof(FileTransferInfo));
@@ -133,6 +131,9 @@ bool CHotUpdateClient::sendOneFile(QString strFile)
         sprintf(fti.cFileSrcPath,"%s",fileInfo.filePath().toStdString().c_str());
         sprintf(fti.cFileDstPath,"/%s","");
         sprintf(fti.cMD5,"%s",getFileMD5(fileInfo.filePath()).constData());
+        fti.sendType=SendType::File;
+        fti.transferState=TransferState::Start;
+        fti.transferResult=TransferResult::Existed;
 
         m_fileTransferInfoList.push_back(fti);
         emit loopSend();//触发循环发送信号
@@ -154,8 +155,6 @@ bool CHotUpdateClient::sendOneDir(QString strDirPath)
            QFileInfo fileInfo=fileInfoList.at(i);
 
            FileTransferInfo fti;
-           fti.sendType=SendType::Dir;
-           fti.transferState=TransferState::Start;
            fti.nTotal=nSzie;
            fti.nIndex=i+1;
            int nFTISize=static_cast<qint64>(sizeof(FileTransferInfo));
@@ -166,6 +165,9 @@ bool CHotUpdateClient::sendOneDir(QString strDirPath)
            QString strDstDir=fileInfo.absolutePath().mid(nPos);
            sprintf(fti.cFileDstPath,"/%s",strDstDir.toStdString().c_str());
            sprintf(fti.cMD5,"%s",getFileMD5(fileInfo.filePath()).constData());
+           fti.sendType=SendType::Dir;
+           fti.transferState=TransferState::Start;
+           fti.transferResult=TransferResult::Existed;
 
            m_fileTransferInfoList.push_back(fti);
         }
@@ -185,12 +187,12 @@ void CHotUpdateClient::sendFeedback(TransferState transferState,TransferResult t
     m_inBlock.resize(0);
 }
 
-void CHotUpdateClient::updateSendInfo(double dProcess)
+void CHotUpdateClient::updateSendInfo(float fProcess)
 {
     FileUpdateInfo fuInfo;
     fuInfo.nTotal=m_fileTransferInfoSend.nTotal;
     fuInfo.nIndex=m_fileTransferInfoSend.nIndex;
-    fuInfo.dProcess=dProcess;
+    fuInfo.dProcess=fProcess;
     if( !m_bIsNormalClient ){//非普通客户端,则添加标识
         sprintf(fuInfo.cHandleFlag,"%s",m_handleFlag.toLatin1().data());
     }
@@ -201,12 +203,12 @@ void CHotUpdateClient::updateSendInfo(double dProcess)
     emit updateSendProcess(fuInfo);
 }
 
-void CHotUpdateClient::updateReceiveInfo(double dProcess)
+void CHotUpdateClient::updateReceiveInfo(float fProcess)
 {
     FileUpdateInfo fuInfo;
     fuInfo.nTotal=m_fileTransferInfoRecv.nTotal;
     fuInfo.nIndex=m_fileTransferInfoRecv.nIndex;
-    fuInfo.dProcess=dProcess;
+    fuInfo.dProcess=fProcess;
     if( !m_bIsNormalClient ){//非普通客户端,则添加标识
         sprintf(fuInfo.cHandleFlag,"%s",m_handleFlag.toLatin1().data());
     }
@@ -433,7 +435,7 @@ void CHotUpdateClient::onReadyRead()
         }
 
         //更新接收文件进度
-        double dRecvProcess=static_cast<double>(m_nReadBytesRead/m_nReadTotalBytes);
+        float dRecvProcess=static_cast<float>(m_nReadBytesRead/m_nReadTotalBytes);
         updateReceiveInfo(dRecvProcess);
         if( m_nReadBytesRead == m_nReadTotalBytes ){
             //关闭本地文件
@@ -463,8 +465,8 @@ void CHotUpdateClient::onUpdateWritten(qint64 nBytesWritten)
         //统计已发送数据大小
         m_nWriteBytesWritten += nBytesWritten;
         //更新发送文件进度
-        double dSendProcess=static_cast<double>(m_nWriteBytesWritten/m_nWriteTotalBytes);
-        updateSendInfo(dSendProcess);
+        float fSendProcess=static_cast<float>(m_nWriteBytesWritten/m_nWriteTotalBytes);
+        updateSendInfo(fSendProcess);
         //如果数据未发送完毕，则继续发送
         if( m_nWriteBytesReady>0 ){
             m_outBlock=m_localSendFile.read(qMin(m_nWriteBytesReady,m_nPerDataSize));
