@@ -187,12 +187,12 @@ void CHotUpdateClient::sendFeedback(TransferState transferState,TransferResult t
     m_inBlock.resize(0);
 }
 
-void CHotUpdateClient::updateSendInfo(float fProcess)
+void CHotUpdateClient::updateSendInfo(double dProcess)
 {
     FileUpdateInfo fuInfo;
     fuInfo.nTotal=m_fileTransferInfoSend.nTotal;
     fuInfo.nIndex=m_fileTransferInfoSend.nIndex;
-    fuInfo.dProcess=fProcess;
+    fuInfo.dProcess=dProcess;
     if( !m_bIsNormalClient ){//非普通客户端,则添加标识
         sprintf(fuInfo.cHandleFlag,"%s",m_handleFlag.toLatin1().data());
     }
@@ -203,12 +203,12 @@ void CHotUpdateClient::updateSendInfo(float fProcess)
     emit updateSendProcess(fuInfo);
 }
 
-void CHotUpdateClient::updateReceiveInfo(float fProcess)
+void CHotUpdateClient::updateReceiveInfo(double dProcess)
 {
     FileUpdateInfo fuInfo;
     fuInfo.nTotal=m_fileTransferInfoRecv.nTotal;
     fuInfo.nIndex=m_fileTransferInfoRecv.nIndex;
-    fuInfo.dProcess=fProcess;
+    fuInfo.dProcess=dProcess;
     if( !m_bIsNormalClient ){//非普通客户端,则添加标识
         sprintf(fuInfo.cHandleFlag,"%s",m_handleFlag.toLatin1().data());
     }
@@ -435,7 +435,7 @@ void CHotUpdateClient::onReadyRead()
         }
 
         //更新接收文件进度
-        float dRecvProcess=static_cast<float>(m_nReadBytesRead/m_nReadTotalBytes);
+        double dRecvProcess=static_cast<double>(m_nReadBytesRead/m_nReadTotalBytes);
         updateReceiveInfo(dRecvProcess);
         if( m_nReadBytesRead == m_nReadTotalBytes ){
             //关闭本地文件
@@ -465,8 +465,8 @@ void CHotUpdateClient::onUpdateWritten(qint64 nBytesWritten)
         //统计已发送数据大小
         m_nWriteBytesWritten += nBytesWritten;
         //更新发送文件进度
-        float fSendProcess=static_cast<float>(m_nWriteBytesWritten/m_nWriteTotalBytes);
-        updateSendInfo(fSendProcess);
+        double dSendProcess=static_cast<double>(m_nWriteBytesWritten/m_nWriteTotalBytes);
+        updateSendInfo(dSendProcess);
         //如果数据未发送完毕，则继续发送
         if( m_nWriteBytesReady>0 ){
             m_outBlock=m_localSendFile.read(qMin(m_nWriteBytesReady,m_nPerDataSize));
