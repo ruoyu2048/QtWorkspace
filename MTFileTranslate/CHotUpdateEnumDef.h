@@ -16,8 +16,9 @@ enum TransferState{
 };
 
 enum TransferResult{
-    Success,
-    Fail
+    Existed,//文件已存在
+    Success,//文件传输成功
+    Fail//文件传输失败
 };
 
 #endif // CHOTUPDATEENUMDEF_H

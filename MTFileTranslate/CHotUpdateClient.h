@@ -57,7 +57,7 @@ private:
 
     bool sendOneFile(QString strFile);
     bool sendOneDir(QString strDirPath);
-    void sendFeedback(TransferState transferState=TransferState::Stop);
+    void sendFeedback(TransferState transferState=TransferState::Stop,TransferResult transferResult=TransferResult::Existed);
 
     void updateSendInfo(double dProcess);
     void updateReceiveInfo(double dProcess);

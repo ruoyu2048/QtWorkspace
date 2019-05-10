@@ -175,9 +175,10 @@ bool CHotUpdateClient::sendOneDir(QString strDirPath)
     return false;
 }
 
-void CHotUpdateClient::sendFeedback(TransferState transferState)
+void CHotUpdateClient::sendFeedback(TransferState transferState,TransferResult transferResult)
 {
     m_fileTransferInfoRecv.transferState=transferState;
+    m_fileTransferInfoRecv.transferResult=transferResult;
     m_inBlock.resize(sizeof(FileTransferInfo));
     memcpy(m_inBlock.data(),&m_fileTransferInfoRecv,sizeof(FileTransferInfo));
     this->write(m_inBlock);
@@ -396,15 +397,14 @@ void CHotUpdateClient::onReadyRead()
                     }
                     m_localRecvFile.setFileName(strAbsFilePath);
                     if( !m_localRecvFile.open(QFile::WriteOnly) ){
-                        sendFeedback(TransferState::Stop);
+                        sendFeedback(TransferState::Stop,TransferResult::Fail);
                         resetReadVariables();
                         return;
                     }
-                    sendFeedback(TransferState::Continue);
+                    sendFeedback(TransferState::Continue,TransferResult::Success);
                 }
                 else{
-                    m_fileTransferInfoRecv.transferResult=TransferResult::Success;
-                    sendFeedback(TransferState::Stop);
+                    sendFeedback(TransferState::Stop,TransferResult::Existed);
                     resetReadVariables();
                 }
             }
@@ -414,7 +414,9 @@ void CHotUpdateClient::onReadyRead()
                 emit bytesWritten(m_nWriteTotalBytes-m_nWriteBytesReady);
             }
             else if( TransferState::Stop==m_fileTransferInfoRecv.transferState ){
-                //qDebug()<<m_fileTransferInfoRecv.nTotal<<m_fileTransferInfoRecv.nIndex<<m_fileTransferInfoRecv.transferResult;
+                if( TransferResult::Existed==m_fileTransferInfoRecv.transferResult ){
+                    emit updateSendInfo(1.0);//更新已存在文件的传输进度
+                }
                 m_fileTransferInfoList.pop_front();
                 resetWriteVariables();
                 resetReadVariables();
@@ -443,13 +445,12 @@ void CHotUpdateClient::onReadyRead()
             //比对下载文件MD5,检验文件是否传输成功
             QByteArray localMD5=getFileMD5(m_localRecvFile.fileName());
             if( 0==strcmp(m_fileTransferInfoRecv.cMD5,localMD5.constData()) ){
-                m_fileTransferInfoRecv.transferResult=TransferResult::Success;
+                //发送回执
+                sendFeedback(TransferState::Stop,TransferResult::Success);
             }
             else{
-                m_fileTransferInfoRecv.transferResult=TransferResult::Fail;
+                sendFeedback(TransferState::Stop,TransferResult::Fail);
             }
-            //发送回执
-            sendFeedback(TransferState::Stop);
             //重置读取文件变量
             resetReadVariables();
         }
