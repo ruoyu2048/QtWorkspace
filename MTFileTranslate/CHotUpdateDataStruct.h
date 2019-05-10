@@ -4,7 +4,7 @@
 #include <memory.h>
 #include "CHotUpdateEnumDef.h"
 
-//#pragma pack(1)
+//#pragma pack(4)
 typedef struct _FileTransferInfo{//文件传输信息
     SendType sendType;//发送类型
     TransferState transferState;//文件发送状态
@@ -30,7 +30,7 @@ typedef struct _FileUpdateInfo{
     char cFileName[128];    //文件名
     char cFilePath[256];    //文件所在文件夹绝对路径
     _FileUpdateInfo(){
-        memset(&cHandleFlag,0,sizeof (_FileUpdateInfo));
+        memset(&nTotal,0,sizeof (_FileUpdateInfo));
     }
 }FileUpdateInfo;
 //#pragma pack()
