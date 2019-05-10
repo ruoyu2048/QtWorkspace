@@ -188,12 +188,12 @@ void CHotUpdateClient::sendFeedback(TransferState transferState,TransferResult t
 void CHotUpdateClient::updateSendInfo(double dProcess)
 {
     FileUpdateInfo fuInfo;
-    if( !m_bIsNormalClient ){//非普通客户端,则添加标识
-        sprintf(fuInfo.cHandleFlag,"%s",m_handleFlag.toLatin1().data());
-    }
     fuInfo.nTotal=m_fileTransferInfoSend.nTotal;
     fuInfo.nIndex=m_fileTransferInfoSend.nIndex;
     fuInfo.dProcess=dProcess;
+    if( !m_bIsNormalClient ){//非普通客户端,则添加标识
+        sprintf(fuInfo.cHandleFlag,"%s",m_handleFlag.toLatin1().data());
+    }
     sprintf(fuInfo.cFileName,"%s",m_fileTransferInfoSend.cFileName);
     QString strSrcPath(m_fileTransferInfoSend.cFileSrcPath);
     QFileInfo fileInfo(strSrcPath);
@@ -204,12 +204,12 @@ void CHotUpdateClient::updateSendInfo(double dProcess)
 void CHotUpdateClient::updateReceiveInfo(double dProcess)
 {
     FileUpdateInfo fuInfo;
-    if( !m_bIsNormalClient ){//非普通客户端,则添加标识
-        sprintf(fuInfo.cHandleFlag,"%s",m_handleFlag.toLatin1().data());
-    }
     fuInfo.nTotal=m_fileTransferInfoRecv.nTotal;
     fuInfo.nIndex=m_fileTransferInfoRecv.nIndex;
     fuInfo.dProcess=dProcess;
+    if( !m_bIsNormalClient ){//非普通客户端,则添加标识
+        sprintf(fuInfo.cHandleFlag,"%s",m_handleFlag.toLatin1().data());
+    }
     sprintf(fuInfo.cFileName,"%s",m_fileTransferInfoRecv.cFileName);
 
     QDir dstDir;
