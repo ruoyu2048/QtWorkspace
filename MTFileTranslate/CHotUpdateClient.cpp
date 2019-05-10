@@ -21,6 +21,7 @@ CHotUpdateClient::CHotUpdateClient(QObject *parent):
     m_nPerDataSize(1024*1024),//1024K
     m_bContinue(false)
 {
+    qRegisterMetaType<FileTransferInfo>("FileTransferInfo");
     initHotUpdateClient();
 }
 
@@ -38,6 +39,7 @@ CHotUpdateClient::CHotUpdateClient(qintptr handle, QObject *parent):
     m_handleId(handle),
     m_bContinue(false)
 {
+    qRegisterMetaType<FileTransferInfo>("FileTransferInfo");
     initHotUpdateClient(handle);
 }
 

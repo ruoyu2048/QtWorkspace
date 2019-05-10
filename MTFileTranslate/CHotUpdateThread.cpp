@@ -8,8 +8,7 @@ CHotUpdateThread::CHotUpdateThread(qintptr handle, QObject *parent):
     QThread(parent),
     m_handleId(handle)
 {
-    qRegisterMetaType<qintptr>("qintptr");
-    qRegisterMetaType<FileTransferInfo>("FileTransferInfo");
+
 }
 
 CHotUpdateThread::~CHotUpdateThread()

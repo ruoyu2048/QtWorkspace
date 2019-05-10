@@ -4,7 +4,6 @@ CHotUpdateServer::CHotUpdateServer(QObject *parent):QTcpServer(parent)
 {
     qRegisterMetaType<qintptr>("qintptr");
     qRegisterMetaType<SendType>("SendType");
-    qRegisterMetaType<FileTransferInfo>("FileTransferInfo");
 }
 
 bool CHotUpdateServer::startListen(QString strIP, quint16 nPort)
