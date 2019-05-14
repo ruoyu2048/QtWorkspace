@@ -200,7 +200,10 @@ void CHotUpdateClient::updateSendInfo(double dProcess)
     QString strSrcPath(m_fileTransferInfoSend.cFileSrcPath);
     QFileInfo fileInfo(strSrcPath);
     sprintf(fuInfo.cFilePath,"%s",fileInfo.absolutePath().toStdString().c_str());
-    emit updateSendProcess(fuInfo);
+
+    QVariant varSP;
+    varSP.setValue(fuInfo);
+    emit updateSendProcess(varSP);
 }
 
 void CHotUpdateClient::updateReceiveInfo(double dProcess)
@@ -221,7 +224,10 @@ void CHotUpdateClient::updateReceiveInfo(double dProcess)
     QString strAbsFilePath=strAbsDirPath+"/"+strFileName;
     QFileInfo fileInfo(strAbsFilePath);
     sprintf(fuInfo.cFilePath,"%s",fileInfo.absolutePath().toStdString().c_str());
-    emit updateReceiveProcess(fuInfo);
+
+    QVariant varRP;
+    varRP.setValue(fuInfo);
+    emit updateReceiveProcess(varRP);
 }
 
 QByteArray CHotUpdateClient::getFileMD5(QString strFilePath)

@@ -32,9 +32,9 @@ signals:
 
     void stopRunning();
 
-    void transferUpdateSendProcess( FileUpdateInfo fuInfo );
+    void transferUpdateSendProcess( QVariant varSP );
 
-    void tranferUpdateReceiveProcess( FileUpdateInfo fuInfo );
+    void tranferUpdateReceiveProcess( QVariant varRP );
 
 public slots:
 

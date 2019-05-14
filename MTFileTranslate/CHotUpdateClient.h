@@ -69,8 +69,21 @@ private:
 signals:
     void loopSend();
     //普通客户端使用
-    void updateSendProcess(FileUpdateInfo fuInfo);
-    void updateReceiveProcess(FileUpdateInfo fuInfo);
+//    void updateSendProcess(FileUpdateInfo fuInfo);
+//    void updateReceiveProcess(FileUpdateInfo fuInfo);
+    ///
+    /// \brief updateSendProcess 更新发送进度
+    /// \param varSP 文件更新信息对象，由于跨线程时，FileUpdateInfo总是提示注册失败，
+    ///        因此将FileUpdateInfo转换成Qt能够识别的QVariant对象，在使用时使用QVariant
+    ///        的setValue()方法和value()获取FileUpdateInfo对象。
+    ///
+    void updateSendProcess(QVariant varSP);//varSP=FileUpdateInfo
+
+    ///
+    /// \brief updateReceiveProcess更新接收进度
+    /// \param varRP
+    ///
+    void updateReceiveProcess(QVariant varRP);//varRP=FileUpdateInfo
 
 public slots:
     ///

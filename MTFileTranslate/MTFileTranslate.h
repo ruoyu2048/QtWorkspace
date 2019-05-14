@@ -22,8 +22,11 @@ public:
 public slots:
     void onClientConnected();
     void onClientDisconnected();
-    void onUpdateSendProcess(FileUpdateInfo fuInfo);
-    void onUpdateReceiveProcess(FileUpdateInfo fuInfo);
+//    void onUpdateSendProcess(FileUpdateInfo fuInfo);
+//    void onUpdateReceiveProcess(FileUpdateInfo fuInfo);
+
+    void onUpdateSendProcess(QVariant varSP);
+    void onUpdateReceiveProcess(QVariant varRP);
 
 private slots:
     void on_btnStartServer_clicked();

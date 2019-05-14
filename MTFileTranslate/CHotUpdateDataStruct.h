@@ -1,6 +1,7 @@
 #ifndef CHOTUPDATEDATASTRUCT_H
 #define CHOTUPDATEDATASTRUCT_H
 #include <QtGlobal>
+#include <QMetaType>
 #include <memory.h>
 #include "CHotUpdateEnumDef.h"
 
@@ -33,6 +34,8 @@ typedef struct _FileUpdateInfo{
         memset(&nTotal,0,sizeof (_FileUpdateInfo));
     }
 }FileUpdateInfo;
+Q_DECLARE_METATYPE(FileUpdateInfo)
+
 //#pragma pack()
 
 #endif // CHOTUPDATEDATASTRUCT_H

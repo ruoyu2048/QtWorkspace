@@ -23,8 +23,8 @@ void CHotUpdateThread::run()
     pClient->setHandleFlag(pClient->peerAddress().toString(),pClient->peerPort());
     connect(pClient,SIGNAL(disconnected()),this,SLOT(quit()));
     connect(pClient,SIGNAL(disconnected()),this,SLOT(onDisconnected()));
-    connect(pClient,SIGNAL(updateSendProcess(FileUpdateInfo)),this,SIGNAL(transferUpdateSendProcess(FileUpdateInfo)));
-    connect(pClient,SIGNAL(updateReceiveProcess(FileUpdateInfo)),this,SIGNAL(tranferUpdateReceiveProcess(FileUpdateInfo)));
+    connect(pClient,&CHotUpdateClient::updateSendProcess,this,&CHotUpdateThread::transferUpdateSendProcess);
+    connect(pClient,&CHotUpdateClient::updateReceiveProcess,this,&CHotUpdateThread::tranferUpdateReceiveProcess);
     //服务端发送文件信号
     connect(this,SIGNAL(setToBeSendFile(QString,SendType)),pClient,SLOT(sendFile(QString)));
     connect(this,SIGNAL(stopRunning()),pClient,SLOT(onStopConnect()));

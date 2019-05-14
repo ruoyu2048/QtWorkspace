@@ -9,14 +9,14 @@ MTFileTranslate::MTFileTranslate(QWidget *parent) :
     ui->setupUi(this);
 
     pS = new CHotUpdateServer(this);
-    connect(pS,SIGNAL(tsUpdateSendProcess(FileUpdateInfo)),this,SLOT(onUpdateSendProcess(FileUpdateInfo)));
-    connect(pS,SIGNAL(tsUpdateReceiveProcess(FileUpdateInfo)),this,SLOT(onUpdateReceiveProcess(FileUpdateInfo)));
+    connect(pS,&CHotUpdateServer::tsUpdateSendProcess,this,&MTFileTranslate::onUpdateSendProcess);
+    connect(pS,&CHotUpdateServer::tsUpdateReceiveProcess,this,&MTFileTranslate::onUpdateReceiveProcess);
 
     pC = new CHotUpdateClient(this);
     connect(pC,SIGNAL(connected()),this,SLOT(onClientConnected()));
     connect(pC,SIGNAL(disconnected()),this,SLOT(onClientDisconnected()));
-    connect(pC,SIGNAL(updateSendProcess(FileUpdateInfo)),this,SLOT(onUpdateSendProcess(FileUpdateInfo)));
-    connect(pC,SIGNAL(updateReceiveProcess(FileUpdateInfo)),this,SLOT(onUpdateReceiveProcess(FileUpdateInfo)));
+    connect(pC,&CHotUpdateClient::updateSendProcess,this,&MTFileTranslate::onUpdateSendProcess);
+    connect(pC,&CHotUpdateClient::updateReceiveProcess,this,&MTFileTranslate::onUpdateReceiveProcess);
 }
 
 MTFileTranslate::~MTFileTranslate()
@@ -35,22 +35,29 @@ void MTFileTranslate::onClientDisconnected()
     ui->btnStartClient->setText("连接服务");
 }
 
-void MTFileTranslate::onUpdateSendProcess(FileUpdateInfo fuInfo)
+void MTFileTranslate::onUpdateSendProcess(QVariant varSP)
 {
-    QString ss=QString("Total:%1[Index:%2] Process:").arg(fuInfo.nTotal).arg(fuInfo.nIndex)+QString::number(fuInfo.dProcess*100,'f',1);
-    if( 0==strlen(fuInfo.cHandleFlag) )
-        ui->leJDC->setText("C-Send:"+ss);
-    else
-        ui->leJDS->setText("S-Send:"+ss);
+    if( varSP.isValid() ){
+        FileUpdateInfo fuInfo=varSP.value<FileUpdateInfo>();
+
+        QString ss=QString("Total:%1[Index:%2] Process:").arg(fuInfo.nTotal).arg(fuInfo.nIndex)+QString::number(fuInfo.dProcess*100,'f',1);
+        if( 0==strlen(fuInfo.cHandleFlag) )
+            ui->leJDC->setText("C-Send:"+ss);
+        else
+            ui->leJDS->setText("S-Send:"+ss);
+    }
 }
 
-void MTFileTranslate::onUpdateReceiveProcess(FileUpdateInfo fuInfo)
+void MTFileTranslate::onUpdateReceiveProcess(QVariant varRP)
 {
-    QString ss=QString("Total:%1[Index:%2] Process:").arg(fuInfo.nTotal).arg(fuInfo.nIndex)+QString::number(fuInfo.dProcess*100,'f',1);
-    if( 0==strlen(fuInfo.cHandleFlag) )
-        ui->leJDC->setText("C-Recv:"+ss);
-    else
-        ui->leJDS->setText("S-Recv:"+ss);
+    if( varRP.isValid() ){
+        FileUpdateInfo fuInfo=varRP.value<FileUpdateInfo>();
+        QString ss=QString("Total:%1[Index:%2] Process:").arg(fuInfo.nTotal).arg(fuInfo.nIndex)+QString::number(fuInfo.dProcess*100,'f',1);
+        if( 0==strlen(fuInfo.cHandleFlag) )
+            ui->leJDC->setText("C-Recv:"+ss);
+        else
+            ui->leJDS->setText("S-Recv:"+ss);
+    }
 }
 
 void MTFileTranslate::on_btnStartServer_clicked()
