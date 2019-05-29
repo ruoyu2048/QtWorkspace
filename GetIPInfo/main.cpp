@@ -5,6 +5,8 @@ int main(int argc, char *argv[])
 {
     //QCoreApplication a(argc, argv);
     int flag =0;
+
+
     if(argc==1)
     {
         printf("Instructions:\n1 Get MoNiZhiHui Net IP information\n2 Get FangZhenDuiKang Net IP information\n");
