@@ -19,10 +19,11 @@ enum CommunicationType{
 
 class CommunicationCfg{
 public:
-    QString strCommuId;      //通信对象Id
-    QString strCommuPara;    //通信对象配置参数
-    QString strCommuLinkedId;//当前通信对象关联的通信对象Id
-    CommunicationType CommuType;      //当前通信对象类型
+    bool    isEnable;           //是否启用
+    QString strCommuId;         //通信对象Id
+    QString strCommuPara;       //通信对象配置参数
+    QString strCommuLinkedId;   //当前通信对象关联的通信对象Id
+    CommunicationType CommuType;//当前通信对象类型
 };
 
 

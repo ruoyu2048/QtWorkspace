@@ -49,6 +49,16 @@ public:
      */
     bool isToLocal( quint8 msgDst );
 
+    /**
+     * @brief clearEncodeAry 清空转码后的报文缓存
+     */
+    void clearEncodeAry();
+
+    /**
+     * @brief clearDecodeAry 清空解码后的报文缓存
+     */
+    void clearDecodeAry();
+
 private:
     /**
      * @brief checkBitTest 校验位检测

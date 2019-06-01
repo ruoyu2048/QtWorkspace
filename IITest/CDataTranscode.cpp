@@ -195,6 +195,16 @@ bool CDataTranscode::isToLocal(quint8 msgDst)
     return (m_msgSrc==msgDst);
 }
 
+void CDataTranscode::clearEncodeAry()
+{
+    m_encodeAry.clear();
+}
+
+void CDataTranscode::clearDecodeAry()
+{
+    m_decodeAry.clear();
+}
+
 bool CDataTranscode::checkBitTest( QByteArray encodeDataAry ){
     quint16 nTotalLen  = encodeDataAry.length();
     if( nTotalLen >= 3 ){
