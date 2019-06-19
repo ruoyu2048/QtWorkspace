@@ -24,24 +24,35 @@ void PluginMacroConfig::initContrals()
 {
     m_pGLMain = new QGridLayout();
     this->setLayout(m_pGLMain);
-    this->setFixedSize(800,600);
-    m_pLBCfgFileName = new QLabel(tr("Configuration file name:"));
+    this->setMinimumWidth(940);
+    this->setMinimumHeight(600);
+
+//    m_pLBCfgFileName = new QLabel(tr("Configuration file name:"));
+//    m_pCBCfgFileName = new QComboBox();
+//    m_pBtnStartCfg = new QPushButton("Start configuring");
+//    m_pBtnSaveCfg = new QPushButton("Save configuration");
+//    m_pBtnGetCfg = new QPushButton("Get configuration");
+//    m_pBtnAddCfg = new QPushButton("Add configuration");
+//    m_pBtnDeleteCfg = new QPushButton("Delete configuration");
+//    m_pBtnJobRelationCfg = new QPushButton("Job relation configuration");
+
+    m_pLBCfgFileName = new QLabel(QStringLiteral("配置文件名称:"));
     m_pCBCfgFileName = new QComboBox();
-    m_pBtnStartCfg = new QPushButton("Start configuring");
-    m_pBtnSaveCfg = new QPushButton("Save configuration");
-    m_pBtnGetCfg = new QPushButton("Get configuration");
-    m_pBtnAddCfg = new QPushButton("Add configuration");
-    m_pBtnDeleteCfg = new QPushButton("Delete configuration");
-    m_pBtnJobRelationCfg = new QPushButton("Job relation configuration");
+    m_pBtnStartCfg = new QPushButton(QStringLiteral("开始配置"));
+    m_pBtnSaveCfg = new QPushButton(QStringLiteral("保存配置"));
+    m_pBtnGetCfg = new QPushButton(QStringLiteral("获取配置"));
+    m_pBtnAddCfg = new QPushButton(QStringLiteral("添加配置"));
+    m_pBtnDeleteCfg = new QPushButton(QStringLiteral("删除配置"));
+    m_pBtnJobRelationCfg = new QPushButton(QStringLiteral("作业关系配置"));
 
     m_pGLMain->addWidget(m_pLBCfgFileName,0,0,1,1);
-    m_pGLMain->addWidget(m_pCBCfgFileName,0,1,1,2);
-    m_pGLMain->addWidget(m_pBtnStartCfg,0,3,1,1);
-    m_pGLMain->addWidget(m_pBtnSaveCfg,0,4,1,1);
-    m_pGLMain->addWidget(m_pBtnGetCfg,0,5,1,1);
-    m_pGLMain->addWidget(m_pBtnAddCfg,0,6,1,1);
-    m_pGLMain->addWidget(m_pBtnDeleteCfg,0,7,1,1);
-    m_pGLMain->addWidget(m_pBtnJobRelationCfg,0,8,1,1);
+    m_pGLMain->addWidget(m_pCBCfgFileName,0,1,1,1);
+    m_pGLMain->addWidget(m_pBtnStartCfg,0,2,1,1);
+    m_pGLMain->addWidget(m_pBtnSaveCfg,0,3,1,1);
+    m_pGLMain->addWidget(m_pBtnGetCfg,0,4,1,1);
+    m_pGLMain->addWidget(m_pBtnAddCfg,0,5,1,1);
+    m_pGLMain->addWidget(m_pBtnDeleteCfg,0,6,1,1);
+    m_pGLMain->addWidget(m_pBtnJobRelationCfg,0,7,1,1);
 
     connect(m_pCBCfgFileName,SIGNAL(currentIndexChanged(int)),this,SLOT(onCBCfgFileName(int)));
     connect(m_pBtnStartCfg,&QPushButton::clicked,this,&PluginMacroConfig::onCBCfgFileName);
@@ -60,7 +71,7 @@ void PluginMacroConfig::initConfigurationManage()
     m_pCfgManageTree = new QTreeWidget();
     m_pCfgManageTree->setColumnCount(1);
     m_pCfgManageTree->header()->setVisible(false);
-    m_pGLMain->addWidget(m_pCfgManageTree,1,0,10,3);
+    m_pGLMain->addWidget(m_pCfgManageTree,1,0,1,2);
     connect(m_pCfgManageTree,&QTreeWidget::itemChanged,this,&PluginMacroConfig::onItemChanged);
 
 
@@ -82,8 +93,7 @@ void PluginMacroConfig::initConfigurationDisplayTab()
 {
     m_pCfgDispalyTab=new QTabWidget();
     m_pCfgDispalyTab->setTabShape(QTabWidget::Rounded);
-    m_pGLMain->addWidget(m_pCfgDispalyTab,1,3,10,6);
-
+    m_pGLMain->addWidget(m_pCfgDispalyTab,1,2,1,6);
 }
 
 void PluginMacroConfig::initConfigurationDisplay()
