@@ -8,10 +8,6 @@
 
 IXbelTree::IXbelTree(QWidget *parent):QTreeWidget(parent)
 {
-//    QStringList labels;
-//    labels << tr("Title") << tr("Location");
-//    setHeaderLabels(labels);
-
     header()->setSectionResizeMode(QHeaderView::Stretch);
 
     m_folderIcon.addPixmap(style()->standardPixmap(QStyle::SP_DirClosedIcon),QIcon::Normal, QIcon::Off);
@@ -140,8 +136,7 @@ bool IXbelTree::read(QIODevice *device)
         child = child.nextSiblingElement("folder");
     }
 
-    connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)),
-            this, SLOT(updateDomElement(QTreeWidgetItem*,int)));
+    connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)),this, SLOT(updateDomElement(QTreeWidgetItem*,int)));
 
     return true;
 }

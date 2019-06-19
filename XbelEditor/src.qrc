@@ -1,5 +1,11 @@
 <RCC>
     <qresource prefix="/">
-        <file>jennifer.xml</file>
+        <file>files/jennifer.xbel</file>
+        <file>img/branch-closed.png</file>
+        <file>img/branch-end.png</file>
+        <file>img/branch-more.png</file>
+        <file>img/branch-open.png</file>
+        <file>img/branch-vline.png</file>
+        <file>qss/treeView.qss</file>
     </qresource>
 </RCC>

@@ -1,16 +1,15 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2018-12-05T14:03:27
+# Project created by QtCreator 2019-06-19T11:20:27
 #
 #-------------------------------------------------
 
-QT       += core gui xml
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = XbelEditor
+TARGET = PluginMacroConfig
 TEMPLATE = app
-
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
@@ -26,16 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        XbelEditor.cpp \
-        XbelTree.cpp \
-        IXbelTree.cpp \
-        IXbelEditor.cpp
+        PluginMacroConfig.cpp
 
 HEADERS += \
-        XbelEditor.h \
-        XbelTree.h \
-        IXbelTree.h \
-        IXbelEditor.h
-
-RESOURCES += \
-        src.qrc
+        PluginMacroConfig.h

@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root zh="A" id="1" en="A型雷达">
+    <class zh="雷达分机_1" type="ctrl" en="Extension_1">
+        <unit zh="开机" en="Power On" cmd="1">
+            <attribute>
+                <zh>开机</zh>
+                <en>PowerOn</en>
+                <id>1</id>
+                <show>true</show>
+                <set>sss</set>
+                <dataType>int</dataType>
+                <dataLen>100</dataLen>
+                <displayType>text</displayType>
+                <select>sss</select>
+                <default>11</default>
+                <regExp>1</regExp>
+                <regTips>1</regTips>
+            </attribute>
+            <attribute>
+                <zh>开机</zh>
+                <en>PowerOn</en>
+                <id>2</id>
+                <show>true</show>
+                <set>sss</set>
+                <dataType>int</dataType>
+                <dataLen>100</dataLen>
+                <displayType>text</displayType>
+                <select>sss</select>
+                <default>11</default>
+                <regExp>1</regExp>
+                <regTips>1</regTips>
+            </attribute>
+        </unit>
+    </class>
+</root>
