@@ -4,8 +4,8 @@
 #include "IXbelEditor.h"
 #include <QPushButton>
 #include <QGridLayout>
+#include <QTreeWidgetItem>
 
-//class IXbelTree;
 class XbelEditor : public IXbelEditor
 {
     Q_OBJECT
@@ -28,6 +28,7 @@ private:
     void initMainWindow( QString strCfgFilePath );
 
 private slots:
+    void onItemClicked(QTreeWidgetItem* pItem, int columcount);
     /**
      * @brief onBtnSave 保存界面配置槽函数
      */
