@@ -1,4 +1,4 @@
-#ifndef PLUGINMACROCONFIG_H
+﻿#ifndef PLUGINMACROCONFIG_H
 #define PLUGINMACROCONFIG_H
 
 #include <QWidget>
@@ -7,7 +7,16 @@
 #include <QTreeWidget>
 #include <QTabWidget>
 #include <QComboBox>
+#include <QFileInfo>
 #include <QLabel>
+
+#include "SubConfigDispalyTree.h"
+
+struct SubCfgInfo{
+    QString strName;//分机名称
+    QString strBaseName;//文件名(无后缀)
+    QString strAbsFilePath;//分机配置文件绝对路径
+};
 
 class PluginMacroConfig : public QWidget
 {
@@ -18,11 +27,32 @@ public:
     ~PluginMacroConfig();
 private:
     void initMainWindow();
+    /**
+     * @brief initContrals 按钮初始化
+     */
     void initContrals();
-    void initConfigurationManage();
-    void initConfigurationDisplayTab();
-    void initConfigurationDisplay();
 
+    /**
+     * @brief initConfigFileNameCommbox 文件列表初始化
+     */
+    void initConfigFileNameCommbox();
+
+    /**
+     * @brief initDeviceCfgManageTree 初始化设备配置管理树控件
+     */
+    void initDeviceCfgManageTree();
+
+    /**
+     * @brief initSubCfgDisplayTab 分机配置信息Tab控件初始化
+     */
+    void initSubCfgDisplayTab();
+
+    void showWindow(int nRadarId);
+
+
+    void resetSubCfgDisplayTabItem(int nRadarId);
+
+    bool getSubCfgInfo(int nRadarId,QList<SubCfgInfo> &cfgInfoList);
 
 private slots:
     void onCBCfgFileName(int nIndex);
@@ -53,7 +83,7 @@ private:
     QTreeWidgetItem* m_pCfgManageRootItem;
 
     QTabWidget*  m_pCfgDispalyTab;
-    QTreeWidget* m_pCfgDisplayTree;
+    SubConfigDispalyTree* m_pCfgSubTree;
 };
 
 #endif // PLUGINMACROCONFIG_H

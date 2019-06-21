@@ -1,6 +1,9 @@
 ﻿#include "PluginMacroConfig.h"
+#include <QMessageBox>
 #include <QHeaderView>
 #include <QDebug>
+#include <QDir>
+#include <QDomDocument>
 
 PluginMacroConfig::PluginMacroConfig(QWidget *parent):QWidget(parent)
 {
@@ -15,9 +18,9 @@ PluginMacroConfig::~PluginMacroConfig()
 void PluginMacroConfig::initMainWindow()
 {
     initContrals();
-    initConfigurationManage();
-    initConfigurationDisplayTab();
-    initConfigurationDisplay();
+    initDeviceCfgManageTree();
+    initSubCfgDisplayTab();
+    showWindow(0);
 }
 
 void PluginMacroConfig::initContrals()
@@ -55,67 +58,145 @@ void PluginMacroConfig::initContrals()
     m_pGLMain->addWidget(m_pBtnJobRelationCfg,0,7,1,1);
 
     connect(m_pCBCfgFileName,SIGNAL(currentIndexChanged(int)),this,SLOT(onCBCfgFileName(int)));
-    connect(m_pBtnStartCfg,&QPushButton::clicked,this,&PluginMacroConfig::onCBCfgFileName);
-    connect(m_pBtnSaveCfg,&QPushButton::clicked,this,&PluginMacroConfig::onCBCfgFileName);
-    connect(m_pBtnGetCfg,&QPushButton::clicked,this,&PluginMacroConfig::onCBCfgFileName);
-    connect(m_pBtnAddCfg,&QPushButton::clicked,this,&PluginMacroConfig::onCBCfgFileName);
-    connect(m_pBtnDeleteCfg,&QPushButton::clicked,this,&PluginMacroConfig::onCBCfgFileName);
-    connect(m_pBtnJobRelationCfg,&QPushButton::clicked,this,&PluginMacroConfig::onCBCfgFileName);
+    connect(m_pBtnStartCfg,&QPushButton::clicked,this,&PluginMacroConfig::onBtnStartCfg);
+    connect(m_pBtnSaveCfg,&QPushButton::clicked,this,&PluginMacroConfig::onBtnSaveCfg);
+    connect(m_pBtnGetCfg,&QPushButton::clicked,this,&PluginMacroConfig::onBtnGetCfg);
+    connect(m_pBtnAddCfg,&QPushButton::clicked,this,&PluginMacroConfig::onBtnAddCfg);
+    connect(m_pBtnDeleteCfg,&QPushButton::clicked,this,&PluginMacroConfig::onBtnDeleteCfg);
+    connect(m_pBtnJobRelationCfg,&QPushButton::clicked,this,&PluginMacroConfig::onBtnJobRelationCfg);
 
-    m_pCBCfgFileName->addItem("FPGAFPGAFPGAFPGAFPGAFPGA");
+    //初始化宏配置文件列表
+    initConfigFileNameCommbox();
 
 }
 
-void PluginMacroConfig::initConfigurationManage()
+void PluginMacroConfig::initConfigFileNameCommbox()
+{
+    QString strDirPath=QDir::currentPath()+"/config/macro_config_files";
+    QDir dir(strDirPath);
+    if( !dir.isEmpty() ){
+        QFileInfoList filesList = dir.entryInfoList(QStringList("*.xml"));
+        foreach (QFileInfo fi, filesList) {
+            m_pCBCfgFileName->addItem(fi.baseName(),QVariant(fi.absoluteFilePath()));
+        }
+    }
+}
+
+void PluginMacroConfig::initDeviceCfgManageTree()
 {
     m_pCfgManageTree = new QTreeWidget();
-    m_pCfgManageTree->setColumnCount(1);
+    m_pCfgManageTree->setColumnCount(2);
+    m_pCfgManageTree->setColumnHidden(1,true);
     m_pCfgManageTree->header()->setVisible(false);
     m_pGLMain->addWidget(m_pCfgManageTree,1,0,1,2);
     connect(m_pCfgManageTree,&QTreeWidget::itemChanged,this,&PluginMacroConfig::onItemChanged);
 
-
-    m_pCfgManageRootItem = new QTreeWidgetItem(m_pCfgManageTree,QStringList(tr("Device Configuration Management")));
+    QStringList headerList;
+    headerList<<QStringLiteral("设备配置管理")<<QStringLiteral("分机ID");
+    //m_pCfgManageRootItem = new QTreeWidgetItem(m_pCfgManageTree,QStringList(tr("Device Configuration Management")));
+    m_pCfgManageRootItem = new QTreeWidgetItem(m_pCfgManageTree,headerList);
     m_pCfgManageRootItem->setCheckState(0,Qt::Unchecked);
     m_pCfgManageRootItem->setExpanded(true);
 
-    QTreeWidgetItem* aa = new QTreeWidgetItem(m_pCfgManageRootItem,QStringList(tr("Device Configuration Management")));
-    aa->setCheckState(0,Qt::Unchecked);
-    aa = new QTreeWidgetItem(m_pCfgManageRootItem,QStringList(tr("Device Configuration Management")));
-    aa->setCheckState(0,Qt::Unchecked);
-    aa = new QTreeWidgetItem(m_pCfgManageRootItem,QStringList(tr("Device Configuration Management")));
-    aa->setCheckState(0,Qt::Unchecked);
-    aa = new QTreeWidgetItem(m_pCfgManageRootItem,QStringList(tr("Device Configuration Management")));
-    aa->setCheckState(0,Qt::Unchecked);
+    QTreeWidgetItem* p = new QTreeWidgetItem(m_pCfgManageRootItem,headerList);
+    p->setCheckState(0,Qt::Unchecked);
+    p->setExpanded(true);
 }
 
-void PluginMacroConfig::initConfigurationDisplayTab()
+
+void PluginMacroConfig::initSubCfgDisplayTab()
 {
     m_pCfgDispalyTab=new QTabWidget();
     m_pCfgDispalyTab->setTabShape(QTabWidget::Rounded);
     m_pGLMain->addWidget(m_pCfgDispalyTab,1,2,1,6);
 }
 
-void PluginMacroConfig::initConfigurationDisplay()
+void PluginMacroConfig::showWindow(int nRadarId)
 {
-    m_pCfgDisplayTree = new QTreeWidget();
-    m_pCfgDisplayTree->setColumnCount(2);
-    QStringList headers;
-    headers<<tr("Paramater Name")<<tr("Paramater Value");
-    m_pCfgDisplayTree->setHeaderLabels(headers);
-    m_pCfgDisplayTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    m_pCfgDispalyTab->addTab(m_pCfgDisplayTree,"AAAA");
+    resetSubCfgDisplayTabItem(nRadarId);
+}
 
-    QTreeWidgetItem* pp=new QTreeWidgetItem(m_pCfgDisplayTree,QStringList("Power On"));
-    pp->setExpanded(true);
-    QTreeWidgetItem* ppp=new QTreeWidgetItem(pp);
-    ppp->setText(0,"Paramater_1");
-    ppp->setText(1,"111");
+void PluginMacroConfig::resetSubCfgDisplayTabItem(int nRadarId)
+{
+    m_pCfgSubTree = new SubConfigDispalyTree();
+    m_pCfgDispalyTab->addTab(m_pCfgSubTree,"AAAA");
 
-    ppp=new QTreeWidgetItem(pp);
-    ppp->setText(0,"Paramater_2");
-    ppp->setText(1,"222");
+    QList<SubCfgInfo> cfgInfoList;
+    if( getSubCfgInfo(nRadarId,cfgInfoList) ){
 
+    }
+}
+
+bool PluginMacroConfig::getSubCfgInfo(int nRadarId, QList<SubCfgInfo> &cfgInfoList)
+{
+    QString strDirPath=QDir::currentPath()+"/config/monitor_config/Rander_01";
+    QDir dir(strDirPath);
+    if( !dir.isEmpty() ){
+        //先找总的配置文件
+        QFileInfoList filesList = dir.entryInfoList(QStringList("*.xml"),QDir::Files,QDir::DirsLast);
+        QFileInfoList foldersList = dir.entryInfoList(QDir::Dirs|QDir::NoDotAndDotDot,QDir::DirsFirst);
+        //判断是否有冗余的配置文件
+        if( 1 == filesList.size() && 1 == foldersList.size() ){
+            //再获取分机文件的路径
+            QString strSubDirPath = foldersList.first().absoluteFilePath();
+            QDir subDir(strSubDirPath);
+            if( !subDir.isEmpty() ){
+                //检查分机配置文件是否存在
+                QFileInfoList subFilesInfo = subDir.entryInfoList(QStringList("*.xml"),QDir::Files,QDir::DirsLast);
+                if( subFilesInfo.size()>0 ){
+                    //先解析总配置文件，获取分机Id，分机名称等
+                    QString strPath=filesList.first().absoluteFilePath();
+
+                    QFile file(strPath);
+                    if (!file.open(QIODevice::ReadOnly)){
+                        qDebug()<<"Open XML Failed,FilePath:"<<strPath;
+                        return false;
+                    }
+
+                    QDomDocument doc;
+                    QString error = "";
+                    int row = 0, column = 0;
+                    if(!doc.setContent(&file, false, &error, &row, &column)){
+                        qDebug() << "parse file failed:" << row << "---" << column <<":" <<error;
+                        file.close();
+                        return false;
+                    }
+                    file.close();
+
+                    QDomElement root = doc.documentElement();
+                    if( "Radar"==root.tagName() )
+                    {
+                        SubCfgInfo subCfgInfo;
+                        QDomNode node = root.firstChild();
+                        while(!node.isNull()) {
+                           QDomElement element = node.toElement(); // try to convert the node to an element.
+                           if(!element.isNull()) {
+                               if( "Subject" == element.tagName() ){
+                                   subCfgInfo.strName=element.attribute("displayName");
+                                   subCfgInfo.strBaseName=element.attribute("cfg").trimmed();
+
+                                   //补充分机配置文件路径信息
+                                   foreach (QFileInfo fi, subFilesInfo) {
+                                       if(fi.baseName()==subCfgInfo.strBaseName){
+                                           subCfgInfo.strAbsFilePath=fi.absoluteFilePath();
+                                           cfgInfoList.push_back(subCfgInfo);
+                                           break;
+                                       }
+                                   }
+                              }
+                           }
+                           node = node.nextSibling();
+                        }
+                    }
+                    return true;
+                }
+            }
+            else{
+                qDebug()<<QStringLiteral("当前设备没有分机配置文件，请检查核实！");
+            }
+        }
+    }
+    return false;
 }
 
 void PluginMacroConfig::onCBCfgFileName(int nIndex)
@@ -145,7 +226,21 @@ void PluginMacroConfig::onBtnAddCfg()
 
 void PluginMacroConfig::onBtnDeleteCfg()
 {
-
+    QString strPath=m_pCBCfgFileName->currentData().toString();
+    QFileInfo fileInfo(strPath);
+    if( fileInfo.exists() ){
+        //QString strInfo=QString("是否删除文件[%1]?").arg(fileInfo.fileName());
+        QString strInfo=QString("Whether to delete file[%1]?").arg(fileInfo.fileName());
+        int nRet = QMessageBox::question(this,QStringLiteral("提示"),
+                                         strInfo,
+                                         QMessageBox::Yes | QMessageBox::No,
+                                         QMessageBox::Yes);
+        if( QMessageBox::Yes == nRet ){
+            if(QFile::remove(strPath)){
+                m_pCBCfgFileName->removeItem(m_pCBCfgFileName->currentIndex());
+            }
+        }
+    }
 }
 
 void PluginMacroConfig::onBtnJobRelationCfg()
