@@ -26,8 +26,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         PluginMacroConfig.cpp \
-    SubConfigDispalyTree.cpp
+        SubConfigDispalyTree.cpp
 
 HEADERS += \
         PluginMacroConfig.h \
-    SubConfigDispalyTree.h
+        SubConfigDispalyTree.h

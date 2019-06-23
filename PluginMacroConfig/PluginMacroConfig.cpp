@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QDomDocument>
+#include <QXmlStreamWriter>
 
 PluginMacroConfig::PluginMacroConfig(QWidget *parent):QWidget(parent)
 {
@@ -86,21 +87,18 @@ void PluginMacroConfig::initDeviceCfgManageTree()
 {
     m_pCfgManageTree = new QTreeWidget();
     m_pCfgManageTree->setColumnCount(2);
-    m_pCfgManageTree->setColumnHidden(1,true);
+    //m_pCfgManageTree->setColumnHidden(1,true);
     m_pCfgManageTree->header()->setVisible(false);
     m_pGLMain->addWidget(m_pCfgManageTree,1,0,1,2);
     connect(m_pCfgManageTree,&QTreeWidget::itemChanged,this,&PluginMacroConfig::onItemChanged);
+    connect(m_pCfgManageTree,&QTreeWidget::itemClicked,this,&PluginMacroConfig::onItemClicked);
 
     QStringList headerList;
+    //headerList<<tr("Device Configuration Management")<<tr("SubID");
     headerList<<QStringLiteral("设备配置管理")<<QStringLiteral("分机ID");
-    //m_pCfgManageRootItem = new QTreeWidgetItem(m_pCfgManageTree,QStringList(tr("Device Configuration Management")));
     m_pCfgManageRootItem = new QTreeWidgetItem(m_pCfgManageTree,headerList);
     m_pCfgManageRootItem->setCheckState(0,Qt::Unchecked);
     m_pCfgManageRootItem->setExpanded(true);
-
-    QTreeWidgetItem* p = new QTreeWidgetItem(m_pCfgManageRootItem,headerList);
-    p->setCheckState(0,Qt::Unchecked);
-    p->setExpanded(true);
 }
 
 
@@ -108,6 +106,8 @@ void PluginMacroConfig::initSubCfgDisplayTab()
 {
     m_pCfgDispalyTab=new QTabWidget();
     m_pCfgDispalyTab->setTabShape(QTabWidget::Rounded);
+    connect(m_pCfgDispalyTab,&QTabWidget::currentChanged,this,&PluginMacroConfig::onCurrentTabChanged);
+
     m_pGLMain->addWidget(m_pCfgDispalyTab,1,2,1,6);
 }
 
@@ -118,12 +118,20 @@ void PluginMacroConfig::showWindow(int nRadarId)
 
 void PluginMacroConfig::resetSubCfgDisplayTabItem(int nRadarId)
 {
-    m_pCfgSubTree = new SubConfigDispalyTree();
-    m_pCfgDispalyTab->addTab(m_pCfgSubTree,"AAAA");
-
     QList<SubCfgInfo> cfgInfoList;
     if( getSubCfgInfo(nRadarId,cfgInfoList) ){
+        foreach( SubCfgInfo subCfgInfo,cfgInfoList){
+            //分机配置文件Tab控件
+            SubConfigDispalyTree* pSubCfgTree = new SubConfigDispalyTree();
+            m_pCfgDispalyTab->addTab(pSubCfgTree,subCfgInfo.strName);
 
+            //设备管理树
+            QStringList columValueList;
+            columValueList<<subCfgInfo.strName<<subCfgInfo.strSubId;
+            QTreeWidgetItem* pSubItem = new QTreeWidgetItem(m_pCfgManageRootItem,columValueList);
+            pSubItem->setCheckState(0,Qt::Unchecked);
+            pSubItem->setExpanded(true);
+        }
     }
 }
 
@@ -173,6 +181,7 @@ bool PluginMacroConfig::getSubCfgInfo(int nRadarId, QList<SubCfgInfo> &cfgInfoLi
                            if(!element.isNull()) {
                                if( "Subject" == element.tagName() ){
                                    subCfgInfo.strName=element.attribute("displayName");
+                                   subCfgInfo.strSubId=element.attribute("subId").trimmed();
                                    subCfgInfo.strBaseName=element.attribute("cfg").trimmed();
 
                                    //补充分机配置文件路径信息
@@ -199,6 +208,18 @@ bool PluginMacroConfig::getSubCfgInfo(int nRadarId, QList<SubCfgInfo> &cfgInfoLi
     return false;
 }
 
+bool PluginMacroConfig::questionMsgBox(QString strInfo)
+{
+    int nRet = QMessageBox::question(this,QStringLiteral("提示"),
+                                     strInfo,
+                                     QMessageBox::Yes | QMessageBox::No,
+                                     QMessageBox::Yes);
+    if( QMessageBox::Yes == nRet )
+        return true;
+
+    return false;
+}
+
 void PluginMacroConfig::onCBCfgFileName(int nIndex)
 {
     qDebug()<<m_pCBCfgFileName->itemData(nIndex).toString();
@@ -221,7 +242,56 @@ void PluginMacroConfig::onBtnGetCfg()
 
 void PluginMacroConfig::onBtnAddCfg()
 {
+    QString strBaseName="test";
+    int nCBItems = m_pCBCfgFileName->count();
+    for( int i=0;i<nCBItems;i++ ){
+        if( strBaseName.trimmed()==m_pCBCfgFileName->itemText(i) ){
+            //QString strInfo=QString("该文件已存在，是否覆盖?");
+            QString strInfo=QString("The file already exists. Does it cover?");
+            if( questionMsgBox(strInfo) )
+                break;
+            else
+                return;
+        }
+    }
 
+    QString strDirPath=QDir::currentPath()+"/config/macro_config_files/";
+    QString strAbsPath=strDirPath+strBaseName.trimmed()+".xml";
+    QFile file(strAbsPath);
+    if (!file.open(QFile::WriteOnly | QFile::Text)) { // 只写模式打开文件
+        qDebug() << QString("Cannot write file %1(%2).").arg(strAbsPath).arg(file.errorString());
+        return;
+    }
+
+    QXmlStreamWriter xmlWriter(&file);
+    //xmlWriter.setCodec("GBK");//XML 编码
+    xmlWriter.writeStartDocument("1.0", true);// 开始文档（XML 声明）
+    xmlWriter.setAutoFormatting(true);//自动格式化
+
+    xmlWriter.writeStartElement(QStringLiteral("分机表"));//开始根元素 <分机>
+
+    int nChild = m_pCfgManageRootItem->childCount();
+    for( int i=0;i<nChild;i++ ){
+        QTreeWidgetItem* pChild=m_pCfgManageRootItem->child(i);
+        if( pChild ){
+            xmlWriter.writeStartElement(QStringLiteral("分机"));
+            xmlWriter.writeAttribute("ID",pChild->text(1).trimmed());
+            if( Qt::Checked==pChild->checkState(0) ){
+                xmlWriter.writeAttribute("Checked","true");
+            }
+            else{
+                xmlWriter.writeAttribute("Checked","false");
+            }
+            xmlWriter.writeEndElement();
+        }
+    }
+    xmlWriter.writeEndElement();  // 结束根元素 </分机表>
+    xmlWriter.writeEndDocument();  // 结束文档
+
+    file.close();  // 关闭文件
+
+    m_pCBCfgFileName->addItem(strBaseName,QVariant(strAbsPath));
+    m_pCBCfgFileName->setCurrentIndex(m_pCBCfgFileName->count()-1);
 }
 
 void PluginMacroConfig::onBtnDeleteCfg()
@@ -231,11 +301,7 @@ void PluginMacroConfig::onBtnDeleteCfg()
     if( fileInfo.exists() ){
         //QString strInfo=QString("是否删除文件[%1]?").arg(fileInfo.fileName());
         QString strInfo=QString("Whether to delete file[%1]?").arg(fileInfo.fileName());
-        int nRet = QMessageBox::question(this,QStringLiteral("提示"),
-                                         strInfo,
-                                         QMessageBox::Yes | QMessageBox::No,
-                                         QMessageBox::Yes);
-        if( QMessageBox::Yes == nRet ){
+        if( questionMsgBox(strInfo) ){
             if(QFile::remove(strPath)){
                 m_pCBCfgFileName->removeItem(m_pCBCfgFileName->currentIndex());
             }
@@ -259,6 +325,35 @@ void PluginMacroConfig::onItemChanged(QTreeWidgetItem *pItem, int column)
         }
     }
 }
+
+void PluginMacroConfig::onItemClicked(QTreeWidgetItem *pItem, int column)
+{
+    Q_UNUSED(column);
+    QString strName=pItem->text(0).trimmed();
+    int nAllTab=m_pCfgDispalyTab->count();
+    for( int i=0;i<nAllTab;i++ ){
+        if( strName==m_pCfgDispalyTab->tabText(i).trimmed() ) {
+            m_pCfgDispalyTab->setCurrentIndex(i);
+            break;
+        }
+    }
+}
+
+void PluginMacroConfig::onCurrentTabChanged(int nIndex)
+{
+    QString strName=m_pCfgDispalyTab->tabText(nIndex).trimmed();
+    int nChild = m_pCfgManageRootItem->childCount();
+    for( int i=0;i<nChild;i++ ){
+        QTreeWidgetItem* pChild=m_pCfgManageRootItem->child(i);
+        if( pChild ){
+            if( strName==pChild->text(0).trimmed() )
+                pChild->setSelected(true);
+            else
+                pChild->setSelected(false);
+        }
+    }
+}
+
 void PluginMacroConfig::setChildCheckState(QTreeWidgetItem* pItem, Qt::CheckState cs)
 {
     if( pItem ){

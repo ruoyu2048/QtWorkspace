@@ -14,6 +14,7 @@
 
 struct SubCfgInfo{
     QString strName;//分机名称
+    QString strSubId;//分机ID
     QString strBaseName;//文件名(无后缀)
     QString strAbsFilePath;//分机配置文件绝对路径
 };
@@ -54,6 +55,8 @@ private:
 
     bool getSubCfgInfo(int nRadarId,QList<SubCfgInfo> &cfgInfoList);
 
+    bool questionMsgBox(QString strInfo);
+
 private slots:
     void onCBCfgFileName(int nIndex);
     void onBtnStartCfg();
@@ -64,6 +67,10 @@ private slots:
     void onBtnJobRelationCfg();
 
     void onItemChanged(QTreeWidgetItem* pItem,int column);
+    void onItemClicked(QTreeWidgetItem* pItem,int column);
+
+    void onCurrentTabChanged(int nIndex);
+
     void setChildCheckState(QTreeWidgetItem* pItem, Qt::CheckState cs);
     void setParentCheckState(QTreeWidgetItem* pItem);
 

@@ -9,7 +9,7 @@ SubConfigDispalyTree::SubConfigDispalyTree()
 void SubConfigDispalyTree::initSubConfigDispalyTree()
 {
     this->setColumnCount(3);
-    this->setColumnHidden(2,true);
+    //this->setColumnHidden(2,true);
     QStringList headers;
     headers<<tr("Paramater Name")<<tr("Paramater Value")<<tr("Paramater ID");
     this->setHeaderLabels(headers);
