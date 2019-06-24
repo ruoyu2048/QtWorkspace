@@ -8,7 +8,8 @@ QT       += core gui xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = PluginMacroConfig
+#TARGET = PluginMacroConfig
+TARGET = ../PluginMacroConfig
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -26,8 +27,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         PluginMacroConfig.cpp \
-        SubConfigDispalyTree.cpp
+        SubConfigDispalyTree.cpp \
+    FileNameDlg.cpp
 
 HEADERS += \
         PluginMacroConfig.h \
-        SubConfigDispalyTree.h
+        SubConfigDispalyTree.h \
+    FileNameDlg.h

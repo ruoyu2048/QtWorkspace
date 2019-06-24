@@ -6,6 +6,8 @@
 #include <QDomDocument>
 #include <QXmlStreamWriter>
 
+#include "FileNameDlg.h"
+
 PluginMacroConfig::PluginMacroConfig(QWidget *parent):QWidget(parent)
 {
     initMainWindow();
@@ -242,56 +244,59 @@ void PluginMacroConfig::onBtnGetCfg()
 
 void PluginMacroConfig::onBtnAddCfg()
 {
-    QString strBaseName="test";
-    int nCBItems = m_pCBCfgFileName->count();
-    for( int i=0;i<nCBItems;i++ ){
-        if( strBaseName.trimmed()==m_pCBCfgFileName->itemText(i) ){
-            //QString strInfo=QString("该文件已存在，是否覆盖?");
-            QString strInfo=QString("The file already exists. Does it cover?");
-            if( questionMsgBox(strInfo) )
-                break;
-            else
-                return;
-        }
-    }
-
-    QString strDirPath=QDir::currentPath()+"/config/macro_config_files/";
-    QString strAbsPath=strDirPath+strBaseName.trimmed()+".xml";
-    QFile file(strAbsPath);
-    if (!file.open(QFile::WriteOnly | QFile::Text)) { // 只写模式打开文件
-        qDebug() << QString("Cannot write file %1(%2).").arg(strAbsPath).arg(file.errorString());
-        return;
-    }
-
-    QXmlStreamWriter xmlWriter(&file);
-    //xmlWriter.setCodec("GBK");//XML 编码
-    xmlWriter.writeStartDocument("1.0", true);// 开始文档（XML 声明）
-    xmlWriter.setAutoFormatting(true);//自动格式化
-
-    xmlWriter.writeStartElement(QStringLiteral("分机表"));//开始根元素 <分机>
-
-    int nChild = m_pCfgManageRootItem->childCount();
-    for( int i=0;i<nChild;i++ ){
-        QTreeWidgetItem* pChild=m_pCfgManageRootItem->child(i);
-        if( pChild ){
-            xmlWriter.writeStartElement(QStringLiteral("分机"));
-            xmlWriter.writeAttribute("ID",pChild->text(1).trimmed());
-            if( Qt::Checked==pChild->checkState(0) ){
-                xmlWriter.writeAttribute("Checked","true");
+    FileNameDlg fileNameDlg;
+    if( QDialog::Accepted==fileNameDlg.exec()){
+        QString strBaseName=fileNameDlg.getFileName();
+        int nCBItems = m_pCBCfgFileName->count();
+        for( int i=0;i<nCBItems;i++ ){
+            if( strBaseName.trimmed()==m_pCBCfgFileName->itemText(i) ){
+                //QString strInfo=QString("该文件已存在，是否覆盖?");
+                QString strInfo=QString("The file already exists. Does it cover?");
+                if( questionMsgBox(strInfo) )
+                    break;
+                else
+                    return;
             }
-            else{
-                xmlWriter.writeAttribute("Checked","false");
-            }
-            xmlWriter.writeEndElement();
         }
+
+        QString strDirPath=QDir::currentPath()+"/config/macro_config_files/";
+        QString strAbsPath=strDirPath+strBaseName.trimmed()+".xml";
+        QFile file(strAbsPath);
+        if (!file.open(QFile::WriteOnly | QFile::Text)) { // 只写模式打开文件
+            qDebug() << QString("Cannot write file %1(%2).").arg(strAbsPath).arg(file.errorString());
+            return;
+        }
+
+        QXmlStreamWriter xmlWriter(&file);
+        //xmlWriter.setCodec("GBK");//XML 编码
+        xmlWriter.writeStartDocument("1.0", true);// 开始文档（XML 声明）
+        xmlWriter.setAutoFormatting(true);//自动格式化
+
+        xmlWriter.writeStartElement(QStringLiteral("分机表"));//开始根元素 <分机>
+
+        int nChild = m_pCfgManageRootItem->childCount();
+        for( int i=0;i<nChild;i++ ){
+            QTreeWidgetItem* pChild=m_pCfgManageRootItem->child(i);
+            if( pChild ){
+                xmlWriter.writeStartElement(QStringLiteral("分机"));
+                xmlWriter.writeAttribute("ID",pChild->text(1).trimmed());
+                if( Qt::Checked==pChild->checkState(0) ){
+                    xmlWriter.writeAttribute("Checked","true");
+                }
+                else{
+                    xmlWriter.writeAttribute("Checked","false");
+                }
+                xmlWriter.writeEndElement();
+            }
+        }
+        xmlWriter.writeEndElement();  // 结束根元素 </分机表>
+        xmlWriter.writeEndDocument();  // 结束文档
+
+        file.close();  // 关闭文件
+
+        m_pCBCfgFileName->addItem(strBaseName,QVariant(strAbsPath));
+        m_pCBCfgFileName->setCurrentIndex(m_pCBCfgFileName->count()-1);
     }
-    xmlWriter.writeEndElement();  // 结束根元素 </分机表>
-    xmlWriter.writeEndDocument();  // 结束文档
-
-    file.close();  // 关闭文件
-
-    m_pCBCfgFileName->addItem(strBaseName,QVariant(strAbsPath));
-    m_pCBCfgFileName->setCurrentIndex(m_pCBCfgFileName->count()-1);
 }
 
 void PluginMacroConfig::onBtnDeleteCfg()
