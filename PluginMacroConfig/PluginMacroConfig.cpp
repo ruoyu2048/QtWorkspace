@@ -148,7 +148,7 @@ void PluginMacroConfig::resetSubCfgDisplayTabItem(int nRadarId)
     if( getSubCfgInfo(nRadarId,cfgInfoList) ){
         foreach( SubCfgInfo subCfgInfo,cfgInfoList){
             //分机配置文件Tab控件
-            SubConfigDispalyTree* pSubCfgTree = new SubConfigDispalyTree(subCfgInfo.strAbsFilePath);
+            SubConfigDispalyTree* pSubCfgTree = new SubConfigDispalyTree(subCfgInfo);
             m_pCfgDispalyTab->addTab(pSubCfgTree,subCfgInfo.strName);
 
             //设备管理树
@@ -246,6 +246,41 @@ bool PluginMacroConfig::questionMsgBox(QString strInfo)
     return false;
 }
 
+void PluginMacroConfig::updateDeviceCfgManageTree(QMap<QString, bool> devManageItemCheckedInfo)
+{
+    if( m_pCfgManageRootItem ){
+        int nChild = m_pCfgManageRootItem->childCount();
+        for( int i=0;i<nChild;i++ ){
+            QTreeWidgetItem* pChild=m_pCfgManageRootItem->child(i);
+            if( pChild ){
+                QString strDevId=pChild->text(1).trimmed();
+                auto it = devManageItemCheckedInfo.find(strDevId);
+                if( it!=devManageItemCheckedInfo.end() ){
+                    if( it.value() )
+                        pChild->setCheckState(0,Qt::Checked);
+                    else
+                        pChild->setCheckState(0,Qt::Unchecked);
+                }
+            }
+        }
+    }
+}
+
+void PluginMacroConfig::updateSubCfgDisplayTabItemValue(QMap<QString, QMap<QString, QString> > subDevParaMap)
+{
+    if( m_pCfgDispalyTab ){
+        int nTabCount = m_pCfgDispalyTab->count();
+        for( int i=0;i<nTabCount;i++ ){
+            SubConfigDispalyTree*pSubCfgTree=qobject_cast<SubConfigDispalyTree*>(m_pCfgDispalyTab->widget(i));
+            QString strSubDevId=pSubCfgTree->getSubDevId();
+            auto it=subDevParaMap.find(strSubDevId);
+            if( it!=subDevParaMap.end() ){
+                pSubCfgTree->importSubConfig(it.value());
+            }
+        }
+    }
+}
+
 void PluginMacroConfig::onCBCfgFileName(int nIndex)
 {
     QString strMacroFile=m_pCBCfgFileName->itemData(nIndex).toString();
@@ -266,7 +301,10 @@ void PluginMacroConfig::onCBCfgFileName(int nIndex)
     }
     file.close();
 
-    QMap<QString,bool>subCfgCheckedInfo;
+    QMap<QString,bool>devManageItemCheckedInfo;
+    //<subDevId,<paraId,value>>
+    QMap<QString,QMap<QString,QString>> subDevParaMap;
+
     QDomElement root = doc.documentElement();
     if( QStringLiteral("设备配置参数")==root.tagName() ){
         QDomElement devInfoNode=root.firstChildElement(QStringLiteral("设备信息"));
@@ -279,31 +317,39 @@ void PluginMacroConfig::onCBCfgFileName(int nIndex)
                         QString strSubDevId=element.attribute(QStringLiteral("subDevId"));
                         QVariant checkedVar(element.attribute(QStringLiteral("checked")));
 
-                        subCfgCheckedInfo.insert(strSubDevId,checkedVar.toBool());
+                        devManageItemCheckedInfo.insert(strSubDevId,checkedVar.toBool());
                     }
                 }
                devNode = devNode.nextSibling();
             }
         }
+
+        QDomElement devNode=root.firstChildElement(QStringLiteral("设备"));
+        while( !devNode.isNull() ){
+            QString strSubDevId=devNode.attribute("subDevId");
+            QDomElement cmdNode=devNode.firstChildElement(QStringLiteral("命令"));
+            QMap<QString,QString>paraValueMap;
+            while (!cmdNode.isNull()) {
+                QDomElement paraNode=cmdNode.firstChildElement(QStringLiteral("参数"));
+                while (!paraNode.isNull()) {
+                    QString strParaId=paraNode.attribute(QStringLiteral("paraId")).trimmed();
+                    QString strValue=paraNode.attribute(QStringLiteral("value")).trimmed();
+                    paraValueMap.insert(strParaId,strValue);
+                    paraNode = paraNode.nextSiblingElement(QStringLiteral("参数"));
+                }
+
+                cmdNode = cmdNode.nextSiblingElement(QStringLiteral("命令"));
+            }
+            subDevParaMap.insert(strSubDevId,paraValueMap);
+            devNode = devNode.nextSiblingElement(QStringLiteral("设备"));
+        }
     }
 
     //更新配置文件管理树勾选状态
-    if( m_pCfgManageRootItem ){
-        int nChild = m_pCfgManageRootItem->childCount();
-        for( int i=0;i<nChild;i++ ){
-            QTreeWidgetItem* pChild=m_pCfgManageRootItem->child(i);
-            if( pChild ){
-                QString strDevId=pChild->text(1).trimmed();
-                auto it = subCfgCheckedInfo.find(strDevId);
-                if( it!=subCfgCheckedInfo.end() ){
-                    if( it.value() )
-                        pChild->setCheckState(0,Qt::Checked);
-                    else
-                        pChild->setCheckState(0,Qt::Unchecked);
-                }
-            }
-        }
-    }
+    updateDeviceCfgManageTree(devManageItemCheckedInfo);
+
+    //更新Tab树中的值
+    updateSubCfgDisplayTabItemValue(subDevParaMap);
 }
 
 void PluginMacroConfig::onBtnStartCfg()

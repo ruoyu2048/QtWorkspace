@@ -12,13 +12,6 @@
 
 #include "SubConfigDispalyTree.h"
 
-struct SubCfgInfo{
-    QString strName;//分机名称
-    QString strSubId;//分机ID
-    QString strBaseName;//文件名(无后缀)
-    QString strAbsFilePath;//分机配置文件绝对路径
-};
-
 class PluginMacroConfig : public QWidget
 {
     Q_OBJECT
@@ -63,6 +56,9 @@ private:
     bool getSubCfgInfo(int nRadarId,QList<SubCfgInfo> &cfgInfoList);
 
     bool questionMsgBox(QString strInfo);
+
+    void updateDeviceCfgManageTree(QMap<QString,bool> devManageItemCheckedInfo);
+    void updateSubCfgDisplayTabItemValue(QMap<QString,QMap<QString,QString>> subDevParaMap);
 
 private slots:
     void onCBCfgFileName(int nIndex);

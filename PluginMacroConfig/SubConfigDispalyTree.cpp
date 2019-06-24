@@ -7,10 +7,22 @@
 #include <QToolTip>
 #include <QComboBox>
 
-SubConfigDispalyTree::SubConfigDispalyTree( QString strSubCfgPath )
+SubConfigDispalyTree::SubConfigDispalyTree(SubCfgInfo subCfgInfo)
 {
     this->setObjectName("SubConfigDispalyTree");
-    initSubConfigDispalyTree(strSubCfgPath);
+    initSubConfigDispalyTree(subCfgInfo.strAbsFilePath);
+    m_subDevId=subCfgInfo.strSubId;
+    m_subDevName=subCfgInfo.strName;
+}
+
+QString SubConfigDispalyTree::getSubDevId()
+{
+    return m_subDevId;
+}
+
+QString SubConfigDispalyTree::getSubDevName()
+{
+    return m_subDevName;
 }
 
 void SubConfigDispalyTree::exportSubCofig(QXmlStreamWriter *pWriter)
@@ -43,6 +55,32 @@ void SubConfigDispalyTree::exportSubCofig(QXmlStreamWriter *pWriter)
                 pWriter->writeEndElement();
             }
             pWriter->writeEndElement();
+        }
+    }
+}
+
+void SubConfigDispalyTree::importSubConfig(QMap<QString, QString> paraValueMap){
+    auto it=paraValueMap.begin();
+    for( ;it!=paraValueMap.end();it++ ){
+        auto itWT=m_IdLinkedMap.find(it.key());
+        if( itWT!=m_IdLinkedMap.end() ){
+            //先获取当前属性显示的类型
+            QString strDisplayType=itWT.value().pItem->text(3).trimmed();
+
+            if( "text"==strDisplayType ){
+                QLineEdit* pLEValue=qobject_cast<QLineEdit*>(itWT.value().pWidget);
+                pLEValue->setText(it.value());
+            }
+            else if( "select"==strDisplayType ){
+                QComboBox* pComBox=qobject_cast<QComboBox*>(itWT.value().pWidget);
+                int nItems = pComBox->count();
+                for( int i=0;i<nItems;i++ ){
+                    if( it.value()==pComBox->itemData(i).toString().trimmed()){
+                        pComBox->setCurrentIndex(i);
+                        break;
+                    }
+                }
+            }
         }
     }
 }
@@ -193,7 +231,6 @@ void SubConfigDispalyTree::lineTextEdited(QString strText){
     auto it = m_widgetMap.find(qobject_cast<QWidget*>(pLineEdit));
     if( it!=m_widgetMap.end() ){
         QTreeWidgetItem* pItem = it.value();
-        qDebug()<<pItem->text(0);
         QString strRegExp = pItem->text(5).trimmed();
         if(!strRegExp.isEmpty()){
             QRegExp regx(strRegExp);

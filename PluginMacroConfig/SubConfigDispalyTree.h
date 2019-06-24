@@ -4,6 +4,13 @@
 #include <QTreeWidget>
 #include <QXmlStreamWriter>
 
+struct SubCfgInfo{
+    QString strName;//分机名称
+    QString strSubId;//分机ID
+    QString strBaseName;//文件名(无后缀)
+    QString strAbsFilePath;//分机配置文件绝对路径
+};
+
 typedef struct _WidgetTreeItem{
     QWidget* pWidget;
     QTreeWidgetItem* pItem;
@@ -17,8 +24,11 @@ class SubConfigDispalyTree : public QTreeWidget
 {
     Q_OBJECT
 public:
-    explicit SubConfigDispalyTree(QString strSubCfgPath);
+    explicit SubConfigDispalyTree(SubCfgInfo subCfgInfo);
+    QString getSubDevId();
+    QString getSubDevName();
     void exportSubCofig(QXmlStreamWriter* pWriter);
+    void importSubConfig(QMap<QString,QString>paraValueMap);
 
 private:
     void initSubConfigDispalyTree(QString strSubCfgPath);
@@ -31,7 +41,8 @@ private slots:
     void lineTextEdited(QString strText);
 
 private:
-
+    QString m_subDevId;
+    QString m_subDevName;
     QMap<QWidget*,QTreeWidgetItem*> m_widgetMap;
     QMap<QString,WidgetTreeItem>m_IdLinkedMap;
 };
