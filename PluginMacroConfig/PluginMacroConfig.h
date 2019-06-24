@@ -48,9 +48,16 @@ private:
      */
     void initSubCfgDisplayTab();
 
+    /**
+     * @brief showWindow 显示宏配置插件
+     * @param nRadarId 雷达Id
+     */
     void showWindow(int nRadarId);
 
-
+    /**
+     * @brief resetSubCfgDisplayTabItem 重置Tab项目
+     * @param nRadarId
+     */
     void resetSubCfgDisplayTabItem(int nRadarId);
 
     bool getSubCfgInfo(int nRadarId,QList<SubCfgInfo> &cfgInfoList);

@@ -13,6 +13,40 @@ SubConfigDispalyTree::SubConfigDispalyTree( QString strSubCfgPath )
     initSubConfigDispalyTree(strSubCfgPath);
 }
 
+void SubConfigDispalyTree::exportSubCofig(QXmlStreamWriter *pWriter)
+{
+    if( nullptr!=pWriter ){
+        int nTopCnt = this->topLevelItemCount();
+        for( int i=0;i<nTopCnt;i++ ){
+            QTreeWidgetItem* pCMDItem = this->topLevelItem(i);
+            pWriter->writeStartElement(QStringLiteral("命令"));
+            pWriter->writeAttribute(QStringLiteral("cmd"),pCMDItem->text(2).trimmed());
+
+            int nChild = pCMDItem->childCount();
+            for( int j=0;j<nChild;j++ ){
+                QTreeWidgetItem* pAttrItem=pCMDItem->child(j);
+                pWriter->writeStartElement(QStringLiteral("参数"));
+                pWriter->writeAttribute(QStringLiteral("paraId"),pAttrItem->text(2).trimmed());
+                QString strParaId=pAttrItem->text(2).trimmed();
+                auto it=m_IdLinkedMap.find(strParaId);
+                if( it!=m_IdLinkedMap.end() ){
+                    QString strDisplayType=pAttrItem->text(3).trimmed();
+                    if( "text"==strDisplayType ){
+                        QLineEdit* pLEValue=qobject_cast<QLineEdit*>(it.value().pWidget);
+                        pWriter->writeAttribute(QStringLiteral("value"),pLEValue->text().trimmed());
+                    }
+                    else if( "select"==strDisplayType ){
+                        QComboBox* pComBox=qobject_cast<QComboBox*>(it.value().pWidget);
+                        pWriter->writeAttribute(QStringLiteral("value"),pComBox->currentData().toString());
+                    }
+                }
+                pWriter->writeEndElement();
+            }
+            pWriter->writeEndElement();
+        }
+    }
+}
+
 void SubConfigDispalyTree::initSubConfigDispalyTree( QString strSubCfgPath )
 {
     this->setColumnCount(7);
@@ -111,7 +145,7 @@ int SubConfigDispalyTree::readEquipmentInfo(QString strPath)
                                                 foreach (QString strPara, paramTypes) {
                                                    QStringList paramPair = strPara.split(":");
                                                    if( 2 == paramPair.size() && !paramPair.at(1).isEmpty()){
-                                                       pCombo->addItem(paramPair.at(1));
+                                                       pCombo->addItem(paramPair.at(1),QVariant(paramPair.at(0)));
                                                    }
                                                 }
                                                 //设置当前默认选项

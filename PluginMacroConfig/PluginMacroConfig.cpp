@@ -4,11 +4,26 @@
 #include <QDebug>
 #include <QDir>
 #include <QDomDocument>
+#include <QDomElement>
 #include <QXmlStreamWriter>
 
 #include "FileNameDlg.h"
 
-PluginMacroConfig::PluginMacroConfig(QWidget *parent):QWidget(parent)
+PluginMacroConfig::PluginMacroConfig(QWidget *parent):
+    QWidget(parent),
+    m_pGLMain(nullptr),
+    m_pLBCfgFileName(nullptr),
+    m_pCBCfgFileName(nullptr),
+    m_pBtnStartCfg(nullptr),
+    m_pBtnSaveCfg(nullptr),
+    m_pBtnGetCfg(nullptr),
+    m_pBtnAddCfg(nullptr),
+    m_pBtnDeleteCfg(nullptr),
+    m_pBtnJobRelationCfg(nullptr),
+    m_pCfgManageTree(nullptr),
+    m_pCfgManageRootItem(nullptr),
+    m_pCfgDispalyTab(nullptr),
+    m_pCfgSubTree(nullptr)
 {
     initMainWindow();
 }
@@ -50,6 +65,9 @@ void PluginMacroConfig::initContrals()
     m_pBtnAddCfg = new QPushButton(QStringLiteral("添加配置"));
     m_pBtnDeleteCfg = new QPushButton(QStringLiteral("删除配置"));
     m_pBtnJobRelationCfg = new QPushButton(QStringLiteral("作业关系配置"));
+
+    m_pBtnGetCfg->setEnabled(false);
+    m_pBtnJobRelationCfg->setEnabled(false);
 
     m_pGLMain->addWidget(m_pLBCfgFileName,0,0,1,1);
     m_pGLMain->addWidget(m_pCBCfgFileName,0,1,1,1);
@@ -117,6 +135,10 @@ void PluginMacroConfig::initSubCfgDisplayTab()
 
 void PluginMacroConfig::showWindow(int nRadarId)
 {
+//    if( !this->isHidden() )
+//        this->close();
+//    this->show();
+
     resetSubCfgDisplayTabItem(nRadarId);
 }
 
@@ -226,7 +248,62 @@ bool PluginMacroConfig::questionMsgBox(QString strInfo)
 
 void PluginMacroConfig::onCBCfgFileName(int nIndex)
 {
-    qDebug()<<m_pCBCfgFileName->itemData(nIndex).toString();
+    QString strMacroFile=m_pCBCfgFileName->itemData(nIndex).toString();
+
+    QFile file(strMacroFile);
+    if (!file.open(QIODevice::ReadOnly)){
+        qDebug()<<"Open XML Failed,FilePath:"<<strMacroFile;
+        return;
+    }
+
+    QDomDocument doc;
+    QString error = "";
+    int row = 0, column = 0;
+    if(!doc.setContent(&file, false, &error, &row, &column)){
+        qDebug() << "parse file failed:" << row << "---" << column <<":" <<error;
+        file.close();
+        return;
+    }
+    file.close();
+
+    QMap<QString,bool>subCfgCheckedInfo;
+    QDomElement root = doc.documentElement();
+    if( QStringLiteral("设备配置参数")==root.tagName() ){
+        QDomElement devInfoNode=root.firstChildElement(QStringLiteral("设备信息"));
+        if( !devInfoNode.isNull() ){
+            QDomNode devNode = devInfoNode.firstChild();
+            while(!devNode.isNull()) {
+                QDomElement element = devNode.toElement(); // try to convert the node to an element.
+                if(!element.isNull()) {
+                    if( QStringLiteral("设备")== element.tagName() ){
+                        QString strSubDevId=element.attribute(QStringLiteral("subDevId"));
+                        QVariant checkedVar(element.attribute(QStringLiteral("checked")));
+
+                        subCfgCheckedInfo.insert(strSubDevId,checkedVar.toBool());
+                    }
+                }
+               devNode = devNode.nextSibling();
+            }
+        }
+    }
+
+    //更新配置文件管理树勾选状态
+    if( m_pCfgManageRootItem ){
+        int nChild = m_pCfgManageRootItem->childCount();
+        for( int i=0;i<nChild;i++ ){
+            QTreeWidgetItem* pChild=m_pCfgManageRootItem->child(i);
+            if( pChild ){
+                QString strDevId=pChild->text(1).trimmed();
+                auto it = subCfgCheckedInfo.find(strDevId);
+                if( it!=subCfgCheckedInfo.end() ){
+                    if( it.value() )
+                        pChild->setCheckState(0,Qt::Checked);
+                    else
+                        pChild->setCheckState(0,Qt::Unchecked);
+                }
+            }
+        }
+    }
 }
 
 void PluginMacroConfig::onBtnStartCfg()
@@ -236,7 +313,63 @@ void PluginMacroConfig::onBtnStartCfg()
 
 void PluginMacroConfig::onBtnSaveCfg()
 {
+    QString strInfo=QString("Do you save the configuration?");
+    if( questionMsgBox(strInfo) ){
+        QString strPath=m_pCBCfgFileName->currentData().toString();
+        QFile file(strPath);
+        if (!file.open(QFile::WriteOnly | QFile::Text)) { // 只写模式打开文件
+            qDebug() << QString("Cannot write file %1(%2).").arg(strPath).arg(file.errorString());
+            return;
+        }
 
+        QXmlStreamWriter xmlWriter(&file);
+        //xmlWriter.setCodec("GBK");//XML 编码
+        xmlWriter.writeStartDocument("1.0", true);// 开始文档（XML 声明）
+        xmlWriter.setAutoFormatting(true);//自动格式化
+
+        xmlWriter.writeStartElement(QStringLiteral("设备配置参数"));//开始根元素 <设备配置参数>
+        xmlWriter.writeStartElement(QStringLiteral("设备信息"));//开始根元素 <设备信息>
+
+        int nChild = m_pCfgManageRootItem->childCount();
+        for( int i=0;i<nChild;i++ ){
+            QTreeWidgetItem* pChild=m_pCfgManageRootItem->child(i);
+            if( pChild ){
+                xmlWriter.writeStartElement(QStringLiteral("设备"));
+                xmlWriter.writeAttribute("subDevId",pChild->text(1).trimmed());
+                if( Qt::Checked==pChild->checkState(0) ){
+                    xmlWriter.writeAttribute("checked","true");
+                }
+                else{
+                    xmlWriter.writeAttribute("checked","false");
+                }
+                xmlWriter.writeEndElement();
+            }
+        }
+        xmlWriter.writeEndElement();  // 结束设备信息元素 </设备信息>
+
+        //设备参数
+        for( int i=0;i<nChild;i++ ){
+            QTreeWidgetItem* pChild=m_pCfgManageRootItem->child(i);
+            if( pChild && Qt::Checked==pChild->checkState(0) ){
+                QString strName=pChild->text(0).trimmed();
+                QString strDevId=pChild->text(1).trimmed();
+                xmlWriter.writeStartElement(QStringLiteral("设备"));
+                xmlWriter.writeAttribute(QStringLiteral("subDevId"),strDevId);
+                int nAllTab=m_pCfgDispalyTab->count();
+                for( int k=0;k<nAllTab;k++ ){
+                    if( strName==m_pCfgDispalyTab->tabText(k).trimmed() ) {
+                        SubConfigDispalyTree*pSubCfgTree=qobject_cast<SubConfigDispalyTree*>(m_pCfgDispalyTab->widget(k));
+                        pSubCfgTree->exportSubCofig(&xmlWriter);
+                        break;
+                    }
+                }
+                xmlWriter.writeEndElement();
+            }
+        }
+
+        xmlWriter.writeEndDocument();  //结束根元素</设备配置参数>
+        file.close();  // 关闭文件
+    }
 }
 
 void PluginMacroConfig::onBtnGetCfg()
@@ -270,30 +403,51 @@ void PluginMacroConfig::onBtnAddCfg()
         }
 
         QXmlStreamWriter xmlWriter(&file);
-        //xmlWriter.setCodec("GBK");//XML 编码
+        //xmlWriter.setCodec("GB2312");//XML 编码
         xmlWriter.writeStartDocument("1.0", true);// 开始文档（XML 声明）
         xmlWriter.setAutoFormatting(true);//自动格式化
 
-        xmlWriter.writeStartElement(QStringLiteral("分机表"));//开始根元素 <分机>
+        xmlWriter.writeStartElement(QStringLiteral("设备配置参数"));//开始根元素 <设备配置参数>
+        xmlWriter.writeStartElement(QStringLiteral("设备信息"));//开始根元素 <设备信息>
 
         int nChild = m_pCfgManageRootItem->childCount();
         for( int i=0;i<nChild;i++ ){
             QTreeWidgetItem* pChild=m_pCfgManageRootItem->child(i);
             if( pChild ){
-                xmlWriter.writeStartElement(QStringLiteral("分机"));
-                xmlWriter.writeAttribute("ID",pChild->text(1).trimmed());
+                xmlWriter.writeStartElement(QStringLiteral("设备"));
+                xmlWriter.writeAttribute("devId",pChild->text(1).trimmed());
                 if( Qt::Checked==pChild->checkState(0) ){
-                    xmlWriter.writeAttribute("Checked","true");
+                    xmlWriter.writeAttribute("checked","true");
                 }
                 else{
-                    xmlWriter.writeAttribute("Checked","false");
+                    xmlWriter.writeAttribute("checked","false");
                 }
                 xmlWriter.writeEndElement();
             }
         }
-        xmlWriter.writeEndElement();  // 结束根元素 </分机表>
-        xmlWriter.writeEndDocument();  // 结束文档
+        xmlWriter.writeEndElement();  // 结束设备信息元素 </设备信息>
 
+        //设备参数
+        for( int i=0;i<nChild;i++ ){
+            QTreeWidgetItem* pChild=m_pCfgManageRootItem->child(i);
+            if( pChild && Qt::Checked==pChild->checkState(0) ){
+                QString strName=pChild->text(0).trimmed();
+                QString strDevId=pChild->text(1).trimmed();
+                xmlWriter.writeStartElement(QStringLiteral("设备"));
+                xmlWriter.writeAttribute(QStringLiteral("subDevId"),strDevId);
+                int nAllTab=m_pCfgDispalyTab->count();
+                for( int k=0;k<nAllTab;k++ ){
+                    if( strName==m_pCfgDispalyTab->tabText(k).trimmed() ) {
+                        SubConfigDispalyTree*pSubCfgTree=qobject_cast<SubConfigDispalyTree*>(m_pCfgDispalyTab->widget(k));
+                        pSubCfgTree->exportSubCofig(&xmlWriter);
+                        break;
+                    }
+                }
+                xmlWriter.writeEndElement();
+            }
+        }
+
+        xmlWriter.writeEndDocument();  //结束根元素</设备配置参数>
         file.close();  // 关闭文件
 
         m_pCBCfgFileName->addItem(strBaseName,QVariant(strAbsPath));

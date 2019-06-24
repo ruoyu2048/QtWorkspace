@@ -2,6 +2,7 @@
 #define SUBCONFIGDISPALYTREE_H
 
 #include <QTreeWidget>
+#include <QXmlStreamWriter>
 
 typedef struct _WidgetTreeItem{
     QWidget* pWidget;
@@ -17,6 +18,7 @@ class SubConfigDispalyTree : public QTreeWidget
     Q_OBJECT
 public:
     explicit SubConfigDispalyTree(QString strSubCfgPath);
+    void exportSubCofig(QXmlStreamWriter* pWriter);
 
 private:
     void initSubConfigDispalyTree(QString strSubCfgPath);
