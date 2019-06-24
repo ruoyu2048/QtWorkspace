@@ -91,6 +91,8 @@ void PluginMacroConfig::initDeviceCfgManageTree()
     m_pCfgManageTree->setColumnCount(2);
     //m_pCfgManageTree->setColumnHidden(1,true);
     m_pCfgManageTree->header()->setVisible(false);
+    m_pCfgManageTree->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
+
     m_pGLMain->addWidget(m_pCfgManageTree,1,0,1,2);
     connect(m_pCfgManageTree,&QTreeWidget::itemChanged,this,&PluginMacroConfig::onItemChanged);
     connect(m_pCfgManageTree,&QTreeWidget::itemClicked,this,&PluginMacroConfig::onItemClicked);
@@ -124,7 +126,7 @@ void PluginMacroConfig::resetSubCfgDisplayTabItem(int nRadarId)
     if( getSubCfgInfo(nRadarId,cfgInfoList) ){
         foreach( SubCfgInfo subCfgInfo,cfgInfoList){
             //分机配置文件Tab控件
-            SubConfigDispalyTree* pSubCfgTree = new SubConfigDispalyTree();
+            SubConfigDispalyTree* pSubCfgTree = new SubConfigDispalyTree(subCfgInfo.strAbsFilePath);
             m_pCfgDispalyTab->addTab(pSubCfgTree,subCfgInfo.strName);
 
             //设备管理树
