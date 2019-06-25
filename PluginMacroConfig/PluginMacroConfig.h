@@ -11,6 +11,12 @@
 #include <QLabel>
 
 #include "SubConfigDispalyTree.h"
+#include "DispatchThread.h"
+
+enum MsgBoxType{
+    Quesstion,
+    Information
+};
 
 class PluginMacroConfig : public QWidget
 {
@@ -71,7 +77,7 @@ private:
      */
     bool getSubCfgInfo(int nRadarId,QList<SubCfgInfo> &cfgInfoList);
 
-    bool questionMsgBox(QString strInfo);
+    bool msgBox(MsgBoxType msgBoxType,QString strInfo);
 
     /**
      * @brief updateDeviceCfgManageTree 更新设备配置管理树元素勾选状态
@@ -120,6 +126,8 @@ private:
 
     QTabWidget*  m_pCfgDispalyTab;
     SubConfigDispalyTree* m_pCfgSubTree;
+
+    DispatchThread m_dispatchThread;
 };
 
 #endif // PLUGINMACROCONFIG_H

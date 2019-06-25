@@ -28,9 +28,13 @@ SOURCES += \
         main.cpp \
         PluginMacroConfig.cpp \
         SubConfigDispalyTree.cpp \
-    FileNameDlg.cpp
+    FileNameDlg.cpp \
+    DispatchMacroConfig.cpp \
+    DispatchThread.cpp
 
 HEADERS += \
         PluginMacroConfig.h \
         SubConfigDispalyTree.h \
-    FileNameDlg.h
+    FileNameDlg.h \
+    DispatchMacroConfig.h \
+    DispatchThread.h

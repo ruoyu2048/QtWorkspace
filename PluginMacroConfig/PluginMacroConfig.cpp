@@ -262,12 +262,24 @@ bool PluginMacroConfig::getSubCfgInfo(int nRadarId, QList<SubCfgInfo> &cfgInfoLi
     return false;
 }
 
-bool PluginMacroConfig::questionMsgBox(QString strInfo)
+bool PluginMacroConfig::msgBox(MsgBoxType msgBoxType, QString strInfo)
 {
-    int nRet = QMessageBox::question(this,QStringLiteral("提示"),
-                                     strInfo,
-                                     QMessageBox::Yes | QMessageBox::No,
-                                     QMessageBox::Yes);
+    int nRet = QMessageBox::Yes;
+    switch (msgBoxType) {
+    case MsgBoxType::Quesstion:
+        nRet = QMessageBox::question(this,QStringLiteral("提示"),
+                                             strInfo,
+                                             QMessageBox::Yes | QMessageBox::No,
+                                             QMessageBox::Yes);
+        break;
+    case MsgBoxType::Information:
+        nRet = QMessageBox::information(this,QStringLiteral("提示"),
+                                             strInfo,
+                                             QMessageBox::Yes,
+                                             QMessageBox::Yes);
+        break;
+    }
+
     if( QMessageBox::Yes == nRet )
         return true;
 
@@ -382,14 +394,27 @@ void PluginMacroConfig::onCBCfgFileName(int nIndex)
 
 void PluginMacroConfig::onBtnStartCfg()
 {
-
+    QString strMacroFile=m_pCBCfgFileName->currentData().toString();
+    if( !strMacroFile.isEmpty() ){
+        m_dispatchThread.startThread(strMacroFile,m_nRadarId);
+    }
+    else{
+        QString strInfo=QStringLiteral("目标文件不存在，请检查后再操作!");
+        msgBox(MsgBoxType::Information,strInfo);
+    }
 }
 
 void PluginMacroConfig::onBtnSaveCfg()
 {
+    QString strPath=m_pCBCfgFileName->currentData().toString();
+    if( strPath.isEmpty() ){
+        QString strInfo=QStringLiteral("目标文件不存在，请检查后再操作!");
+        msgBox(MsgBoxType::Information,strInfo);
+        return;
+    }
     QString strInfo=QString("Do you save the configuration?");
-    if( questionMsgBox(strInfo) ){
-        QString strPath=m_pCBCfgFileName->currentData().toString();
+    if( msgBox(MsgBoxType::Quesstion,strInfo) ){
+
         QFile file(strPath);
         if (!file.open(QFile::WriteOnly | QFile::Text)) { // 只写模式打开文件
             qDebug() << QString("Cannot write file %1(%2).").arg(strPath).arg(file.errorString());
@@ -461,7 +486,7 @@ void PluginMacroConfig::onBtnAddCfg()
             if( strBaseName.trimmed()==m_pCBCfgFileName->itemText(i) ){
                 //QString strInfo=QString("该文件已存在，是否覆盖?");
                 QString strInfo=QString("The file already exists. Does it cover?");
-                if( questionMsgBox(strInfo) )
+                if( msgBox(MsgBoxType::Quesstion,strInfo) )
                     break;
                 else
                     return;
@@ -532,11 +557,14 @@ void PluginMacroConfig::onBtnAddCfg()
 void PluginMacroConfig::onBtnDeleteCfg()
 {
     QString strPath=m_pCBCfgFileName->currentData().toString();
+    if( strPath.isEmpty() )
+        return;
+
     QFileInfo fileInfo(strPath);
     if( fileInfo.exists() ){
         //QString strInfo=QString("是否删除文件[%1]?").arg(fileInfo.fileName());
         QString strInfo=QString("Whether to delete file[%1]?").arg(fileInfo.fileName());
-        if( questionMsgBox(strInfo) ){
+        if( msgBox(MsgBoxType::Quesstion,strInfo) ){
             if(QFile::remove(strPath)){
                 m_pCBCfgFileName->removeItem(m_pCBCfgFileName->currentIndex());
             }
