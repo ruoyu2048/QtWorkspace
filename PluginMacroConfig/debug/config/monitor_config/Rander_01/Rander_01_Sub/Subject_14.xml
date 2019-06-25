@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<Subject name="Subject_14" subId="0x31" displayName="监控软件">
+    <subjectInfo name="monitor" displayName="监视" type="monitor" cmdType="0x01">
+        <entity name="MSState" displayName="监控软件状态信息" cmd="0x01">
+            <attribute show="true" name="devState" displayType="select" displayName="设备状态" paramType="0:故障;1:正常;2:中断" addBtn="false" dataType="byte" default="" id="20001" dataLen="1"/>
+            <attribute show="true" name="cpu" displayType="text" displayName="CPU使用率" addBtn="false" dataType="byte" default="" id="20002" dataLen="1"/>
+            <attribute show="true" name="ram" displayType="text" displayName="内存使用率" addBtn="false" dataType="byte" default="" id="20003" dataLen="1"/>
+            <attribute show="true" name="hard" displayType="text" displayName="硬盘占用率" addBtn="false" dataType="byte" default="" id="20004" dataLen="1"/>
+            <attribute show="true" name="hard" displayType="select" displayName="工作模式" paramType="1:搜索模式;2:跟踪模式;3:凝视模式;4:自检模式;5:方向图测试;6:通道一致性校正;8:模拟数据;9:回放模式;10:自定义搜索模式" addBtn="false" dataType="byte" default="" id="20005" dataLen="1"/>
+        </entity>
+    </subjectInfo>
+</Subject>

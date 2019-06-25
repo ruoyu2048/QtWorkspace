@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<Subject name="Subject_10" subId="0x12" displayName="源及变频组件">
+    <subjectInfo name="control" displayName="控制" type="control" cmdType="0x02">
+        <entity name="SFMDevCmd" displayName="源及变频组件设备控制命令" cmd="0x02" flag="C">
+            <attribute show="true" name="addr" displayType="text" tips="请输入值" displayName="频点值" addBtn="true" dataType="byte" default="8" id="00002" validator="" dataLen="1"/>
+        </entity>
+    </subjectInfo>
+    <subjectInfo name="monitor" displayName="监视" type="monitor" cmdType="0x01">
+        <entity name="SFMState" displayName="源及变频组件设备状态信息" cmd="0x01">
+            <attribute show="true" name="freqValue" displayType="text" displayName="频点值" addBtn="false" dataType="byte" default="" id="20001" dataLen="1"/>
+            <attribute show="true" name="devState" displayType="select" displayName="锁定指示" paramType="1:锁定;0:失锁" addBtn="false" dataType="byte" default="" id="20002" dataLen="1"/>
+            <attribute show="true" name="outPut" displayType="text" displayName="输出幅度" addBtn="false" dataType="byte" default="" id="20003" dataLen="1"/>
+            <attribute show="true" name="devState" displayType="select" displayName="设备工作状态" paramType="0:故障;1:正常;2:中断" addBtn="false" dataType="byte" default="" id="20004" dataLen="1"/>
+        </entity>
+    </subjectInfo>
+</Subject>

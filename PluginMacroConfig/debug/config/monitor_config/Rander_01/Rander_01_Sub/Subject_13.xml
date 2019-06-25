@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<Subject name="Subject_13" subId="0x22" displayName="信号处理板DSP2">
+    <subjectInfo name="control" displayName="控制" type="control" cmdType="0x02">
+        <entity name="DevBookCmd" displayName="设备装订指令" cmd="0x02" flag="C">
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="站址编号" addBtn="false" dataType="byte" default="1" id="00002" validator="" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="真北角" addBtn="false" dataType="float" default="110" id="00003" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="站址经度" addBtn="false" dataType="double" default="114.4327" id="00004" validator="" dataLen="8"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="站址纬度" addBtn="false" dataType="double" default="38.04374" id="00005" validator="" dataLen="8"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="站址高度" addBtn="false" dataType="float" default="3.3" id="00006" validator="" dataLen="4"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="GPS安装角与天线法线夹角" addBtn="false" dataType="float" default="180" id="00007" validator="" dataLen="2"/>
+            <attribute show="true" name="addrSelect" displayType="select" displayName="站址选择信息" paramType="1:实时;2:固定值" addBtn="false" dataType="byte" default="固定值" id="00008" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="距离零值" addBtn="false" dataType="float" default="11" id="00010" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="速度零值" addBtn="false" dataType="float" default="22" id="00011" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="方位零值" addBtn="false" dataType="float" default="33" id="00012" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="俯仰零值" addBtn="false" dataType="float" default="44" id="00013" validator="" dataLen="2"/>
+            <attribute show="true" name="TongDao" displayType="text" tips="请输入值!" iniFile="dataSrc.ini" displayName="通道一致性校正系数" addBtn="false" dataType="short" default="tongdaoyizhixing.txt" id="00015" validator="" dataLen="96"/>
+            <attribute show="true" name="ZhengJiao" displayType="text" tips="请输入值!" iniFile="dataSrc.ini" displayName="正交一致性校正系数" addBtn="true" dataType="short" default="zhengjiaoyizhixing.txt" id="00016" validator="" dataLen="96"/>
+        </entity>
+    </subjectInfo>
+    <subjectInfo name="monitor" displayName="监视" type="monitor" cmdType="0x01">
+        <entity name="DSP2" displayName="DSP2状态" cmd="0x01">
+            <attribute show="true" name="ver[3]" displayType="text" displayName="版本号" addBtn="false" dataType="byte" default="" id="20001" dataLen="1"/>
+            <attribute show="true" name="alarmState" displayType="select" displayName="故障状态" paramType="0:故障;1:正常;2:中断" addBtn="false" dataType="byte" default="" id="20002" dataLen="1"/>
+            <attribute show="false" name="alarmCode1" displayType="text" displayName="自定义故障码1" addBtn="false" dataType="byte" default="" id="20003" dataLen="1"/>
+            <attribute show="false" name="alarmCode2" displayType="text" displayName="自定义故障码2" addBtn="false" dataType="byte" default="" id="20004" dataLen="1"/>
+            <attribute show="false" name="inState" displayType="text" displayName="输入状态检测" addBtn="false" dataType="byte" default="" id="20005" dataLen="1"/>
+            <attribute show="true" name="IP" displayType="text" displayName="IP" addBtn="false" dataType="int" default="" id="20006" dataLen="4"/>
+            <attribute show="true" name="port1" displayType="text" displayName="端口号1" addBtn="false" dataType="short" default="" id="20007" dataLen="2"/>
+            <attribute show="true" name="port2" displayType="text" displayName="端口号2" addBtn="false" dataType="short" default="" id="20008" dataLen="2"/>
+            <attribute show="true" name="port3" displayType="text" displayName="端口号3" addBtn="false" dataType="short" default="" id="20009" dataLen="2"/>
+            <attribute show="true" name="cpu" displayType="text" displayName="CPU主频" addBtn="false" dataType="short" default="" id="20010" dataLen="2"/>
+            <attribute show="true" name="ddr" displayType="text" displayName="DDR速率" addBtn="false" dataType="short" default="" id="20011" dataLen="2"/>
+            <attribute show="false" name="commRate" displayType="text" displayName="串口波特率" addBtn="false" dataType="short" default="" id="20012" dataLen="2"/>
+            <attribute show="true" name="SRIORate" displayType="text" displayName="SRIO速率等级" addBtn="false" dataType="short" default="" id="20013" dataLen="2"/>
+            <attribute show="true" name="SRIOID" displayType="text" displayName="SRIO ID号" addBtn="false" dataType="short" default="" id="20014" dataLen="2"/>
+            <attribute show="true" name="SRIOMode" displayType="text" displayName="SRIO配置模式" addBtn="false" dataType="byte" default="" id="20015" dataLen="1"/>
+            <attribute show="true" name="SRIDAlarm" displayType="text" displayName="SRIO故障" addBtn="false" dataType="byte" default="" id="20016" dataLen="1"/>
+            <attribute show="false" name="bei[6]" displayType="text" displayName="备用" addBtn="false" dataType="byte" default="" id="20017" dataLen="6"/>
+            <attribute show="false" name="bei1[64]" displayType="text" displayName="参数（应用程序）" addBtn="false" dataType="byte" default="" id="20018" dataLen="64"/>
+            <attribute show="true" name="h0State" displayType="text" displayName="核0状态：心跳" addBtn="false" dataType="byte" default="" id="20019" dataLen="1"/>
+            <attribute show="false" name="h0bei[7]" displayType="text" displayName="备用（核0自定义状态）" addBtn="false" dataType="byte" default="" id="20020" dataLen="7"/>
+            <attribute show="true" name="h1State" displayType="text" displayName="核1状态：心跳" addBtn="false" dataType="byte" default="" id="20021" dataLen="1"/>
+            <attribute show="false" name="h1bei[7]" displayType="text" displayName="备用（核1自定义状态）" addBtn="false" dataType="byte" default="" id="20022" dataLen="7"/>
+            <attribute show="true" name="h2State" displayType="text" displayName="核2状态：心跳" addBtn="false" dataType="byte" default="" id="20023" dataLen="1"/>
+            <attribute show="false" name="h2bei[7]" displayType="text" displayName="备用（核2自定义状态）" addBtn="false" dataType="byte" default="" id="20024" dataLen="7"/>
+            <attribute show="true" name="h3State" displayType="text" displayName="核3状态：心跳" addBtn="false" dataType="byte" default="" id="20025" dataLen="1"/>
+            <attribute show="false" name="h3bei[7]" displayType="text" displayName="备用（核3自定义状态）" addBtn="false" dataType="byte" default="" id="20026" dataLen="7"/>
+            <attribute show="true" name="h4State" displayType="text" displayName="核4状态：心跳" addBtn="false" dataType="byte" default="" id="20027" dataLen="1"/>
+            <attribute show="false" name="h4bei[7]" displayType="text" displayName="备用（核4自定义状态）" addBtn="false" dataType="byte" default="" id="20028" dataLen="7"/>
+            <attribute show="true" name="h5State" displayType="text" displayName="核5状态：心跳" addBtn="false" dataType="byte" default="" id="20029" dataLen="1"/>
+            <attribute show="false" name="h5bei[7]" displayType="text" displayName="备用（核5自定义状态）" addBtn="false" dataType="byte" default="" id="20030" dataLen="7"/>
+            <attribute show="true" name="h6State" displayType="text" displayName="核6状态：心跳" addBtn="false" dataType="byte" default="" id="20031" dataLen="1"/>
+            <attribute show="false" name="h6bei[7]" displayType="text" displayName="备用（核6自定义状态）" addBtn="false" dataType="byte" default="" id="20032" dataLen="7"/>
+            <attribute show="true" name="h7State" displayType="text" displayName="核7状态：心跳" addBtn="false" dataType="byte" default="" id="20033" dataLen="1"/>
+            <attribute show="false" name="h7bei[7]" displayType="text" displayName="备用（核7自定义状态）" addBtn="false" dataType="byte" default="" id="20034" dataLen="7"/>
+        </entity>
+    </subjectInfo>
+</Subject>

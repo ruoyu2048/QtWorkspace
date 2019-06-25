@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<Subject name="Subject_15" subId="0x41" displayName="数据处理软件">
+    <subjectInfo name="control" displayName="控制" type="control" cmdType="0x02">
+        <entity name="PWSwitchCmd" displayName="跟踪波位指令" cmd="0x04" flag="C">
+            <attribute show="true" name="addr" displayType="text" tips="" displayName="跟踪目标个数" addBtn="false" dataType="byte" default="" id="00022" validator="" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="第1个目标批号" addBtn="false" dataType="byte" default="" id="00023" validator="" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="" displayName="第1个目标波位" addBtn="false" dataType="byte" default="" id="00024" validator="" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="第1个目标方位(°)" addBtn="false" dataType="short" default="" id="00025" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="第2个目标批号" addBtn="false" dataType="byte" default="" id="00026" validator="" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="" displayName="第2个目标波位" addBtn="false" dataType="byte" default="" id="00027" validator="" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="第2个目标方位(1°)" addBtn="false" dataType="short" default="" id="00028" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="第3个目标批号" addBtn="false" dataType="byte" default="" id="00029" validator="" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="" displayName="第3个目标波位" addBtn="false" dataType="byte" default="" id="00030" validator="" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="第3个目标方位(°)" addBtn="false" dataType="short" default="" id="00031" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="第4个目标批号" addBtn="false" dataType="byte" default="" id="00032" validator="" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="" displayName="第4个目标波位" addBtn="false" dataType="byte" default="" id="00033" validator="" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="第4个目标方位(°)" addBtn="true" dataType="short" default="" id="00034" validator="" dataLen="2"/>
+        </entity>
+    </subjectInfo>
+    <subjectInfo name="monitor" displayName="监视" type="monitor" cmdType="0x01">
+        <entity name="LaunchDevState" displayName="数据处理软件状态信息" cmd="0x01">
+            <attribute show="true" name="gongLv" displayType="select" displayName="设备状态" paramType="0:故障;1:正常;2:中断" addBtn="false" dataType="byte" default="" id="20001" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="text" displayName="机箱内温度" addBtn="false" dataType="byte" default="" id="20002" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="text" displayName="电源1电压值" addBtn="false" dataType="byte" default="" id="20003" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="text" displayName="电源1电流值" addBtn="false" dataType="float" default="" id="20004" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="text" displayName="电源2电压值" addBtn="false" dataType="float" default="" id="20005" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="text" displayName="电源2电流值" addBtn="false" dataType="float" default="" id="20006" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="text" displayName="电源3电压值" addBtn="false" dataType="float" default="" id="20007" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="text" displayName="电源3电流值" addBtn="false" dataType="float" default="" id="20008" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="text" displayName="cpu使用率" addBtn="false" dataType="float" default="" id="20009" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="text" displayName="内存使用率" addBtn="false" dataType="byte" default="" id="20010" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="text" displayName="硬盘占用率" addBtn="false" dataType="byte" default="" id="20011" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="select" displayName="处理终端工作状态" paramType="0:工作;1:空闲" addBtn="false" dataType="byte" default="" id="20012" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="text" displayName="雷达编号" addBtn="false" dataType="byte" default="" id="20013" dataLen="5"/>
+        </entity>
+    </subjectInfo>
+</Subject>

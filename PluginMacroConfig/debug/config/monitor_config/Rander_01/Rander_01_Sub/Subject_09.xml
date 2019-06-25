@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<Subject name="Subject_09" subId="0x11" displayName="中频源">
+    <subjectInfo name="control" displayName="控制" type="control" cmdType="0x02">
+        <entity name="IFSDevCmd" displayName="中频源设备控制命令" cmd="0x02" flag="C">
+           <attribute show="true" name="addrSelect" displayType="select" displayName="工作模式" paramType="1:单频;2:锯齿波变周期(10MHz);4:锯齿波单周期1(10MHz);5:锯齿波单周期2(10MHz);6:锯齿波单周期3(10MHz)" addBtn="false" dataType="byte" default="单频" id="00002" dataLen="1"/>
+            <attribute show="true" name="addrSelect" displayType="select" displayName="CPI" paramType="1:90(2s数据率);2:124(3s数据率);3:246(6s数据率);4:496(12s数据率)" addBtn="false" dataType="byte" default="90(2s数据率)" id="00003" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="参数值为：1~21" displayName="频点值" addBtn="true" dataType="byte" default="6" id="00004" validator="" dataLen="1"/>
+        </entity>
+    </subjectInfo>
+    <subjectInfo name="monitor" displayName="监视" type="monitor" cmdType="0x01">
+        <entity name="IFSState" displayName="中频源状态信息" cmd="0x01">
+            <attribute show="true" name="workMode" displayType="select" displayName="工作模式" paramType="1:单频;2:锯齿波变周期(10MHz);4:锯齿波单周期1(10MHz);5:锯齿波单周期2(10MHz);6:锯齿波单周期3(10MHz)" addBtn="false" dataType="byte" default="" id="20001" dataLen="1"/>
+            <attribute show="true" name="cpi" displayType="select" displayName="CPI" paramType="1:90(2s数据率);2:124(3s数据率);3:246(6s数据率);4:496(12s数据率)" addBtn="false" dataType="byte" default="" id="20002" dataLen="1"/>
+            <attribute show="true" name="danPin" displayType="text" displayName="频点值" addBtn="false" dataType="byte" default="" id="20003" dataLen="1"/>
+            <attribute show="true" name="juChi" displayType="select" displayName="脉冲输入" paramType="0:无同步信号输入;1:有波位、无脉冲同步信号输入;2:无波位、有脉冲同步信号输入;3:有波位和脉冲同步信号输入" addBtn="false" dataType="byte" default="" id="20004" dataLen="1"/>
+            <attribute show="true" name="outPut" displayType="text" displayName="输出幅度" addBtn="false" dataType="byte" default="" id="20005" dataLen="1"/>
+            <attribute show="true" name="devState" displayType="select" displayName="设备工作状态" paramType="0:故障;1:正常;2:中断" addBtn="false" dataType="byte" default="" id="20006" dataLen="1"/>
+        </entity>
+    </subjectInfo>
+</Subject>

@@ -88,21 +88,29 @@ void SubConfigDispalyTree::importSubConfig(QMap<QString, QString> paraValueMap){
 void SubConfigDispalyTree::initSubConfigDispalyTree( QString strSubCfgPath )
 {
     this->setColumnCount(7);
-//    this->setColumnHidden(2,true);
-//    this->setColumnHidden(3,true);
-//    this->setColumnHidden(4,true);
-//    this->setColumnHidden(5,true);
-//    this->setColumnHidden(6,true);
+    this->setColumnHidden(2,true);
+    this->setColumnHidden(3,true);
+    this->setColumnHidden(4,true);
+    this->setColumnHidden(5,true);
+    this->setColumnHidden(6,true);
     QStringList headers;
-    headers<<tr("Paramater Name")
-                <<tr("Paramater Value")
-                <<tr("Paramater ID")
-                <<tr("Display Type")
-                <<tr("Paramater Type")
-                <<tr("Regular Expression")
-                <<tr("Tips");
+//    headers<<tr("Paramater Name")
+//                <<tr("Paramater Value")
+//                <<tr("Paramater ID")
+//                <<tr("Display Type")
+//                <<tr("Paramater Type")
+//                <<tr("Regular Expression")
+//                <<tr("Tips");
+    headers<<QStringLiteral("参数名称")
+                <<QStringLiteral("参数值")
+                <<QStringLiteral("参数Id")
+                <<QStringLiteral("显示类型")
+                <<QStringLiteral("参数类型")
+                <<QStringLiteral("正则表达式")
+                <<QStringLiteral("提示信息");
     this->setHeaderLabels(headers);
-    this->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
+    this->header()->setSectionResizeMode(QHeaderView::Stretch);
+    //this->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
 
     readEquipmentInfo(strSubCfgPath);
 }
@@ -164,7 +172,7 @@ int SubConfigDispalyTree::readEquipmentInfo(QString strPath)
                                             pAttrItem->setText(0,strName);
                                             if("text"==strDisplayType ){
                                                 QLineEdit* pLEVal = new QLineEdit(strValue);
-                                                //pLEVal->setFrame(false);
+                                                pLEVal->setFrame(false);
                                                 connect(pLEVal,&QLineEdit::textEdited,this,&SubConfigDispalyTree::lineTextEdited);
 
                                                 this->setItemWidget(pAttrItem,1,pLEVal);
@@ -178,7 +186,7 @@ int SubConfigDispalyTree::readEquipmentInfo(QString strPath)
                                             }
                                             else if("select"==strDisplayType){
                                                 QComboBox* pCombo = new QComboBox();
-                                                //pCombo->setFrame(false);
+                                                pCombo->setFrame(false);
                                                 QStringList paramTypes = strParamType.split(";");
                                                 foreach (QString strPara, paramTypes) {
                                                    QStringList paramPair = strPara.split(":");

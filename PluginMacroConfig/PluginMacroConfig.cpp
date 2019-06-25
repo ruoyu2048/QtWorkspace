@@ -11,6 +11,7 @@
 
 PluginMacroConfig::PluginMacroConfig(QWidget *parent):
     QWidget(parent),
+    m_nRadarId(-1),
     m_pGLMain(nullptr),
     m_pLBCfgFileName(nullptr),
     m_pCBCfgFileName(nullptr),
@@ -70,13 +71,13 @@ void PluginMacroConfig::initContrals()
     m_pBtnJobRelationCfg->setEnabled(false);
 
     m_pGLMain->addWidget(m_pLBCfgFileName,0,0,1,1);
-    m_pGLMain->addWidget(m_pCBCfgFileName,0,1,1,1);
-    m_pGLMain->addWidget(m_pBtnStartCfg,0,2,1,1);
-    m_pGLMain->addWidget(m_pBtnSaveCfg,0,3,1,1);
-    m_pGLMain->addWidget(m_pBtnGetCfg,0,4,1,1);
-    m_pGLMain->addWidget(m_pBtnAddCfg,0,5,1,1);
-    m_pGLMain->addWidget(m_pBtnDeleteCfg,0,6,1,1);
-    m_pGLMain->addWidget(m_pBtnJobRelationCfg,0,7,1,1);
+    m_pGLMain->addWidget(m_pCBCfgFileName,0,1,1,2);
+    m_pGLMain->addWidget(m_pBtnStartCfg,0,3,1,1);
+    m_pGLMain->addWidget(m_pBtnSaveCfg,0,4,1,1);
+    m_pGLMain->addWidget(m_pBtnGetCfg,0,5,1,1);
+    m_pGLMain->addWidget(m_pBtnAddCfg,0,6,1,1);
+    m_pGLMain->addWidget(m_pBtnDeleteCfg,0,7,1,1);
+    m_pGLMain->addWidget(m_pBtnJobRelationCfg,0,8,1,1);
 
     connect(m_pCBCfgFileName,SIGNAL(currentIndexChanged(int)),this,SLOT(onCBCfgFileName(int)));
     connect(m_pBtnStartCfg,&QPushButton::clicked,this,&PluginMacroConfig::onBtnStartCfg);
@@ -107,11 +108,11 @@ void PluginMacroConfig::initDeviceCfgManageTree()
 {
     m_pCfgManageTree = new QTreeWidget();
     m_pCfgManageTree->setColumnCount(2);
-    //m_pCfgManageTree->setColumnHidden(1,true);
+    m_pCfgManageTree->setColumnHidden(1,true);
     m_pCfgManageTree->header()->setVisible(false);
-    m_pCfgManageTree->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
+    //m_pCfgManageTree->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
 
-    m_pGLMain->addWidget(m_pCfgManageTree,1,0,1,2);
+    m_pGLMain->addWidget(m_pCfgManageTree,1,0,1,3);
     connect(m_pCfgManageTree,&QTreeWidget::itemChanged,this,&PluginMacroConfig::onItemChanged);
     connect(m_pCfgManageTree,&QTreeWidget::itemClicked,this,&PluginMacroConfig::onItemClicked);
 
@@ -130,7 +131,7 @@ void PluginMacroConfig::initSubCfgDisplayTab()
     m_pCfgDispalyTab->setTabShape(QTabWidget::Rounded);
     connect(m_pCfgDispalyTab,&QTabWidget::currentChanged,this,&PluginMacroConfig::onCurrentTabChanged);
 
-    m_pGLMain->addWidget(m_pCfgDispalyTab,1,2,1,6);
+    m_pGLMain->addWidget(m_pCfgDispalyTab,1,3,1,6);
 }
 
 void PluginMacroConfig::showWindow(int nRadarId)
@@ -138,11 +139,38 @@ void PluginMacroConfig::showWindow(int nRadarId)
 //    if( !this->isHidden() )
 //        this->close();
 //    this->show();
-
-    resetSubCfgDisplayTabItem(nRadarId);
+    if( m_nRadarId!=nRadarId ){
+        clearDeviceCfgManageTreeItems();
+        clearSubCfgDisplayTabItems();
+        resetSubCfgDisplayItems(nRadarId);
+    }
 }
 
-void PluginMacroConfig::resetSubCfgDisplayTabItem(int nRadarId)
+void PluginMacroConfig::clearDeviceCfgManageTreeItems()
+{
+    if( m_pCfgManageRootItem ){
+        int nChild=m_pCfgManageRootItem->childCount();
+        for( int i=nChild-1;i>=0;i-- ){
+            delete m_pCfgManageRootItem->takeChild(i);
+        }
+    }
+}
+
+void PluginMacroConfig::clearSubCfgDisplayTabItems()
+{
+    if( m_pCfgDispalyTab ){
+        int nTabSz=m_pCfgDispalyTab->count();
+        for( int i=nTabSz-1;i>=0;i-- ){
+            QWidget* pWidget = m_pCfgDispalyTab->widget(i);
+            if( nullptr!=pWidget ){
+                delete pWidget;
+                pWidget = nullptr;
+            }
+        }
+    }
+}
+
+void PluginMacroConfig::resetSubCfgDisplayItems(int nRadarId)
 {
     QList<SubCfgInfo> cfgInfoList;
     if( getSubCfgInfo(nRadarId,cfgInfoList) ){

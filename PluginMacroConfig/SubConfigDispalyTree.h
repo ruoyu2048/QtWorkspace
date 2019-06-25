@@ -27,7 +27,17 @@ public:
     explicit SubConfigDispalyTree(SubCfgInfo subCfgInfo);
     QString getSubDevId();
     QString getSubDevName();
+
+    /**
+     * @brief exportSubCofig 导出分机配置参数
+     * @param pWriter
+     */
     void exportSubCofig(QXmlStreamWriter* pWriter);
+
+    /**
+     * @brief importSubConfig 导入分机配置参数，用于界面数据刷新
+     * @param paraValueMap
+     */
     void importSubConfig(QMap<QString,QString>paraValueMap);
 
 private:

@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<Subject name="Subject_08" subId="0x08" displayName="发射组件08">
+    <subjectInfo name="control" displayName="控制" type="control" cmdType="0x02">
+        <entity name="PWSwitchCmd" displayName="功率和波位切换" cmd="0x02" flag="C">
+            <attribute show="true" name="addr" displayType="text" tips="发射功率对应的衰减值，衰减值范围:0~63 !" displayName="衰减值(0-63)" addBtn="false" dataType="byte" default="0" id="00002" validator="" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="波位号对应的移相值，移相值范围:0~63 !" displayName="移相值(0-63)" addBtn="true" dataType="byte" default="0" id="00003" validator="" dataLen="1"/>
+        </entity>
+        <entity name="LaunchDevOnOff" displayName="发射组件开关指令" cmd="0x03" flag="C">
+            <attribute show="true" name="addrSelect" displayType="select" displayName="发射组件开关设置" paramType="0:关闭;1:打开" addBtn="true" dataType="byte" default="打开" id="00012" dataLen="1"/>
+        </entity>
+    </subjectInfo>
+    <subjectInfo name="monitor" displayName="监视" type="monitor" cmdType="0x01">
+        <entity name="LaunchDevState" displayName="发射组件08状态" cmd="0x01">
+            <attribute show="true" name="WenDu" displayType="text" displayName="组件温度" addBtn="false" dataType="byte" default="" id="20001" dataLen="1"/>
+            <attribute show="true" name="dianLiu" displayType="select" displayName="组件电流状态" paramType="1:正常;0:异常" addBtn="false" dataType="byte" default="" id="20002" dataLen="1"/>
+            <attribute show="true" name="onOff" displayType="select" displayName="开关状态" paramType="0:关闭;1:打开" addBtn="false" dataType="byte" default="" id="20003" dataLen="1"/>
+            <attribute show="true" name="shuaiJianZhi" displayType="text" displayName="衰减值" addBtn="false" dataType="byte" default="" id="20004" dataLen="1"/>
+            <attribute show="true" name="yiXiangZhi" displayType="text" displayName="移相值" addBtn="false" dataType="byte" default="" id="20005" dataLen="1"/>
+            <attribute show="true" name="gongLv" displayType="text" displayName="输出功率值" addBtn="false" dataType="byte" default="" id="20006" dataLen="1"/>
+            <attribute show="true" name="sheBeiZhuangTai" displayType="select" displayName="设备工作状态" paramType="0:故障;1:正常;2:中断" addBtn="false" dataType="byte" default="" id="20007" dataLen="1"/>
+        </entity>
+    </subjectInfo>
+</Subject>

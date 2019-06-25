@@ -1,0 +1,304 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<Subject name="Subject_12" subId="0x21" displayName="信号处理板DSP1">
+    <subjectInfo name="control" displayName="控制" type="control" cmdType="0x02">
+        <entity name="DevBookCmd" displayName="设备装订指令" cmd="0x02" flag="C">
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="站址编号" addBtn="false" dataType="byte" default="1" id="00002" validator="" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="真北角" addBtn="false" dataType="short" default="10" id="00003" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="站址经度" addBtn="false" dataType="double" default="114.3473" id="00004" validator="" dataLen="8"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="站址纬度" addBtn="false" dataType="double" default="38.249767" id="00005" validator="" dataLen="8"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="站址高度" addBtn="false" dataType="float" default="3.3" id="00006" validator="" dataLen="4"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="GPS安装角与天线法线夹角" addBtn="false" dataType="short" default="180" id="00007" validator="" dataLen="2"/>
+            <attribute show="true" name="addrSelect" displayType="select" displayName="站址选择信息" paramType="1:实时;2:固定值" addBtn="false" dataType="byte" default="实时" id="00008" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="距离零值" addBtn="false" dataType="short" default="11" id="00010" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="速度零值" addBtn="false" dataType="short" default="22" id="00011" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="方位零值" addBtn="false" dataType="short" default="33" id="00012" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="俯仰零值" addBtn="false" dataType="short" default="44" id="00013" validator="" dataLen="2"/>
+            <attribute show="true" name="TongDao" displayType="text" tips="请输入值!" iniFile="dataSrc.ini" displayName="通道一致性校正系数" addBtn="false" dataType="short" default="tongdaoyizhixing.txt" id="00015" validator="" dataLen="96"/>
+            <attribute show="true" name="ZhengJiao" displayType="text" tips="请输入值!" iniFile="dataSrc.ini" displayName="正交一致性校正系数" addBtn="true" dataType="short" default="zhengjiaoyizhixing.txt" id="00016" validator="" dataLen="96"/>
+        </entity>
+        <entity name="FPGASimCmd" displayName="FPGA目标模拟指令" cmd="0x05" flag="C">
+            <attribute show="true" name="addr" displayType="select" displayName="DDS控制模式" paramType="0:关闭;1:手动控制模式;2:仿真目标模式" addBtn="false" dataType="byte" default="仿真目标模式" id="00302" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="select" displayName="DDS复位" paramType="0:保持;90:同步;165:复位" addBtn="false" dataType="byte" default="保持" id="00303" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="" displayName="目标速度" addBtn="false" dataType="short" default="30" id="00304" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="" displayName="目标距离" addBtn="false" dataType="short" default="1000" id="00305" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="" displayName="目标方位角" addBtn="false" dataType="short" default="-41" id="00306" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="" displayName="幅度" addBtn="true" dataType="short" default="65535" id="00307" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS4幅度" addBtn="false" dataType="short" default="" id="00308" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS5幅度" addBtn="false" dataType="short" default="" id="00309" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS6幅度" addBtn="false" dataType="short" default="" id="00310" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS7幅度" addBtn="false" dataType="short" default="" id="00311" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS8幅度" addBtn="false" dataType="short" default="" id="00312" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS9幅度" addBtn="false" dataType="short" default="" id="00313" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS10幅度" addBtn="false" dataType="short" default="" id="00314" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS11幅度" addBtn="false" dataType="short" default="" id="00315" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS12幅度" addBtn="false" dataType="short" default="" id="00316" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS13幅度" addBtn="false" dataType="short" default="" id="00317" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS14幅度" addBtn="false" dataType="short" default="" id="00318" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS15幅度" addBtn="false" dataType="short" default="" id="00319" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS16幅度" addBtn="false" dataType="short" default="" id="00320" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS17幅度" addBtn="false" dataType="short" default="" id="00321" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS18幅度" addBtn="false" dataType="short" default="" id="00322" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS19幅度" addBtn="false" dataType="short" default="" id="00323" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS20幅度" addBtn="false" dataType="short" default="" id="00324" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS21幅度" addBtn="false" dataType="short" default="" id="00325" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS22幅度" addBtn="false" dataType="short" default="" id="00326" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS23幅度" addBtn="false" dataType="short" default="" id="00327" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS24幅度" addBtn="false" dataType="short" default="" id="00328" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS25幅度" addBtn="false" dataType="short" default="" id="00329" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS26幅度" addBtn="false" dataType="short" default="" id="00330" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS27幅度" addBtn="false" dataType="short" default="" id="00331" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS28幅度" addBtn="false" dataType="short" default="" id="00332" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS29幅度" addBtn="false" dataType="short" default="" id="00333" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS30幅度" addBtn="false" dataType="short" default="" id="00334" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS31幅度" addBtn="false" dataType="short" default="" id="00335" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS32幅度" addBtn="false" dataType="short" default="" id="00336" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS33幅度" addBtn="false" dataType="short" default="" id="00337" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS34幅度" addBtn="false" dataType="short" default="" id="00338" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS35幅度" addBtn="false" dataType="short" default="" id="00339" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS36幅度" addBtn="false" dataType="short" default="" id="00340" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS37幅度" addBtn="false" dataType="short" default="" id="00341" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS38幅度" addBtn="false" dataType="short" default="" id="00342" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS39幅度" addBtn="false" dataType="short" default="" id="00343" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS40幅度" addBtn="false" dataType="short" default="" id="00344" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS41幅度" addBtn="false" dataType="short" default="" id="00345" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS42幅度" addBtn="false" dataType="short" default="" id="00346" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS43幅度" addBtn="false" dataType="short" default="" id="00347" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS44幅度" addBtn="false" dataType="short" default="" id="00348" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS45幅度" addBtn="false" dataType="short" default="" id="00349" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS46幅度" addBtn="false" dataType="short" default="" id="00350" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS47幅度" addBtn="false" dataType="short" default="" id="00351" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS48幅度" addBtn="false" dataType="short" default="" id="00352" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS49幅度" addBtn="false" dataType="short" default="" id="00353" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS50幅度" addBtn="false" dataType="short" default="" id="00354" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS51幅度" addBtn="false" dataType="short" default="" id="00355" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS52幅度" addBtn="false" dataType="short" default="" id="00356" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS53幅度" addBtn="false" dataType="short" default="" id="00357" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS54幅度" addBtn="false" dataType="short" default="" id="00358" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS55幅度" addBtn="false" dataType="short" default="" id="00359" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS56幅度" addBtn="false" dataType="short" default="" id="00360" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS57幅度" addBtn="false" dataType="short" default="" id="00361" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS58幅度" addBtn="false" dataType="short" default="" id="00362" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS59幅度" addBtn="false" dataType="short" default="" id="00363" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS60幅度" addBtn="false" dataType="short" default="" id="00364" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS61幅度" addBtn="false" dataType="short" default="" id="00365" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS62幅度" addBtn="false" dataType="short" default="" id="00366" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS63幅度" addBtn="false" dataType="short" default="" id="00367" validator="" dataLen="2"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS0频率控制字" addBtn="false" dataType="int" default="" id="00368" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS1频率控制字" addBtn="false" dataType="int" default="" id="00369" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS2频率控制字" addBtn="false" dataType="int" default="" id="00370" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS3频率控制字" addBtn="false" dataType="int" default="" id="00371" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS4频率控制字" addBtn="false" dataType="int" default="" id="00372" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS5频率控制字" addBtn="false" dataType="int" default="" id="00373" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS6频率控制字" addBtn="false" dataType="int" default="" id="00374" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS7频率控制字" addBtn="false" dataType="int" default="" id="00375" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS8频率控制字" addBtn="false" dataType="int" default="" id="00376" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS9频率控制字" addBtn="false" dataType="int" default="" id="00377" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS10频率控制字" addBtn="false" dataType="int" default="" id="00378" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS11频率控制字" addBtn="false" dataType="int" default="" id="00379" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS12频率控制字" addBtn="false" dataType="int" default="" id="00380" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS13频率控制字" addBtn="false" dataType="int" default="" id="00381" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS14频率控制字" addBtn="false" dataType="int" default="" id="00382" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS15频率控制字" addBtn="false" dataType="int" default="" id="00383" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS16频率控制字" addBtn="false" dataType="int" default="" id="00384" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS17频率控制字" addBtn="false" dataType="int" default="" id="00385" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS18频率控制字" addBtn="false" dataType="int" default="" id="00386" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS19频率控制字" addBtn="false" dataType="int" default="" id="00387" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS20频率控制字" addBtn="false" dataType="int" default="" id="00388" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS21频率控制字" addBtn="false" dataType="int" default="" id="00389" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS22频率控制字" addBtn="false" dataType="int" default="" id="00390" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS23频率控制字" addBtn="false" dataType="int" default="" id="00391" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS24频率控制字" addBtn="false" dataType="int" default="" id="00392" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS25频率控制字" addBtn="false" dataType="int" default="" id="00393" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS26频率控制字" addBtn="false" dataType="int" default="" id="00394" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS27频率控制字" addBtn="false" dataType="int" default="" id="00395" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS28频率控制字" addBtn="false" dataType="int" default="" id="00396" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS29频率控制字" addBtn="false" dataType="int" default="" id="00397" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS30频率控制字" addBtn="false" dataType="int" default="" id="00398" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS31频率控制字" addBtn="false" dataType="int" default="" id="00399" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS32频率控制字" addBtn="false" dataType="int" default="" id="00400" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS33频率控制字" addBtn="false" dataType="int" default="" id="00401" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS34频率控制字" addBtn="false" dataType="int" default="" id="00402" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS35频率控制字" addBtn="false" dataType="int" default="" id="00403" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS36频率控制字" addBtn="false" dataType="int" default="" id="00404" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS37频率控制字" addBtn="false" dataType="int" default="" id="00405" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS38频率控制字" addBtn="false" dataType="int" default="" id="00406" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS39频率控制字" addBtn="false" dataType="int" default="" id="00407" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS40频率控制字" addBtn="false" dataType="int" default="" id="00408" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS41频率控制字" addBtn="false" dataType="int" default="" id="00409" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS42频率控制字" addBtn="false" dataType="int" default="" id="00410" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS43频率控制字" addBtn="false" dataType="int" default="" id="00411" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS44频率控制字" addBtn="false" dataType="int" default="" id="00412" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS45频率控制字" addBtn="false" dataType="int" default="" id="00413" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS46频率控制字" addBtn="false" dataType="int" default="" id="00414" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS47频率控制字" addBtn="false" dataType="int" default="" id="00415" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS48频率控制字" addBtn="false" dataType="int" default="" id="00416" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS49频率控制字" addBtn="false" dataType="int" default="" id="00417" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS50频率控制字" addBtn="false" dataType="int" default="" id="00418" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS51频率控制字" addBtn="false" dataType="int" default="" id="00419" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS52频率控制字" addBtn="false" dataType="int" default="" id="00420" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS53频率控制字" addBtn="false" dataType="int" default="" id="00421" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS54频率控制字" addBtn="false" dataType="int" default="" id="00422" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS55频率控制字" addBtn="false" dataType="int" default="" id="00423" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS56频率控制字" addBtn="false" dataType="int" default="" id="00424" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS57频率控制字" addBtn="false" dataType="int" default="" id="00425" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS58频率控制字" addBtn="false" dataType="int" default="" id="00426" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS59频率控制字" addBtn="false" dataType="int" default="" id="00427" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS60频率控制字" addBtn="false" dataType="int" default="" id="00428" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS61频率控制字" addBtn="false" dataType="int" default="" id="00429" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS62频率控制字" addBtn="false" dataType="int" default="" id="00430" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS63频率控制字" addBtn="false" dataType="int" default="" id="00431" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS0相位初始化值" addBtn="false" dataType="int" default="" id="00432" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS1相位初始化值" addBtn="false" dataType="int" default="" id="00433" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS2相位初始化值" addBtn="false" dataType="int" default="" id="00434" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS3相位初始化值" addBtn="false" dataType="int" default="" id="00435" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS4相位初始化值" addBtn="false" dataType="int" default="" id="00436" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS5相位初始化值" addBtn="false" dataType="int" default="" id="00437" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS6相位初始化值" addBtn="false" dataType="int" default="" id="00438" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS7相位初始化值" addBtn="false" dataType="int" default="" id="00439" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS8相位初始化值" addBtn="false" dataType="int" default="" id="00440" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS9相位初始化值" addBtn="false" dataType="int" default="" id="00441" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS10相位初始化值" addBtn="false" dataType="int" default="" id="00442" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS11相位初始化值" addBtn="false" dataType="int" default="" id="00443" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS12相位初始化值" addBtn="false" dataType="int" default="" id="00444" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS13相位初始化值" addBtn="false" dataType="int" default="" id="00445" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS14相位初始化值" addBtn="false" dataType="int" default="" id="00446" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS15相位初始化值" addBtn="false" dataType="int" default="" id="00447" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS16相位初始化值" addBtn="false" dataType="int" default="" id="00448" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS17相位初始化值" addBtn="false" dataType="int" default="" id="00449" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS18相位初始化值" addBtn="false" dataType="int" default="" id="00450" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS19相位初始化值" addBtn="false" dataType="int" default="" id="00451" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS20相位初始化值" addBtn="false" dataType="int" default="" id="00452" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS21相位初始化值" addBtn="false" dataType="int" default="" id="00453" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS22相位初始化值" addBtn="false" dataType="int" default="" id="00454" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS23相位初始化值" addBtn="false" dataType="int" default="" id="00455" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS24相位初始化值" addBtn="false" dataType="int" default="" id="00456" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS25相位初始化值" addBtn="false" dataType="int" default="" id="00457" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS26相位初始化值" addBtn="false" dataType="int" default="" id="00458" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS27相位初始化值" addBtn="false" dataType="int" default="" id="00459" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS28相位初始化值" addBtn="false" dataType="int" default="" id="00460" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS29相位初始化值" addBtn="false" dataType="int" default="" id="00461" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS30相位初始化值" addBtn="false" dataType="int" default="" id="00462" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS31相位初始化值" addBtn="false" dataType="int" default="" id="00463" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS32相位初始化值" addBtn="false" dataType="int" default="" id="00464" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS33相位初始化值" addBtn="false" dataType="int" default="" id="00465" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS34相位初始化值" addBtn="false" dataType="int" default="" id="00466" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS35相位初始化值" addBtn="false" dataType="int" default="" id="00467" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS36相位初始化值" addBtn="false" dataType="int" default="" id="00468" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS37相位初始化值" addBtn="false" dataType="int" default="" id="00469" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS38相位初始化值" addBtn="false" dataType="int" default="" id="00470" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS39相位初始化值" addBtn="false" dataType="int" default="" id="00471" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS40相位初始化值" addBtn="false" dataType="int" default="" id="00472" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS41相位初始化值" addBtn="false" dataType="int" default="" id="00473" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS42相位初始化值" addBtn="false" dataType="int" default="" id="00474" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS43相位初始化值" addBtn="false" dataType="int" default="" id="00475" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS44相位初始化值" addBtn="false" dataType="int" default="" id="00476" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS45相位初始化值" addBtn="false" dataType="int" default="" id="00477" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS46相位初始化值" addBtn="false" dataType="int" default="" id="00478" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS47相位初始化值" addBtn="false" dataType="int" default="" id="00479" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS48相位初始化值" addBtn="false" dataType="int" default="" id="00480" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS49相位初始化值" addBtn="false" dataType="int" default="" id="00481" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS50相位初始化值" addBtn="false" dataType="int" default="" id="00482" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS51相位初始化值" addBtn="false" dataType="int" default="" id="00483" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS52相位初始化值" addBtn="false" dataType="int" default="" id="00484" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS53相位初始化值" addBtn="false" dataType="int" default="" id="00485" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS54相位初始化值" addBtn="false" dataType="int" default="" id="00486" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS55相位初始化值" addBtn="false" dataType="int" default="" id="00487" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS56相位初始化值" addBtn="false" dataType="int" default="" id="00488" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS57相位初始化值" addBtn="false" dataType="int" default="" id="00489" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS58相位初始化值" addBtn="false" dataType="int" default="" id="00490" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS59相位初始化值" addBtn="false" dataType="int" default="" id="00491" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS60相位初始化值" addBtn="false" dataType="int" default="" id="00492" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS61相位初始化值" addBtn="false" dataType="int" default="" id="00493" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS62相位初始化值" addBtn="false" dataType="int" default="" id="00494" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="DDS63相位初始化值" addBtn="false" dataType="int" default="" id="00495" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="重频系数1频率控制字" addBtn="false" dataType="int" default="" id="00496" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="重频系数2频率控制字" addBtn="false" dataType="int" default="" id="00497" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="重频系数3频率控制字" addBtn="false" dataType="int" default="" id="00498" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="重频系数1速度累加系数" addBtn="false" dataType="int" default="" id="00499" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="重频系数2速度累加系数" addBtn="false" dataType="int" default="" id="00500" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="重频系数3速度累加系数" addBtn="false" dataType="int" default="" id="00501" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="重频系数1频率控制字累加值" addBtn="false" dataType="int" default="" id="00502" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="重频系数2频率控制字累加值" addBtn="false" dataType="int" default="" id="00503" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="重频系数3频率控制字累加值" addBtn="false" dataType="int" default="" id="00504" validator="" dataLen="4"/>
+            <attribute show="false" name="addr" displayType="text" tips="" displayName="5A刷新(自动清零)" addBtn="false" dataType="byte" default="" id="00505" validator="" dataLen="1"/>
+        </entity>
+        <entity name="DSPResetCmd" displayName="DSP复位命令" cmd="0x06" flag="C">
+            <attribute show="true" name="addr" displayType="select" displayName="DSP复位命令" paramType="6:DSP复位" addBtn="true" dataType="byte" default="DSP复位" id="00201" dataLen="1"/>
+        </entity>
+    </subjectInfo>
+    <subjectInfo name="monitor" displayName="监视" type="monitor" cmdType="0x01">
+        <entity name="DSP1" displayName="DSP1状态" cmd="0x01">
+            <attribute show="true" name="ver" displayType="text" displayName="版本号" addBtn="false" dataType="byte" default="" id="20001" dataLen="1"/>
+            <attribute show="true" name="alarmState" displayType="select" displayName="故障状态" paramType="0:故障;1:正常;2:中断" addBtn="false" dataType="byte" default="" id="20002" dataLen="1"/>
+            <attribute show="true" name="alarmCode1" displayType="text" displayName="自定义故障码1" addBtn="false" dataType="byte" default="" id="20003" dataLen="1"/>
+            <attribute show="true" name="alarmCode2" displayType="text" displayName="自定义故障码2" addBtn="false" dataType="byte" default="" id="20004" dataLen="1"/>
+            <attribute show="true" name="inState" displayType="text" displayName="输入状态检测" addBtn="false" dataType="byte" default="" id="20005" dataLen="1"/>
+            <attribute show="true" name="IP" displayType="text" displayName="IP" addBtn="false" dataType="int" default="" id="20006" dataLen="4"/>
+            <attribute show="true" name="port1" displayType="text" displayName="端口号1" addBtn="false" dataType="short" default="" id="20007" dataLen="2"/>
+            <attribute show="true" name="port2" displayType="text" displayName="端口号2" addBtn="false" dataType="short" default="" id="20008" dataLen="2"/>
+            <attribute show="true" name="port3" displayType="text" displayName="端口号3" addBtn="false" dataType="short" default="" id="20009" dataLen="2"/>
+            <attribute show="true" name="cpu" displayType="text" displayName="CPU主频" addBtn="false" dataType="short" default="" id="20010" dataLen="2"/>
+            <attribute show="true" name="ddr" displayType="text" displayName="DDR速率" addBtn="false" dataType="short" default="" id="20011" dataLen="2"/>
+            <attribute show="true" name="commRate" displayType="text" displayName="串口波特率" addBtn="false" dataType="short" default="" id="20012" dataLen="2"/>
+            <attribute show="true" name="SRIORate" displayType="text" displayName="SRIO速率等级" addBtn="false" dataType="short" default="" id="20013" dataLen="2"/>
+            <attribute show="true" name="SRIOID" displayType="text" displayName="SRIO ID号" addBtn="false" dataType="short" default="" id="20014" dataLen="2"/>
+            <attribute show="true" name="SRIOMode" displayType="text" displayName="SRIO配置模式" addBtn="false" dataType="byte" default="" id="20015" dataLen="1"/>
+            <attribute show="true" name="SRIDAlarm" displayType="text" displayName="SRIO故障" addBtn="false" dataType="byte" default="" id="20016" dataLen="1"/>
+            <attribute show="false" name="bei[6]" displayType="text" displayName="备用" addBtn="false" dataType="byte" default="" id="20017" dataLen="6"/>
+            <attribute show="true" name="bei1[64]" displayType="text" displayName="参数（应用程序）" addBtn="false" dataType="byte" default="" id="20018" dataLen="64"/>
+            <attribute show="true" name="h0State" displayType="text" displayName="核0状态：心跳" addBtn="false" dataType="byte" default="" id="20019" dataLen="1"/>
+            <attribute show="true" name="h0bei[7]" displayType="text" displayName="备用（核0自定义状态）" addBtn="false" dataType="byte" default="" id="20020" dataLen="7"/>
+            <attribute show="true" name="h1State" displayType="text" displayName="核1状态：心跳" addBtn="false" dataType="byte" default="" id="20021" dataLen="1"/>
+            <attribute show="true" name="h1bei[7]" displayType="text" displayName="备用（核1自定义状态）" addBtn="false" dataType="byte" default="" id="20022" dataLen="7"/>
+            <attribute show="true" name="h2State" displayType="text" displayName="核2状态：心跳" addBtn="false" dataType="byte" default="" id="20023" dataLen="1"/>
+            <attribute show="true" name="h2bei[7]" displayType="text" displayName="备用（核2自定义状态）" addBtn="false" dataType="byte" default="" id="20024" dataLen="7"/>
+            <attribute show="true" name="h3State" displayType="text" displayName="核3状态：心跳" addBtn="false" dataType="byte" default="" id="20025" dataLen="1"/>
+            <attribute show="true" name="h3bei[7]" displayType="text" displayName="备用（核3自定义状态）" addBtn="false" dataType="byte" default="" id="20026" dataLen="7"/>
+            <attribute show="true" name="h4State" displayType="text" displayName="核4状态：心跳" addBtn="false" dataType="byte" default="" id="20027" dataLen="1"/>
+            <attribute show="true" name="h4bei[7]" displayType="text" displayName="备用（核4自定义状态）" addBtn="false" dataType="byte" default="" id="20028" dataLen="7"/>
+            <attribute show="true" name="h5State" displayType="text" displayName="核5状态：心跳" addBtn="false" dataType="byte" default="" id="20029" dataLen="1"/>
+            <attribute show="true" name="h5bei[7]" displayType="text" displayName="备用（核5自定义状态）" addBtn="false" dataType="byte" default="" id="20030" dataLen="7"/>
+            <attribute show="true" name="h6State" displayType="text" displayName="核6状态：心跳" addBtn="false" dataType="byte" default="" id="20031" dataLen="1"/>
+            <attribute show="true" name="h6bei[7]" displayType="text" displayName="备用（核6自定义状态）" addBtn="false" dataType="byte" default="" id="20032" dataLen="7"/>
+            <attribute show="true" name="h7State" displayType="text" displayName="核7状态：心跳" addBtn="false" dataType="byte" default="" id="20033" dataLen="1"/>
+            <attribute show="true" name="h7bei[7]" displayType="text" displayName="备用（核7自定义状态）" addBtn="false" dataType="byte" default="" id="20034" dataLen="7"/>
+            <attribute show="true" name="FPGAVer" displayType="text" displayName="FPGA版本号" addBtn="false" dataType="byte" default="" id="20035" dataLen="1"/>
+            <attribute show="true" name="FPGAAlarm" displayType="select" displayName="FPGA故障状态" paramType="0:故障;1:正常;2:中断" addBtn="false" dataType="byte" default="" id="20036" dataLen="1"/>
+            <attribute show="true" name="FPGAip" displayType="text" displayName="网络IP地址" addBtn="false" dataType="int" default="" id="20037" dataLen="4"/>
+            <attribute show="true" name="FPGAport1" displayType="text" displayName="网络端口号1" addBtn="false" dataType="short" default="" id="20038" dataLen="2"/>
+            <attribute show="true" name="FPGAport2" displayType="text" displayName="网络端口号2" addBtn="false" dataType="short" default="" id="20039" dataLen="2"/>
+            <attribute show="true" name="FPGAport3" displayType="text" displayName="网络端口号3" addBtn="false" dataType="short" default="" id="20040" dataLen="2"/>
+            <attribute show="true" name="FPGABig" displayType="text" displayName="FPGA最高主频" addBtn="false" dataType="short" default="" id="20041" dataLen="2"/>
+            <attribute show="true" name="FPGADDR" displayType="text" displayName="FPGA DDR速率" addBtn="false" dataType="byte" default="" id="20042" dataLen="1"/>
+            <attribute show="true" name="FPGASRAM" displayType="text" displayName="FPGA SRAM速率" addBtn="false" dataType="short" default="" id="20043" dataLen="2"/>
+            <attribute show="true" name="FPGAComm1" displayType="text" displayName="FPGA串口波特率1" addBtn="false" dataType="byte" default="" id="20044" dataLen="1"/>
+            <attribute show="true" name="FPGAComm2" displayType="text" displayName="FPGA串口波特率2" addBtn="false" dataType="byte" default="" id="20045" dataLen="1"/>
+            <attribute show="true" name="FPGAComm3" displayType="text" displayName="FPGA串口波特率3" addBtn="false" dataType="byte" default="" id="20046" dataLen="1"/>
+            <attribute show="true" name="FPGAComm4" displayType="text" displayName="FPGA串口波特率4" addBtn="false" dataType="byte" default="" id="20047" dataLen="1"/>
+            <attribute show="true" name="FPGAGx1" displayType="text" displayName="FPGA光纤速率1" addBtn="false" dataType="short" default="" id="20048" dataLen="2"/>
+            <attribute show="true" name="FPGAGx2" displayType="text" displayName="FPGA光纤速率2" addBtn="false" dataType="short" default="" id="20049" dataLen="2"/>
+            <attribute show="true" name="FPGAGx3" displayType="text" displayName="FPGA光纤速率3" addBtn="false" dataType="short" default="" id="20050" dataLen="2"/>
+            <attribute show="true" name="FPGAGx4" displayType="text" displayName="FPGA光纤速率4" addBtn="false" dataType="short" default="" id="20051" dataLen="2"/>
+            <attribute show="true" name="FPGACPCI" displayType="text" displayName="FPGA CPCI速率" addBtn="false" dataType="short" default="" id="20052" dataLen="2"/>
+            <attribute show="true" name="FPGAPCIE" displayType="text" displayName="FPGA PCIE速率" addBtn="false" dataType="short" default="" id="20053" dataLen="2"/>
+            <attribute show="true" name="canRate" displayType="text" displayName="CAN速率" addBtn="false" dataType="short" default="" id="20054" dataLen="2"/>
+            <attribute show="true" name="CANID" displayType="text" displayName="CAN ID" addBtn="false" dataType="short" default="" id="20055" dataLen="2"/>
+            <attribute show="true" name="canBZ" displayType="text" displayName="CAN 标准" addBtn="false" dataType="byte" default="" id="20056" dataLen="1"/>
+            <attribute show="true" name="FPGA_SRIO" displayType="text" displayName="FPGA SRIO速率等级" addBtn="false" dataType="byte" default="" id="20057" dataLen="1"/>
+            <attribute show="true" name="FPGA_SRIO_ID1" displayType="text" displayName="FPGA SRIO ID号1" addBtn="false" dataType="short" default="" id="20058" dataLen="2"/>
+            <attribute show="true" name="FPGA_SRIO_ID2" displayType="text" displayName="FPGA SRIO ID号2" addBtn="false" dataType="short" default="" id="20059" dataLen="2"/>
+            <attribute show="true" name="FPGA_SRIO_ID3" displayType="text" displayName="FPGA SRIO ID号3" addBtn="false" dataType="short" default="" id="20060" dataLen="2"/>
+            <attribute show="true" name="FPGA_SRIO_ID4" displayType="text" displayName="FPGA SRIO ID号4" addBtn="false" dataType="short" default="" id="20061" dataLen="2"/>
+            <attribute show="true" name="FPGA_SRIO_Mode" displayType="text" displayName="FPGA SRIO配置模式" addBtn="false" dataType="byte" default="" id="20062" dataLen="1"/>
+            <attribute show="true" name="FPGA_SRIO_ALARM" displayType="text" displayName="FPGA SRIO故障" addBtn="false" dataType="byte" default="" id="20063" dataLen="1"/>
+            <attribute show="true" name="FPGA_in" displayType="text" displayName="FPGA输入信息检测" addBtn="false" dataType="byte" default="" id="20064" dataLen="1"/>
+            <attribute show="true" name="FPGA_alarmCode1" displayType="text" displayName="FPGA自定义故障码1" addBtn="false" dataType="byte" default="" id="20065" dataLen="1"/>
+            <attribute show="true" name="FPGA_alarmCode2" displayType="text" displayName="FPGA自定义故障码2" addBtn="false" dataType="byte" default="" id="20066" dataLen="1"/>
+            <attribute show="false" name="bei2[10]" displayType="text" displayName="FPGA备用" addBtn="false" dataType="byte" default="" id="20067" dataLen="10"/>
+            <attribute show="true" name="kjxs" displayType="text" displayName="FPGA参数" addBtn="false" dataType="byte" default="" id="20068" dataLen="1"/>
+            <attribute show="true" name="dwdx" displayType="text" displayName="定位定向状态" addBtn="false" dataType="byte" default="" id="20069" dataLen="1"/>
+            <attribute show="false" name="bei3[62]" displayType="text" displayName="保留" addBtn="false" dataType="byte" default="" id="20070" dataLen="62"/>
+            <attribute show="false" name="fpgabei[10]" displayType="text" displayName="FPGA保留" addBtn="false" dataType="byte" default="" id="20071" dataLen="10"/>
+        </entity>
+    </subjectInfo>
+</Subject>

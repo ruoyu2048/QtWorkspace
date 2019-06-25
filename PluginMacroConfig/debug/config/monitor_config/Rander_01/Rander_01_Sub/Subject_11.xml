@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<Subject name="Subject_11" subId="0x13" displayName="校正源">
+    <subjectInfo name="control" displayName="控制" type="control" cmdType="0x02">
+        <entity name="SFMDevCmd" displayName="校正源设备控制命令" cmd="0x02" flag="C">
+            <attribute show="true" name="addr" displayType="select" displayName="开关状态" paramType="0:打开;1:关闭" addBtn="false" dataType="byte" default="关闭" id="00002" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值" displayName="频点" addBtn="true" dataType="short" default="1920" id="00003" validator="" dataLen="2"/>
+        </entity>
+    </subjectInfo>
+    <subjectInfo name="monitor" displayName="监视" type="monitor" cmdType="0x01">
+        <entity name="SFMState" displayName="校正源设备状态信息" cmd="0x01">
+            <attribute show="true" name="devState" displayType="select" displayName="开关状态" paramType="0:打开;1:关闭" addBtn="false" dataType="byte" default="" id="20001" dataLen="1"/>
+            <attribute show="true" name="freqValue" displayType="text" displayName="频点" addBtn="false" dataType="short" default="" id="20002" dataLen="2"/>
+            <attribute show="true" name="outPut" displayType="text" displayName="输出幅度" addBtn="false" dataType="byte" default="" id="20003" dataLen="1"/>
+            <attribute show="true" name="devState" displayType="select" displayName="设备工作状态" paramType="0:故障;1:正常;2:中断" addBtn="false" dataType="byte" default="" id="20004" dataLen="1"/>
+        </entity>
+    </subjectInfo>
+</Subject>

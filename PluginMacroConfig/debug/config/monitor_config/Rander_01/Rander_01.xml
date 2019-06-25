@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--分机设备列表-->
+<Radar enable="true" id="1" name="Radar_01" displayName="总机_01">
+	<Subject enable="true"  name="Subject_01" displayName="发射组件01"     cfg="Subject_01" subId="0x01"/>
+	<Subject enable="true"  name="Subject_02" displayName="发射组件02"     cfg="Subject_02" subId="0x02"/>
+	<Subject enable="true"  name="Subject_03" displayName="发射组件03"     cfg="Subject_03" subId="0x03"/>
+	<Subject enable="true"  name="Subject_04" displayName="发射组件04"     cfg="Subject_04" subId="0x04"/>
+	<Subject enable="true"  name="Subject_05" displayName="发射组件05"     cfg="Subject_05" subId="0x05"/>
+	<Subject enable="true"  name="Subject_06" displayName="发射组件06"     cfg="Subject_06" subId="0x06"/>
+	<Subject enable="true"  name="Subject_07" displayName="发射组件07"     cfg="Subject_07" subId="0x07"/>
+	<Subject enable="true"  name="Subject_08" displayName="发射组件08"     cfg="Subject_08" subId="0x08"/>
+	<Subject enable="true"  name="Subject_09" displayName="中频源"         cfg="Subject_09" subId="0x11"/>
+	<Subject enable="true"  name="Subject_10" displayName="源及变频组件"   cfg="Subject_10" subId="0x12"/>
+	<Subject enable="true"  name="Subject_11" displayName="校正源"         cfg="Subject_11" subId="0x13"/>
+	<Subject enable="true"  name="Subject_12" displayName="信号处理板DSP1" cfg="Subject_12" subId="0x21"/>
+	<Subject enable="true"  name="Subject_13" displayName="信号处理板DSP2" cfg="Subject_13" subId="0x22"/>
+	<Subject enable="true"  name="Subject_14" displayName="监控软件"       cfg="Subject_14" subId="0x31"/>
+	<Subject enable="true"  name="Subject_15" displayName="数据处理软件"   cfg="Subject_15" subId="0x41"/>
+	<Subject enable="true"  name="Subject_16" displayName="座体"           cfg="Subject_16" subId="0x50"/>	
+</Radar>

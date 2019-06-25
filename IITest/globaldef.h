@@ -1,9 +1,0 @@
-#ifndef GLOBALDEF_H
-#define GLOBALDEF_H
-
-
-#define FRAME_HEAD 0XAA
-#define FRAME_END  0XA5
-#define COMMAXLEN 102400
-
-#endif // GLOBALDEF_H

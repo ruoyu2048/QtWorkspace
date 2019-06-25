@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<Subject name="Subject_16" subId="0x50" displayName="座体">
+    <subjectInfo name="control" displayName="控制" type="control" cmdType="0x02">
+        <entity name="LaunchDevOnOff" displayName="座体设备控制指令" cmd="0x02" flag="C">
+            <attribute show="true" name="addr" displayType="select" displayName="伺服控制" paramType="0:停止;1:转动" addBtn="false" dataType="byte" default="转动" id="00002" dataLen="1"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="目标角度" addBtn="false" dataType="short" default="-62" id="00003" validator="" dataLen="2"/>
+            <attribute show="true" name="addr" displayType="text" tips="请输入值!" displayName="转速" addBtn="true" dataType="byte" default="1" id="00004" validator="" dataLen="1"/>
+        </entity>
+    </subjectInfo>
+    <subjectInfo name="monitor" displayName="监视" type="monitor" cmdType="0x01">
+        <entity name="LaunchDevState" displayName="座体设备状态信息" cmd="0x01">
+            <attribute show="true" name="state" displayType="select" displayName="状态" paramType="0:停止;1:转动" addBtn="false" dataType="byte" default="" id="20001" dataLen="1"/>
+            <attribute show="true" name="curAngle" displayType="text" displayName="当前角度" addBtn="false" dataType="short" default="" id="20002" dataLen="2"/>
+            <attribute show="true" name="roteSpeed" displayType="text" displayName="转速" addBtn="false" dataType="byte" default="" id="20003" dataLen="1"/>
+            <attribute show="true" name="devState" displayType="select" displayName="设备工作状态" paramType="0:故障;1:正常;2:中断" addBtn="false" dataType="byte" default="" id="20004" dataLen="1"/>
+        </entity>
+    </subjectInfo>
+</Subject>

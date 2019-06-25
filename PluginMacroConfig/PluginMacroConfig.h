@@ -48,16 +48,41 @@ private:
     void showWindow(int nRadarId);
 
     /**
-     * @brief resetSubCfgDisplayTabItem 重置Tab项目
+     * @brief clearDeviceCfgManageTreeItems 清除设备配置管理树元素
+     */
+    void clearDeviceCfgManageTreeItems();
+
+    /**
+     * @brief clearSubCfgDisplayTabItems 清除Tab控件中所有分机参数控件
+     */
+    void clearSubCfgDisplayTabItems();
+
+    /**
+     * @brief resetSubCfgDisplayItems 重置Tab项目
      * @param nRadarId
      */
-    void resetSubCfgDisplayTabItem(int nRadarId);
+    void resetSubCfgDisplayItems(int nRadarId);
 
+    /**
+     * @brief getSubCfgInfo 获取当前雷达分机配置信息
+     * @param nRadarId 雷达Id
+     * @param cfgInfoList 获取到的分机配置文件信息
+     * @return
+     */
     bool getSubCfgInfo(int nRadarId,QList<SubCfgInfo> &cfgInfoList);
 
     bool questionMsgBox(QString strInfo);
 
+    /**
+     * @brief updateDeviceCfgManageTree 更新设备配置管理树元素勾选状态
+     * @param devManageItemCheckedInfo  树节点勾选状态字典<subDevId,checked>
+     */
     void updateDeviceCfgManageTree(QMap<QString,bool> devManageItemCheckedInfo);
+
+    /**
+     * @brief updateSubCfgDisplayTabItemValue 更新Tab控件中分机参数
+     * @param subDevParaMap<分机Id，<参数Id，参数值>>
+     */
     void updateSubCfgDisplayTabItemValue(QMap<QString,QMap<QString,QString>> subDevParaMap);
 
 private slots:
@@ -78,6 +103,7 @@ private slots:
     void setParentCheckState(QTreeWidgetItem* pItem);
 
 private:
+    int          m_nRadarId;//记录当前雷达Id
     QGridLayout* m_pGLMain;
     QLabel*      m_pLBCfgFileName;
     QComboBox*   m_pCBCfgFileName;
