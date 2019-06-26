@@ -89,7 +89,6 @@ void PluginMacroConfig::initContrals()
 
     //初始化宏配置文件列表
     initConfigFileNameCommbox();
-
 }
 
 void PluginMacroConfig::initConfigFileNameCommbox()
@@ -143,6 +142,8 @@ void PluginMacroConfig::showWindow(int nRadarId)
         clearDeviceCfgManageTreeItems();
         clearSubCfgDisplayTabItems();
         resetSubCfgDisplayItems(nRadarId);
+
+        onCBCfgFileName(m_pCBCfgFileName->currentIndex());
     }
 }
 
