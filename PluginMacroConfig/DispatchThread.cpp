@@ -14,7 +14,7 @@ DispatchThread::DispatchThread(QObject *parent) :
     connect(&m_dispatchMacroCfg,&DispatchMacroConfig::publishMacroCfg,this,&DispatchThread::onPublishMacroCfg);
     connect(&m_dispatchMacroCfg,&DispatchMacroConfig::dispatchFinished,this,&DispatchThread::onDispatchFinished);
     m_dispatchMacroCfg.moveToThread(&m_dispatchThread);
-    m_dispatchThread.start();
+    //m_dispatchThread.start();
 }
 
 DispatchThread::~DispatchThread()
@@ -29,6 +29,7 @@ bool DispatchThread::startThread(QString strFilePath, int nRadarId)
         m_nRadarId = nRadarId;
         if( m_dispatchMacroCfg.startDispatch(strFilePath) ){
             m_bDispatchFinished=false;
+            m_dispatchThread.start();
             m_pTimer->start();
             return true;
         }
@@ -61,6 +62,8 @@ void DispatchThread::onDispatchFinished()
     if( m_pTimer->isActive() ){
         m_pTimer->stop();
     }
+    m_dispatchThread.quit();
+    m_dispatchThread.wait();
     QString strInfo=QStringLiteral("本次操作已完成！");
     QMessageBox::information(nullptr,QStringLiteral("提示"),
                                     strInfo,
