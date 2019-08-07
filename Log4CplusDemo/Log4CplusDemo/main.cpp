@@ -39,7 +39,7 @@ void doTestRun(int i) {
     // 使用NDC给线程设置名称
     log4cplus::NDCContextCreator _ndc(LOG4CPLUS_STRING_TO_TSTRING(threadName));
     int nIndex=0;
-    while ( nIndex<10 ) {
+    while ( nIndex<100 ) {
         this_thread::sleep_for(std::chrono::seconds(1));
         // 如果不加u8，日志文件会是GB2312格式
         string info = u8"你好：" + getTime();

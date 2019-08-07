@@ -37,9 +37,23 @@ INCLUDEPATH += $$PWD/include
 
 
 CONFIG(debug,debug|release){
-    LIBS += $$PWD/libs/windows/liblog4cplusUD.dll
+#    #<1>MINGW_MSVC_2017_x64(均不可用)
+#    LIBS += $$PWD/libs/windows/mingw_x64/log4cplusUD.dll
+    #<2>MINGW_x86(MinGW可用)
+    LIBS += $$PWD/libs/windows/mingw_x86/liblog4cplusUD.dll
+#    #<3>MSVC_2017_x64(均不可用)
+#    LIBS += $$PWD/libs/windows/msvc_x64/log4cplusUD.dll
+#    #<4>MSVC_2017_x86(均不可用)
+#    LIBS += $$PWD/libs/windows/msvc_x86/log4cplusUD.dll
 }
 else{
-    LIBS += $$PWD/libs/windows/liblog4cplusU.dll
+#    #<1>MINGW_MSVC_2017_x64(均不可用)
+#    LIBS += $$PWD/libs/windows/mingw_x64/log4cplusU.dll
+    #<2>MINGW_x86(MinGW可用)
+    LIBS += $$PWD/libs/windows/mingw_x86/liblog4cplusU.dll
+#    #<3>MSVC_2017_x64(均不可用)
+#    LIBS += $$PWD/libs/windows/msvc_x64/log4cplusU.dll
+#    #<4>MSVC_2017_x86(均不可用)
+#    LIBS += $$PWD/libs/windows/msvc_x86/log4cplusU.dll
 }
 
