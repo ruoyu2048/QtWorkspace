@@ -35,25 +35,43 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 INCLUDEPATH += $$PWD/include
 
-
-CONFIG(debug,debug|release){
-#    #<1>MINGW_MSVC_2017_x64(均不可用)
-#    LIBS += $$PWD/libs/windows/mingw_x64/log4cplusUD.dll
-    #<2>MINGW_x86(MinGW可用)
-    LIBS += $$PWD/libs/windows/mingw_x86/liblog4cplusUD.dll
-#    #<3>MSVC_2017_x64(均不可用)
-#    LIBS += $$PWD/libs/windows/msvc_x64/log4cplusUD.dll
-#    #<4>MSVC_2017_x86(均不可用)
-#    LIBS += $$PWD/libs/windows/msvc_x86/log4cplusUD.dll
+win32{
+    CONFIG(debug,debug|release){
+    #    #<1>MINGW_MSVC_2017_x64(均不可用)
+    #    LIBS += $$PWD/libs/windows/mingw_x64/log4cplusUD.dll
+        #<2>MINGW_x86(MinGW可用)
+        LIBS += $$PWD/libs/windows/mingw_x86/liblog4cplusUD.dll
+    #    #<3>MSVC_2017_x64(均不可用)
+    #    LIBS += $$PWD/libs/windows/msvc_x64/log4cplusUD.dll
+    #    #<4>MSVC_2017_x86(均不可用)
+    #    LIBS += $$PWD/libs/windows/msvc_x86/log4cplusUD.dll
+    }
+    else{
+    #    #<1>MINGW_MSVC_2017_x64(均不可用)
+    #    LIBS += $$PWD/libs/windows/mingw_x64/log4cplusU.dll
+        #<2>MINGW_x86(MinGW可用)
+        LIBS += $$PWD/libs/windows/mingw_x86/liblog4cplusU.dll
+    #    #<3>MSVC_2017_x64(均不可用)
+    #    LIBS += $$PWD/libs/windows/msvc_x64/log4cplusU.dll
+    #    #<4>MSVC_2017_x86(均不可用)
+    #    LIBS += $$PWD/libs/windows/msvc_x86/log4cplusU.dll
+    }
 }
-else{
-#    #<1>MINGW_MSVC_2017_x64(均不可用)
-#    LIBS += $$PWD/libs/windows/mingw_x64/log4cplusU.dll
-    #<2>MINGW_x86(MinGW可用)
-    LIBS += $$PWD/libs/windows/mingw_x86/liblog4cplusU.dll
-#    #<3>MSVC_2017_x64(均不可用)
-#    LIBS += $$PWD/libs/windows/msvc_x64/log4cplusU.dll
-#    #<4>MSVC_2017_x86(均不可用)
-#    LIBS += $$PWD/libs/windows/msvc_x86/log4cplusU.dll
-}
 
+linux{
+#    #Ubuntu18.04
+#    CONFIG(debug,debug|release){
+#        LIBS += $$PWD/libs/ubunut18.04/lib_d/liblog4cplus.so
+#    }
+#    else{
+#        LIBS += $$PWD/libs/ubunut18.04/lib_r/liblog4cplus.so
+#    }
+
+    #Kylin
+    CONFIG(debug,debug|release){
+        LIBS += $$PWD/libs/kylin/lib_d/liblog4cplus.so
+    }
+    else{
+        LIBS += $$PWD/libs/kylin/lib_r/liblog4cplus.so
+    }
+}

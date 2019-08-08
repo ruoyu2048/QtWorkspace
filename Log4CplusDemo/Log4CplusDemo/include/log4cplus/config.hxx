@@ -29,7 +29,7 @@
 #elif (defined(__MWERKS__) && defined(__MACOS__))
 #  include <log4cplus/config/macosx.h>
 #else
-#  include <log4cplus/config/defines.hxx>
+#  include <log4cplus/config/defines.hxx.in>
 #endif
 
 # if ! defined (LOG4CPLUS_WORKING_LOCALE) \

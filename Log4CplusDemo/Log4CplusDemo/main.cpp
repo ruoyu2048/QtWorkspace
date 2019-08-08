@@ -1,4 +1,5 @@
 ﻿#include <QCoreApplication>
+#include <QDebug>
 
 #include <vector>
 #include <thread>
@@ -43,7 +44,7 @@ void doTestRun(int i) {
         this_thread::sleep_for(std::chrono::seconds(1));
         // 如果不加u8，日志文件会是GB2312格式
         string info = u8"你好：" + getTime();
-
+        //qDebug()<<QString(info.c_str());
         LOG4CPLUS_WARN(logger, LOG4CPLUS_STRING_TO_TSTRING(info));
         nIndex++;
     }
@@ -54,7 +55,11 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     //用Initializer类进行初始化
     log4cplus::Initializer initializer;
-    PropertyConfigurator pc(LOG4CPLUS_TEXT("log4cplus.properties"));
+    QString strPath=QCoreApplication::applicationDirPath()+"/log4cplus.properties";
+    string strCfgPath=strPath.toStdString();
+    //Kylin system con't find this file by default path
+    //PropertyConfigurator pc(LOG4CPLUS_TEXT("log4cplus.properties"));
+    PropertyConfigurator pc(LOG4CPLUS_TEXT(strCfgPath));
     pc.configure();
 
     vector<std::thread> threadVector;
