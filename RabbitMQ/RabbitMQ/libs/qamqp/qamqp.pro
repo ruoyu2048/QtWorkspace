@@ -87,21 +87,21 @@ SOURCES += \
     qamqpqueue.cpp \
     qamqptable.cpp
 
-# install
-headers.files = $${INSTALL_HEADERS}
-headers.path = $${PREFIX}/include/qamqp
-target.path = $${PREFIX}/$${LIBDIR}
-INSTALLS += headers target
+# install 安装路径设置
+#headers.files = $${INSTALL_HEADERS}
+#headers.path = $${PREFIX}/include/qamqp
+#target.path = $${PREFIX}/$${LIBDIR}
+#INSTALLS += headers target
 
 # pkg-config support
-CONFIG += create_pc create_prl no_install_prl
-QMAKE_PKGCONFIG_DESTDIR = pkgconfig
-QMAKE_PKGCONFIG_LIBDIR = $$target.path
-QMAKE_PKGCONFIG_INCDIR = $$headers.path
+#CONFIG += create_pc create_prl no_install_prl
+#QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+#QMAKE_PKGCONFIG_LIBDIR = $$target.path
+#QMAKE_PKGCONFIG_INCDIR = $$headers.path
 equals(QAMQP_LIBRARY_TYPE, staticlib) {
     QMAKE_PKGCONFIG_CFLAGS = -DQAMQP_STATIC
 } else {
     QMAKE_PKGCONFIG_CFLAGS = -DQAMQP_SHARED
 }
-unix:QMAKE_CLEAN += -r pkgconfig lib$${TARGET}.prl
+#unix:QMAKE_CLEAN += -r pkgconfig lib$${TARGET}.prl
 
