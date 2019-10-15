@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDateTime>
 
@@ -8,21 +8,34 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_rabbitClient = new QRabbitMQ(this);
-
-    connect(m_rabbitClient, SIGNAL(msgSig(QString)),this, SLOT(showMsg(QString)));
-    m_pSendTimer = new QTimer(this);
-    connect(m_pSendTimer,SIGNAL(timeout()),this,SLOT(on_sendMsg()));
-    m_pSendTimer->setInterval(100);
-
-    ui->connBtn->setText(tr("连接"));
+    initSender();
+    initReceiver();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 
-    delete m_rabbitClient;
+    delete m_pSender;
+    delete m_pReceiver;
+}
+
+void MainWindow::initSender()
+{
+    m_pSender = new QRabbitMQ(this);
+
+    m_pSendTimer = new QTimer(this);
+    connect(m_pSendTimer,SIGNAL(timeout()),this,SLOT(on_sendMsg()));
+    m_pSendTimer->setInterval(100);
+
+    ui->btnConnect_s->setText(tr("连接"));
+}
+
+void MainWindow::initReceiver()
+{
+    m_pReceiver = new QRabbitMQ(this);
+    connect(m_pReceiver, SIGNAL(msgSig(QString)),this, SLOT(showMsg(QString)));
+    ui->btnConnect_r->setText(tr("连接"));
 }
 
 void MainWindow::showMsg(QString msg)
@@ -30,36 +43,51 @@ void MainWindow::showMsg(QString msg)
     ui->textBrowser->append(msg);
 }
 
-void MainWindow::on_sendBtn_clicked()
+void MainWindow::on_sendMsg()
+{
+    QString strMsg = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")+" "+ui->le_s->text();
+    m_pSender->sendMsg(strMsg);
+}
+
+void MainWindow::on_btnConnect_s_clicked()
+{
+    m_pSender->setServerParam(ui->sIP_s->text(),ui->sPort_s->value());
+    m_pSender->setRabbitClientParam(ui->routKey_s->text(), ui->bindKey_s->text().split(";"));
+
+    if( !m_pSender->isConnected() ){
+        ui->btnConnect_s->setText(tr("断开连接"));
+        m_pSender->start();
+    }
+    else{
+        ui->btnConnect_s->setText(tr("连接"));
+        m_pSender->stop();
+    }
+}
+
+void MainWindow::on_btnConnect_r_clicked()
+{
+    m_pReceiver->setServerParam(ui->sIP_r->text(),ui->sPort_r->value());
+    m_pReceiver->setRabbitClientParam(ui->routKey_r->text(), ui->bindKey_r->text().split(";"));
+
+    if( !m_pReceiver->isConnected() ){
+        ui->btnConnect_r->setText(tr("断开连接"));
+        m_pReceiver->start();
+    }
+    else{
+        ui->btnConnect_r->setText(tr("连接"));
+        m_pReceiver->stop();
+    }
+}
+
+void MainWindow::on_btnSend_s_clicked()
 {
     if( m_pSendTimer->isActive() ){
-        ui->sendBtn->setText(tr("发送数据"));
+        ui->btnSend_s->setText(tr("发送数据"));
         m_pSendTimer->stop();
     }
     else{
-        ui->lineEdit->clear();
-        ui->sendBtn->setText(tr("停止发送"));
+        //ui->le_s->clear();
+        ui->btnSend_s->setText(tr("停止发送"));
         m_pSendTimer->start();
     }
-}
-
-void MainWindow::on_connBtn_clicked()
-{
-    m_rabbitClient->setServerParam(ui->serverIP->text(), ui->serverPort->value());
-    m_rabbitClient->setRabbitClientParam(ui->routingKey->text(), ui->bindingKey->text().split(";"));
-
-    if( !m_rabbitClient->isConnected() ){
-        ui->connBtn->setText(tr("断开连接"));
-        m_rabbitClient->start();
-    }
-    else{
-        ui->connBtn->setText(tr("连接"));
-        m_rabbitClient->stop();
-    }
-}
-
-void MainWindow::on_sendMsg()
-{
-    QString strMsg = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")+" "+ui->lineEdit->text();
-    m_rabbitClient->sendMsg(strMsg);
 }

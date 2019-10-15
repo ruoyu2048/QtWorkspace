@@ -1,5 +1,8 @@
 #目标文件生成路径
 DESTDIR = $$OUT_PWD/../../bin
+CONFIG(debug, debug|release){
+    DESTDIR = $$OUT_PWD/../../bind
+}
 
 #Qt核心依赖库
 QT += network

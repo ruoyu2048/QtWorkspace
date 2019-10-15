@@ -5,7 +5,7 @@ QRabbitMQ::QRabbitMQ(QObject *parent) :
 {
     m_exchangerName = "direct_exchanger";
     connect(&m_client, SIGNAL(connected()), this, SLOT(clientConnected()));
-    connect(&m_client,SIGNAL(disconnect()),this,SLOT(clientDisconnected()));
+    connect(&m_client,SIGNAL(disconnected()),this,SLOT(clientDisconnected()));
 }
 
 void QRabbitMQ::start()

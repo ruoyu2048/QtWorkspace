@@ -9,14 +9,17 @@ QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = RabbitClient
+CONFIG(debug, debug|release){
+    TARGET = RabbitClient
+}
 TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    qrabbitmq.cpp
+        QRabbitMQ.cpp
 
 HEADERS  += mainwindow.h \
-    qrabbitmq.h
+        QRabbitMQ.h
 
 FORMS    += mainwindow.ui
 
