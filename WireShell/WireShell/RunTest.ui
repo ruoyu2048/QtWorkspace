@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RunTest</class>
+ <widget class="QWidget" name="RunTest">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>320</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>45</x>
+     <y>27</y>
+     <width>511</width>
+     <height>261</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="laTestType">
+      <property name="text">
+       <string>自动测试</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" colspan="2">
+     <widget class="QComboBox" name="cbProjectList">
+      <property name="currentText">
+       <string>------------选择工程------------</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>------------选择工程------------</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QPushButton" name="btnRefreshList">
+      <property name="text">
+       <string>刷新列表</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="laWorkerID">
+      <property name="text">
+       <string>工    号</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="leWorkerID"/>
+    </item>
+    <item row="1" column="2">
+     <widget class="QLabel" name="laProductNum">
+      <property name="text">
+       <string>产品编号</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="3">
+     <widget class="QLineEdit" name="leProductNum"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="laTemperature">
+      <property name="text">
+       <string>温    度</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="leTemperature"/>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLabel" name="laTestItem">
+      <property name="text">
+       <string>测试项目</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QLineEdit" name="leTestItem"/>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="laHumidity">
+      <property name="text">
+       <string>湿    度</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLineEdit" name="leHumidity"/>
+    </item>
+    <item row="3" column="2">
+     <widget class="QLabel" name="laTestDate">
+      <property name="text">
+       <string>测试日期</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="3">
+     <widget class="QLineEdit" name="leTestDate"/>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="laAtmospheric">
+      <property name="text">
+       <string>大 气 压</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLineEdit" name="leAtmospheric"/>
+    </item>
+    <item row="4" column="2">
+     <widget class="QLabel" name="laTestAddr">
+      <property name="text">
+       <string>测试地点</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="3">
+     <widget class="QLineEdit" name="leTestAddr"/>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="laTester">
+      <property name="text">
+       <string>测试人员</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QLineEdit" name="leTester"/>
+    </item>
+    <item row="5" column="2" colspan="2">
+     <widget class="QPushButton" name="btnStartTest">
+      <property name="text">
+       <string>开始测试</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
