@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>icons/01_01_autoTest.png</file>
-        <file>icons/01_02_sequenceTest.png</file>
-        <file>icons/02_01_userManage.png</file>
-        <file>icons/03_01_logManage.png</file>
-        <file>icons/login.jpg</file>
-    </qresource>
-</RCC>
