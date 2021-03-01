@@ -5,7 +5,7 @@
 
 QString ControllerPlugin::name() const
 {
-    return tr("控制器");
+    return tr("Controlor");
 }
 
 QString ControllerPlugin::iconPath() const

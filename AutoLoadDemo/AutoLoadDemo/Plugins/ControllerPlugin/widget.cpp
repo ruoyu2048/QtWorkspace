@@ -7,8 +7,8 @@ Widget::Widget(QWidget *parent) :
     _Switch(false)
 {
     ui->setupUi(this);
-    setWindowTitle("控制器");
-    switchIcon(_Switch);
+//    setWindowTitle("控制器");
+//    switchIcon(_Switch);
     stateLedIcon(2);
     QObject::connect(ui->smSwitchBtn, SIGNAL(clicked(bool)), this, SLOT(smSwitchBtnClickedSlots()));
     QObject::connect(ui->smSettingBtn, SIGNAL(clicked(bool)), this, SLOT(smSettingBtnClickedSlots()));
