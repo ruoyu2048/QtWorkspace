@@ -1,0 +1,84 @@
+{
+	"mediafront":[
+		{	
+			"frontId":1,
+			"rabbitmq":{
+				"mq_url":"amqp://admin:admin@124.239.10.60:8022/",
+				"mq_exchange":"exchange.media",
+				"mq_queue":"media.cmd.front",
+				"mq_bindKeys":"cmd.live.startPush,cmd.live.endPush,cmd.live.restartPush",
+				"mq_exchange_fanout":"exchange.media.fanout",
+				"mq_queue_fanout":"queue.fanout.startPushReply"
+			},
+			"ftp": {
+				"enable":false,
+				"ftp_url":"ftp://admin:ftpadmin123@124.239.10.10:2121/"
+			},
+			"mail": {
+				"enable":true,
+				"host":"124.239.10.60",
+				"port":8135,
+				"connectionType":"TLS",
+				"comment":"连接类型有SSL和TLS两种",
+				"username":"media_front@video.com",
+				"password":"admin123456",
+				"time":"18:18:00",
+				"time_format":"每天发送邮件的时间，格式：hh:mm:ss",
+				"recipients":[
+					{"recipient":"houzhuoyue@video.com"},
+					{"recipient":"chenyouzhi@video.com"},
+					{"recipient":"1029932910@qq.com"}
+				]
+			},
+			"record": {
+				"enable":true,
+				"use_tcp":true,
+				"use_tool":true,
+				"tool_para_i_before":"",
+				"tool_para_i_after":"-vcodec copy -acodec copy",
+				"time_length":30,
+				"time_delay":3,
+				"cache_path":"./TSRecord",
+				"remote_path":"/drv/CameraRecordTest"
+			},
+			"heartbeat": {
+				"enable":false,
+				"http":true,
+				"use_tool":false,
+				"checkInterval":30
+			},
+			"snapshot": {
+				"enable":false,
+				"use_tcp":false,
+				"use_tool":false,
+				"snapshotInterval":30,
+				"cache_path":"./Snapshot",
+				"remote_path":"/drv/CameraSnapshotTest"
+			},
+			"push": {
+				"enable":true,
+				"use_tcp":false,
+				"use_tool":true,
+				"tool_para_i_before":"",
+				"tool_para_i_after":"-vcodec copy -acodec copy -f flv"
+			},
+			"splice": {
+				"enable":false,
+				"storage_path":"./TSRecord/",
+				"file_name":"TS"
+			},
+			"cameras":[
+				{
+					"cameraId":"888",
+					"cameraName":"西安研发办公室",
+					"cameraPosition":"西安",
+					"cameraType":"ZF",
+					"record_url":"live1",
+					"live1":"rtsp://admin:xh123456@192.168.2.55:554/h264/ch1/main/av_stream",
+					"live2":"rtsp://192.168.2.22:554/live2.sdp",
+					"live3":"rtsp://192.168.2.22:554/live3.sdp"
+				}
+			] 
+		}
+	]
+}
